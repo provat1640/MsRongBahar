@@ -28,4 +28,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-node_modules
+
+# OS & IDE metadata
+.DS_Store
+Thumbs.db
+*.exe
+.vscode/
+.idea/
+
