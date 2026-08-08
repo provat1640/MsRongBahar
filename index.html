@@ -66,7 +66,12 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-card:hover {
-      border-color: rgba(245, 158, 11, 0.4);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+    .category-card-active {
+      border-color: rgba(245, 158, 11, 0.9) !important;
+      background: rgba(245, 158, 11, 0.15) !important;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
     }
     .paint-splash-bg {
       background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.15), transparent 70%),
@@ -74,7 +79,7 @@
     }
   </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950 paint-splash-bg">
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950 paint-splash-bg relative">
 
   <!-- Top Announcement Bar -->
   <div class="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-bold text-xs py-2 px-4 text-center tracking-wide flex items-center justify-center gap-3 shadow-md">
@@ -86,15 +91,15 @@
 
   <!-- Header / Navigation -->
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
       
       <!-- Brand Official Logo -->
-      <a href="#" class="flex items-center gap-3 group">
+      <a href="#" class="flex items-center gap-3 group shrink-0">
         <div class="p-1 rounded-xl bg-slate-900 border border-amber-500/30 group-hover:border-amber-400 transition-colors shadow-lg">
           <img 
             src="logo.jpg" 
             alt="M/S RONG BAHAR Paint & Hardware Supplies" 
-            class="h-11 sm:h-13 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform duration-300"
+            class="h-10 sm:h-13 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform duration-300"
           />
         </div>
         <div class="hidden sm:block">
@@ -108,11 +113,11 @@
       </a>
 
       <!-- Quick Search Bar -->
-      <div class="hidden md:flex flex-1 max-w-md mx-4 relative">
+      <div class="hidden md:flex flex-1 max-w-md mx-2 relative">
         <input 
           type="text" 
           id="searchInput"
-          placeholder="Search Red Oxide Primer, Polac Undercoat, Marine Paint, Glue Gun..." 
+          placeholder="Search Red Oxide, Acrylic Lacquer, Adhesives, Wire Brush..." 
           class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition shadow-inner"
           onkeyup="filterProducts()"
         />
@@ -121,6 +126,16 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-2 sm:gap-3">
+        <!-- DIRECT ADD PRODUCT BUTTON ON HEADER -->
+        <button 
+          onclick="toggleAddProductModal()"
+          class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md"
+          title="Add New Product to Storefront"
+        >
+          <i class="fa-solid fa-plus-circle text-sm"></i>
+          <span class="hidden sm:inline">Add Product</span>
+        </button>
+
         <!-- Paint Calculator Trigger -->
         <button 
           onclick="togglePaintCalcModal()"
@@ -130,21 +145,13 @@
           <i class="fa-solid fa-calculator"></i> Paint Calc
         </button>
 
-        <!-- Request Unlisted Product Button -->
-        <button 
-          onclick="toggleProductRequestModal()"
-          class="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition"
-        >
-          <i class="fa-solid fa-clipboard-question text-amber-400"></i> Request Item
-        </button>
-
         <!-- Admin Panel Trigger -->
         <button 
           onclick="openAdminModal()"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-amber-400 text-xs font-bold transition flex items-center gap-1.5"
+          class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition flex items-center gap-1.5"
           title="Admin Control Center"
         >
-          <i class="fa-solid fa-user-shield"></i> Admin Panel
+          <i class="fa-solid fa-user-shield text-amber-400"></i> <span class="hidden md:inline">Admin Panel</span>
         </button>
 
         <!-- Auth / Profile Button -->
@@ -175,7 +182,7 @@
   <main class="flex-grow">
 
     <!-- Hero Banner Section -->
-    <section class="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 py-12 lg:py-16 px-4 lg:px-8">
+    <section class="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 py-10 lg:py-14 px-4 lg:px-8">
       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
         
         <!-- Left Hero Copy -->
@@ -187,33 +194,23 @@
           <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
             Premium Paints, Primers, <br class="hidden sm:inline" />
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600">
-              Marine Coats & Tools
+              Marine Coats & Hardware
             </span>
           </h1>
 
           <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
-            Order authentic Berger, Nippon, Aqua & Polac Paints, Red Oxide Primers, Clear Varnishes, XParT 100W Glue Guns, Omega Digital Weight Scales, and Heavy-Duty Hand Tools directly from Pakundia's trusted shop.
+            Order authentic Berger, Nippon, Aqua & Polac Paints, Red Oxide Primers, Clear Varnishes, Glue Guns, Omega Digital Scales, and Tools directly from Pakundia's trusted shop.
           </p>
 
           <!-- Action Buttons -->
           <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-            <button onclick="togglePaintCalcModal()" class="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xl transition">
+            <button onclick="toggleAddProductModal()" class="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xl transition">
+              <i class="fa-solid fa-plus-circle text-base"></i> Add New Product to Store
+            </button>
+
+            <button onclick="togglePaintCalcModal()" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition">
               <i class="fa-solid fa-calculator"></i> Calculate Required Paint Liters
             </button>
-
-            <button onclick="toggleProductRequestModal()" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition">
-              <i class="fa-solid fa-clipboard-question"></i> Request Unlisted Item
-            </button>
-          </div>
-
-          <!-- Quick Tags -->
-          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-2 text-xs font-semibold text-slate-400">
-            <span class="text-slate-500">Popular Supplies:</span>
-            <button onclick="setSearchFilter('Marine')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">Marine Red Oxide</button>
-            <button onclick="setSearchFilter('Varnish')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">Clear Varnish</button>
-            <button onclick="setSearchFilter('Brill White')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">Aqua Brill White 430</button>
-            <button onclick="setSearchFilter('Wire Brush')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">4-Row Wire Brush</button>
-            <button onclick="setSearchFilter('Glue Gun')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">100W Glue Gun</button>
           </div>
         </div>
 
@@ -272,109 +269,127 @@
       </div>
     </section>
 
-    <!-- Categories Grid Section -->
+    <!-- Categories Grid Section (SRS Inventory Categories) -->
     <section class="max-w-7xl mx-auto px-4 lg:px-8 py-12 space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-800 pb-4 gap-2">
         <div>
-          <h2 class="font-display text-2xl font-extrabold text-white tracking-tight">Paint & Hardware Departments</h2>
-          <p class="text-xs text-slate-400">Browse Marine Coatings, Clear Varnishes, Wire Brushes, Screwdrivers & Scales</p>
+          <h2 class="font-display text-2xl font-extrabold text-white tracking-tight">SRS Inventory Categories</h2>
+          <p class="text-xs text-slate-400">Click any category card below to filter items in real-time</p>
         </div>
-        <span class="text-xs text-amber-400 font-semibold"><i class="fa-solid fa-layer-group"></i> 10 Hardware Categories</span>
+        <span class="text-xs text-amber-400 font-semibold"><i class="fa-solid fa-list-check"></i> 9 Hardware Sub-Categories</span>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div id="categoryCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         
-        <!-- Category Items -->
-        <div onclick="setCategoryFilter('all')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+        <!-- 1. All Inventory Items -->
+        <div onclick="setCategoryFilter('all', this)" class="cat-card category-card-active cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-boxes-stacked"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">All Products</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Full Catalog</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">All Inventory Items</h3>
+          <p class="text-xs text-slate-400 mt-1">Complete Shop Catalog</p>
         </div>
 
-        <div onclick="setCategoryFilter('Marine Coatings')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-ship"></i>
-          </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Marine Paints</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Rainbow & Polac Marine Red Oxide</p>
-        </div>
-
-        <div onclick="setCategoryFilter('Clear Varnishes')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-spray-can-sparkles"></i>
-          </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Clear Varnishes</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Rainbow Synthetic Varnish 0.91L</p>
-        </div>
-
-        <div onclick="setCategoryFilter('Synthetic Enamel')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+        <!-- 2. Synthetic Enamel Paints -->
+        <div onclick="setCategoryFilter('Enamel', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-paint-roller"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Gloss Enamels</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Aqua Rongila Brill White Tk 430</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Synthetic Enamel Paints</h3>
+          <p class="text-xs text-slate-400 mt-1">Berger Robbialac & Aqua CNG Green</p>
         </div>
 
-        <div onclick="setCategoryFilter('Wire Brushes & Scraping')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-broom"></i>
+        <!-- 3. Acrylic Lacquer Sprays -->
+        <div onclick="setCategoryFilter('Lacquer', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-spray-can"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Wire Brushes</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">4-Row Steel Wire Scraping Brush</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Acrylic Lacquer Sprays</h3>
+          <p class="text-xs text-slate-400 mt-1">JM Lacquer Spray 37 Light Green</p>
         </div>
 
-        <div onclick="setCategoryFilter('Hand Tools & Screwdrivers')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-screwdriver"></i>
+        <!-- 4. Adhesives & Glues -->
+        <div onclick="setCategoryFilter('Adhesive', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-bottle-droplet"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Hand Tools</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">MEGA STAR 4" Philips Screwdriver</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Adhesives & Glues</h3>
+          <p class="text-xs text-slate-400 mt-1">Fevicol 1K PUR Polyurethane</p>
         </div>
 
-        <div onclick="setCategoryFilter('Measuring Tapes')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-ruler-combined"></i>
+        <!-- 5. Paint Brushes & Tools -->
+        <div onclick="setCategoryFilter('Brush', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-brush"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Measuring Tapes</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">3M / 10FT Rubberized Auto-Lock</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Paint Brushes & Tools</h3>
+          <p class="text-xs text-slate-400 mt-1">Wooden Handle Brushes (Size 125)</p>
         </div>
 
-        <div onclick="setCategoryFilter('Electrical & Tools')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Electric Tools</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">XParT 100W Glue Gun</p>
-        </div>
-
-        <div onclick="setCategoryFilter('Digital Scales')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
-            <i class="fa-solid fa-weight-scale"></i>
-          </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Digital Scales</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Omega 3-Yr Warranty Scale</p>
-        </div>
-
-        <div onclick="setCategoryFilter('Padlocks & Security')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+        <!-- 6. Padlocks & Security -->
+        <div onclick="setCategoryFilter('Lock', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-lock"></i>
           </div>
-          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Security Locks</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">HMBR 50mm Stainless Locks</p>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Padlocks & Security</h3>
+          <p class="text-xs text-slate-400 mt-1">HMBR Stainless Steel 50mm Locks</p>
+        </div>
+
+        <!-- 7. Power & Scale Tools -->
+        <div onclick="setCategoryFilter('Scale', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-weight-scale"></i>
+          </div>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Power & Scale Tools</h3>
+          <p class="text-xs text-slate-400 mt-1">Impact Drills & Digital 30kg Scales</p>
+        </div>
+
+        <!-- 8. Hammers & Striking Tools -->
+        <div onclick="setCategoryFilter('Hammer', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-hammer"></i>
+          </div>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Hammers & Striking Tools</h3>
+          <p class="text-xs text-slate-400 mt-1">500g, 1kg, 2kg Claw & Sledgehammers</p>
+        </div>
+
+        <!-- 9. Cutting Blades & Discs -->
+        <div onclick="setCategoryFilter('Cutting', this)" class="cat-card cursor-pointer group glass-card p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-compact-disc"></i>
+          </div>
+          <h3 class="font-extrabold text-slate-100 text-base group-hover:text-amber-400 transition">Cutting Blades & Discs</h3>
+          <p class="text-xs text-slate-400 mt-1">Diamond Tile & Iron Cutting Discs</p>
         </div>
 
       </div>
     </section>
 
     <!-- Product Showcase Section -->
-    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+    <section id="productsGridSection" class="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-4 gap-3">
         <div>
           <h2 id="catalogHeading" class="font-display text-2xl font-extrabold text-white tracking-tight">Catalog Products</h2>
           <p class="text-xs text-slate-400">Select sizes, single/pack options, tip types, or tape lengths</p>
         </div>
+
+        <!-- Action Controls Above Product Grid -->
+        <div class="flex items-center gap-3">
+          <button 
+            onclick="toggleAddProductModal()" 
+            class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+          >
+            <i class="fa-solid fa-plus-circle"></i> Add Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Filter Badge (Shown when filtered) -->
+      <div id="activeFilterBadgeContainer" class="hidden">
+        <span class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full text-xs font-bold">
+          <span id="activeFilterBadgeText">Category: All</span>
+          <button onclick="setCategoryFilter('all')" class="hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </span>
       </div>
 
       <!-- Products Grid Container -->
@@ -408,6 +423,24 @@
     </section>
 
   </main>
+
+  <!-- PERSISTENT FLOATING QUICK ACTION BUTTON BAR -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2.5">
+    <button 
+      onclick="toggleAddProductModal()" 
+      class="px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-2xl shadow-2xl text-xs flex items-center gap-2 transition hover:scale-105 border border-amber-300/40"
+      title="Add New Item to Shop Front"
+    >
+      <i class="fa-solid fa-plus-circle text-base"></i> Add New Product
+    </button>
+    <button 
+      onclick="openAdminModal()" 
+      class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-2xl shadow-2xl text-xs flex items-center gap-2 transition hover:scale-105 border border-slate-800"
+      title="Open Inventory Management"
+    >
+      <i class="fa-solid fa-boxes-stacked"></i> Inventory Manager
+    </button>
+  </div>
 
   <!-- Paint Volume Calculator Modal -->
   <div id="paintCalcModal" class="fixed inset-0 z-50 hidden">
@@ -453,7 +486,7 @@
         <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2 text-center">
           <span class="text-[11px] text-slate-400 font-semibold block">Estimated Total Paint Needed:</span>
           <span id="calcResultLiters" class="text-3xl font-black text-amber-400">0.0 Liters</span>
-          <span id="calcResultTins" class="text-xs text-slate-300 font-bold block">≈ 0 Gallon Tins (3.64L)</span>
+          <span id="calcResultTins" class="text-xs text-slate-300 font-bold block">≈ 0 Gallon Tins (3.64L Tins)</span>
         </div>
       </div>
     </div>
@@ -606,35 +639,34 @@
           <div>
             <label class="font-semibold text-slate-300 block mb-1">Department / Category</label>
             <select id="newProdCategory" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+              <option value="Synthetic Enamel Paints">Synthetic Enamel Paints</option>
+              <option value="Acrylic Lacquer Sprays">Acrylic Lacquer Sprays</option>
+              <option value="Adhesives & Glues">Adhesives & Glues</option>
+              <option value="Paint Brushes & Tools">Paint Brushes & Tools</option>
+              <option value="Padlocks & Security">Padlocks & Security</option>
+              <option value="Power & Scale Tools">Power & Scale Tools</option>
+              <option value="Hammers & Striking Tools">Hammers & Striking Tools</option>
+              <option value="Cutting Blades & Discs">Cutting Blades & Discs</option>
               <option value="Marine Coatings">Marine Coatings</option>
               <option value="Clear Varnishes">Clear Varnishes</option>
-              <option value="Synthetic Enamel">Synthetic Enamel</option>
-              <option value="Surface Preparation">Surface Preparation</option>
-              <option value="Plastic Emulsion">Plastic Emulsion</option>
-              <option value="Wire Brushes & Scraping">Wire Brushes & Scraping</option>
-              <option value="Hand Tools & Screwdrivers">Hand Tools & Screwdrivers</option>
               <option value="Measuring Tapes">Measuring Tapes</option>
-              <option value="Electrical & Tools">Electrical & Tools</option>
-              <option value="Digital Scales">Digital Scales</option>
-              <option value="Adhesives">Adhesives</option>
-              <option value="Padlocks & Security">Padlocks & Security</option>
             </select>
           </div>
           <div>
             <label class="font-semibold text-slate-300 block mb-1">Brand Name</label>
-            <input type="text" id="newProdBrand" required placeholder="e.g. Berger / Rainbow / Mega Star" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+            <input type="text" id="newProdBrand" required placeholder="e.g. Berger / Fevicol / JM / HMBR" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
           </div>
         </div>
 
         <div>
           <label class="font-semibold text-slate-300 block mb-1">Specifications / Product Details</label>
-          <input type="text" id="newProdSpecs" required placeholder="e.g. Finish: Gloss • Volume: 0.91L • Anti-Rust" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          <input type="text" id="newProdSpecs" required placeholder="e.g. High Gloss • Heavy Duty • Size 125" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
         </div>
 
         <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="font-semibold text-slate-300 block mb-1">Variant / Size</label>
-            <input type="text" id="newProdVarName" required placeholder="e.g. 0.91L Tin" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+            <input type="text" id="newProdVarName" required placeholder="e.g. 0.91L Tin / 500g" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
           </div>
           <div>
             <label class="font-semibold text-slate-300 block mb-1">Price (BDT ৳)</label>
@@ -652,7 +684,7 @@
         </div>
 
         <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
-          <i class="fa-solid fa-circle-check"></i> Save Product to Catalog
+          <i class="fa-solid fa-circle-check"></i> Save Product & Show on Storefront
         </button>
       </form>
     </div>
@@ -967,40 +999,25 @@
 
   <!-- Embedded JavaScript Application Code -->
   <script>
-    // Full Store Inventory Data Store
+    // Full Store Inventory Data Store matching all SRS Modules & Categories
     let productsData = JSON.parse(localStorage.getItem('mrb_productsData')) || [
-      // 1. Marine Coatings
+      // 1. Synthetic Enamel Paints
       {
-        id: 201,
-        title: 'Polac / Rainbow Marine Anti-Corrosive Red Oxide Paint',
-        category: 'Marine Coatings',
-        brand: 'Polac Marine',
-        specs: 'Grade: Marine Duty • Vessel & Saltwater Heavy Anti-Rust Protection',
-        image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '0.91 Litre Tin', price: 420, stock: 25 },
-          { name: '3.64 Litre Gallon Tin', price: 1580, stock: 12 }
-        ]
-      },
-
-      // 2. Synthetic Clear Varnishes
-      {
-        id: 202,
-        title: 'Rainbow Synthetic Clear Varnish (0.91 Litre)',
-        category: 'Clear Varnishes',
-        brand: 'Rainbow',
-        specs: 'Finish: Transparent Clear Gloss • Wood Furniture, Doors & Railings',
+        id: 101,
+        title: 'Berger Robbialac Synthetic Gloss Enamel (Yellow / White)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        specs: 'High Gloss Finish • Wood & Metal Protection • Durable Shield',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '0.91 Litre Tin (Clear Gloss)', price: 390, stock: 30 }
+          { name: '0.91 Litre Tin', price: 440, stock: 35 },
+          { name: '3.64 Litre Gallon Tin', price: 1650, stock: 15 }
         ]
       },
-
-      // 3. High Gloss Enamels
       {
-        id: 203,
+        id: 102,
         title: 'Aqua Paints Rongila Synthetic Gloss Enamel (Brill White - Tk 430)',
-        category: 'Synthetic Enamel',
+        category: 'Synthetic Enamel Paints',
         brand: 'Aqua',
         specs: 'Shade: Brill White • High Gloss Finish • 0.91 Litre MRP Tk 430',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
@@ -1009,98 +1026,115 @@
         ]
       },
 
-      // 4. Wire Brushes & Surface Scraping
+      // 2. Acrylic Lacquer Sprays
       {
-        id: 204,
-        title: '4-Row Heavy Tempered Steel Wire Brush with Plastic Handle',
-        category: 'Wire Brushes & Scraping',
-        brand: 'Rong Bahar Tools',
-        specs: 'Bristles: 4-Row Tempered Steel • Heavy Plastic Handle • Rust & Paint Removal',
-        image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+        id: 103,
+        title: 'JM Acrylic Lacquer Spray 400ml (37 Light Green / Clear Gloss)',
+        category: 'Acrylic Lacquer Sprays',
+        brand: 'JM Spray',
+        specs: 'Fast Drying • Code 37 Light Green & Clear Gloss • Anti-Corrosive',
+        image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: 'Single Wire Brush Unit', price: 85, stock: 60 },
-          { name: 'Box Pack of 12 Wire Brushes', price: 950, stock: 15 }
+          { name: '400ml Spray Can (Light Green 37)', price: 220, stock: 40 },
+          { name: '400ml Spray Can (Clear Gloss)', price: 220, stock: 30 }
         ]
       },
 
-      // 5. Hand Tools & Screwdrivers
-      {
-        id: 205,
-        title: 'MEGA STAR Screwdriver 4" / 100mm Philips #1 (Model: MS100PH)',
-        category: 'Hand Tools & Screwdrivers',
-        brand: 'MEGA STAR',
-        specs: 'Size: 4 Inch / 100mm • Shaft Tip: Philips (#1 Cross-head) • Anti-Slip Grip',
-        image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '4" / 100mm Philips Screwdriver', price: 120, stock: 45 }
-        ]
-      },
-
-      // 6. Measuring Tapes
-      {
-        id: 206,
-        title: '3M / 10FT Heavy Duty Rubberized Measuring Tape',
-        category: 'Measuring Tapes',
-        brand: 'Precision Tools',
-        specs: 'Scale: 3 Meters / 10 Feet • Auto-Lock Button • Belt Clip • Rubber Shockproof Case',
-        image: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '3M / 10FT Tape Measure', price: 140, stock: 50 },
-          { name: '5M / 16FT Heavy Tape Measure', price: 220, stock: 30 }
-        ]
-      },
-
-      // Surface Preparation Base Coats
-      {
-        id: 101,
-        title: 'Berger Robbialac Anti-Corrosive Red Oxide Metal Primer',
-        category: 'Surface Preparation',
-        brand: 'Berger',
-        specs: 'Application: Steel & Iron Anti-Rust • Finish: Matt Red Oxide',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '0.91 Litre Tin', price: 380, stock: 35 },
-          { name: '3.64 Litre Gallon Tin', price: 1450, stock: 18 }
-        ]
-      },
-
-      // Electric Tools
+      // 3. Adhesives & Glues
       {
         id: 104,
-        title: 'XParT Premium Quality Electric Glue Gun (100W, Code: 961109)',
-        category: 'Electrical & Tools',
-        brand: 'XParT',
-        specs: 'Power: 100W • EU Plug Standard • Fast Heat-up • Includes 3 Free Glue Sticks',
+        title: 'Fevicol 1K PUR Polyurethane Wood Adhesive & Super Glue',
+        category: 'Adhesives & Glues',
+        brand: 'Fevicol',
+        specs: 'Waterproof Grade D4 • High Bond Strength for Carpentry & DIY',
         image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '100W Electric Glue Gun Kit', price: 650, stock: 25 }
+          { name: '500g Bottle', price: 340, stock: 25 },
+          { name: 'Super Glue 3g Tube (Pack of 5)', price: 100, stock: 50 }
         ]
       },
 
-      // Digital Scales
+      // 4. Paint Brushes & Tools
       {
         id: 105,
-        title: 'Omega Digital Price Computing Scale (Type ACS - 3 Years Warranty)',
-        category: 'Digital Scales',
-        brand: 'Omega',
-        specs: 'Model: Type ACS • 3 Years Warranty Badge • Dual LED/LCD • Battery/AC Power',
-        image: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=600&q=80',
+        title: 'Wooden Handle Paint Brush (Size 125 / 4 Inch) & Wire Brushes',
+        category: 'Paint Brushes & Tools',
+        brand: 'Rong Bahar Tools',
+        specs: 'Natural Bristles • Smooth Ergonomic Wooden Handle • Wall & Door Painting',
+        image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: 'Omega Computing Scale (Type ACS)', price: 2950, stock: 10 }
+          { name: '4 Inch / Size 125 Brush', price: 95, stock: 50 },
+          { name: '4-Row Steel Wire Scraping Brush', price: 85, stock: 60 }
         ]
       },
 
-      // Padlocks
+      // 5. Padlocks & Security
       {
-        id: 6,
-        title: 'HMBR Stainless Steel Heavy Duty Top Security Padlock',
+        id: 106,
+        title: 'HMBR Stainless Steel Heavy Duty Top Security Padlock (50mm)',
         category: 'Padlocks & Security',
         brand: 'HMBR',
-        specs: 'Hardened Anti-Cut Shackle • Grade 5 Security • 4 Keys',
+        specs: 'Hardened Anti-Cut Shackle • Grade 5 Security • 4 Brass Keys',
         image: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '50mm Lock (Size 50)', price: 220, stock: 25 },
-          { name: '60mm Lock (Size 60)', price: 320, stock: 15 }
+          { name: '50mm Stainless Lock', price: 220, stock: 25 },
+          { name: '60mm Heavy Duty Lock', price: 320, stock: 15 }
+        ]
+      },
+
+      // 6. Power & Scale Tools
+      {
+        id: 107,
+        title: 'Omega Digital Price Computing Scale (Type ACS 30kg) & Drills',
+        category: 'Power & Scale Tools',
+        brand: 'Omega',
+        specs: 'Capacity: 30kg • 3 Years Warranty Badge • Dual LED Display • AC/Battery',
+        image: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: 'Omega 30kg Scale (Type ACS)', price: 2950, stock: 10 },
+          { name: 'XParT 100W Electric Glue Gun Kit', price: 650, stock: 20 }
+        ]
+      },
+
+      // 7. Hammers & Striking Tools
+      {
+        id: 108,
+        title: 'Heavy Duty Claw Hammer 500g & Sledgehammer 2kg (Rubber Grip)',
+        category: 'Hammers & Striking Tools',
+        brand: 'Pro Hardware',
+        specs: 'Drop Forged Carbon Steel • Anti-Vibration Shock Absorbent Handle',
+        image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '500g Claw Hammer', price: 280, stock: 20 },
+          { name: '2kg Heavy Sledgehammer', price: 580, stock: 12 }
+        ]
+      },
+
+      // 8. Cutting Blades & Discs
+      {
+        id: 109,
+        title: '4 Inch Diamond Tile & Marble Cutting Disc / Iron Grinding Disc',
+        category: 'Cutting Blades & Discs',
+        brand: 'Apex Cutting',
+        specs: 'RPM: 15,300 • High Speed Wet/Dry Tile & Metal Cutters',
+        image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '4" Diamond Tile Cutting Disc', price: 160, stock: 40 },
+          { name: '4" Iron Metal Cutting Disc (Pack of 5)', price: 180, stock: 30 }
+        ]
+      },
+
+      // 9. Marine Coatings
+      {
+        id: 110,
+        title: 'Polac / Rainbow Marine Anti-Corrosive Red Oxide Paint',
+        category: 'Marine Coatings',
+        brand: 'Polac Marine',
+        specs: 'Grade: Marine Duty • Vessel & Saltwater Heavy Anti-Rust Protection',
+        image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Tin', price: 420, stock: 25 },
+          { name: '3.64 Litre Gallon Tin', price: 1580, stock: 12 }
         ]
       }
     ];
@@ -1154,6 +1188,40 @@
       localStorage.setItem('mrb_productsData', JSON.stringify(productsData));
     }
 
+    // Category Card Selection & Filtering Logic
+    function setCategoryFilter(categoryKey, el = null) {
+      activeCategory = categoryKey;
+      
+      // Update UI active card highlights
+      const cards = document.querySelectorAll('.cat-card');
+      cards.forEach(c => c.classList.remove('category-card-active'));
+      
+      if (el) {
+        el.classList.add('category-card-active');
+      }
+
+      // Display Active Filter Badge
+      const badgeContainer = document.getElementById('activeFilterBadgeContainer');
+      const badgeText = document.getElementById('activeFilterBadgeText');
+
+      if (categoryKey === 'all') {
+        badgeContainer.classList.add('hidden');
+        document.getElementById('catalogHeading').innerText = 'Catalog Products';
+      } else {
+        badgeContainer.classList.remove('hidden');
+        badgeText.innerText = `Filtered by: ${categoryKey}`;
+        document.getElementById('catalogHeading').innerText = `${categoryKey} Department`;
+      }
+
+      renderProducts();
+
+      // Smooth scroll down to product grid section
+      const target = document.getElementById('productsGridSection');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
     // Wall Paint Swatch Previewer
     function previewWallColor(hex, name) {
       const wall = document.getElementById('visualizerWall');
@@ -1170,7 +1238,6 @@
     function calculatePaintLiters() {
       const sqft = parseFloat(document.getElementById('calcSqFt').value) || 0;
       const coats = parseInt(document.getElementById('calcCoats').value) || 2;
-      // Coverage rate: ~100 sq ft per liter of paint for standard 1 coat
       const requiredLiters = (sqft / 100) * coats;
       const gallonTins = Math.ceil(requiredLiters / 3.64);
 
@@ -1346,7 +1413,10 @@
       renderInventoryTable();
       toggleAddProductModal();
       document.getElementById('addProductForm').reset();
-      alert(`Success! Product "${title}" (${varName} - ৳${price}) has been added to shop catalog!`);
+      
+      // Auto-scroll to newly added product on storefront
+      setCategoryFilter('all');
+      alert(`Success! Product "${title}" (৳${price}) has been added and is now LIVE on your storefront!`);
     }
 
     function openAdminModal() {
@@ -1479,25 +1549,42 @@
       renderAdminTables();
     }
 
-    // Storefront Catalog Render
+    // Storefront Catalog Render (Smart Fuzzy Filtering)
     function renderProducts() {
       const grid = document.getElementById('productsGrid');
-      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
       const filtered = productsData.filter(item => {
-        const matchesCategory = activeCategory === 'all' || item.category === activeCategory || item.brand === activeCategory;
-        const matchesSearch = item.title.toLowerCase().includes(searchVal) || item.category.toLowerCase().includes(searchVal) || item.brand.toLowerCase().includes(searchVal) || item.specs.toLowerCase().includes(searchVal);
+        const catKey = activeCategory.toLowerCase();
+        const matchesCategory = activeCategory === 'all' || 
+          item.category.toLowerCase().includes(catKey) || 
+          catKey.includes(item.category.toLowerCase()) ||
+          item.title.toLowerCase().includes(catKey) ||
+          item.specs.toLowerCase().includes(catKey) ||
+          item.brand.toLowerCase().includes(catKey);
+
+        const matchesSearch = !searchVal || 
+          item.title.toLowerCase().includes(searchVal) || 
+          item.category.toLowerCase().includes(searchVal) || 
+          item.brand.toLowerCase().includes(searchVal) || 
+          item.specs.toLowerCase().includes(searchVal);
+
         return matchesCategory && matchesSearch;
       });
 
       if (filtered.length === 0) {
         grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-500 space-y-3">
-            <i class="fa-solid fa-paint-roller text-4xl block text-slate-600"></i>
-            <p>No inventory items found matching your search.</p>
-            <button onclick="toggleProductRequestModal()" class="px-4 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl">
-              Request this item from M/S Rong Bahar
-            </button>
+          <div class="col-span-full py-12 text-center text-slate-500 space-y-4">
+            <i class="fa-solid fa-boxes-packing text-5xl block text-slate-600"></i>
+            <p class="text-sm font-semibold text-slate-300">No products found in "${activeCategory}".</p>
+            <div class="flex items-center justify-center gap-3">
+              <button onclick="setCategoryFilter('all')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition">
+                Show All Products
+              </button>
+              <button onclick="toggleAddProductModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">
+                + Add Item to This Category
+              </button>
+            </div>
           </div>
         `;
         return;
@@ -1709,12 +1796,6 @@
     function setSearchFilter(query) {
       document.getElementById('searchInput').value = query;
       filterProducts();
-    }
-
-    function setCategoryFilter(category) {
-      activeCategory = category;
-      document.getElementById('catalogHeading').innerText = category === 'all' ? 'Catalog Products' : `${category} Department`;
-      renderProducts();
     }
 
     function filterProducts() { renderProducts(); }
