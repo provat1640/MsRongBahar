@@ -386,15 +386,149 @@
       </div>
 
       <!-- Active Filter Badge (Shown when filtered) -->
-      <div id="activeFilterBadgeContainer" class="hidden">
-        <span class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full text-xs font-bold">
+      <div id="activeFilterBadgeContainer" class="hidden animate-pulse">
+        <span class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full text-xs font-bold shadow-lg">
           <span id="activeFilterBadgeText">Category: All</span>
-          <button onclick="setCategoryFilter('all')" class="hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="clearAllFilters()" class="hover:text-white transition"><i class="fa-solid fa-xmark"></i></button>
         </span>
       </div>
 
-      <!-- Products Grid Container -->
-      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Sidebar: Paint Brand Explorer Tree -->
+        <div class="lg:col-span-3 space-y-4">
+          <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-sitemap"></i> Paint Brand Explorer Tree
+              </h3>
+              <button onclick="clearAllFilters()" class="text-[10px] text-slate-400 hover:text-white underline transition">Clear</button>
+            </div>
+
+            <!-- Collapsible Tree Structures -->
+            <div class="space-y-3.5 text-xs font-semibold select-none text-left">
+              
+              <!-- Berger Paint Node -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-200 hover:text-amber-400 cursor-pointer py-1 transition" onclick="toggleTreeNode('bergerTreeBranch', 'bergerTreeIcon')">
+                  <span class="flex items-center gap-2">
+                    <i id="bergerTreeIcon" class="fa-solid fa-folder-open text-amber-500"></i> Berger Paints
+                  </span>
+                  <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-black tracking-wide">Brand</span>
+                </div>
+                
+                <div id="bergerTreeBranch" class="pl-4 border-l border-slate-800/80 space-y-2 ml-2 mt-1 transition-all duration-300">
+                  
+                  <!-- Berger Interior Collapsible -->
+                  <div>
+                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('bergerInteriorBranch', 'bergerInteriorIcon')">
+                      <span class="flex items-center gap-1.5">
+                        <i id="bergerInteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Interior
+                      </span>
+                    </div>
+                    <div id="bergerInteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
+                      <button onclick="setPaintTreeFilter('Berger', 'Interior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-fill-drip text-[10px] text-amber-500/70"></i> Top coat (Interior Products)</button>
+                      <button onclick="setPaintTreeFilter('Berger', 'Interior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
+                    </div>
+                  </div>
+
+                  <!-- Berger Exterior Collapsible -->
+                  <div>
+                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('bergerExteriorBranch', 'bergerExteriorIcon')">
+                      <span class="flex items-center gap-1.5">
+                        <i id="bergerExteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Exterior
+                      </span>
+                    </div>
+                    <div id="bergerExteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
+                      <button onclick="setPaintTreeFilter('Berger', 'Exterior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-house-chimney-crack text-[10px] text-amber-500/70"></i> Top coat (Exterior Product)</button>
+                      <button onclick="setPaintTreeFilter('Berger', 'Exterior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
+                    </div>
+                  </div>
+
+                  <!-- Berger Waterproofing Leaf -->
+                  <button onclick="setPaintTreeFilter('Berger', 'Waterproofing', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-droplet-slash text-amber-500/70"></i> Waterproofing</button>
+
+                  <!-- Berger Enamel Leaf -->
+                  <button onclick="setPaintTreeFilter('Berger', 'Enamel', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-paint-roller text-amber-500/70"></i> Enamel</button>
+
+                  <!-- Berger Wood Coating Leaf -->
+                  <button onclick="setPaintTreeFilter('Berger', 'Wood Coating', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-tree text-amber-500/70"></i> Wood coating</button>
+
+                  <!-- Berger Special Products Leaf -->
+                  <button onclick="setPaintTreeFilter('Berger', 'Special Products', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-wand-magic-sparkles text-amber-500/70"></i> Special products</button>
+
+                  <!-- Berger Undercoat Leaf -->
+                  <button onclick="setPaintTreeFilter('Berger', 'Undercoat', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-shield text-amber-500/70"></i> Undercoat</button>
+
+                </div>
+              </div>
+
+              <!-- Aqua Paint Node -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-slate-200 hover:text-amber-400 cursor-pointer py-1 transition" onclick="toggleTreeNode('aquaTreeBranch', 'aquaTreeIcon')">
+                  <span class="flex items-center gap-2">
+                    <i id="aquaTreeIcon" class="fa-solid fa-folder-open text-amber-500"></i> Aqua Paints
+                  </span>
+                  <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-black tracking-wide">Brand</span>
+                </div>
+                
+                <div id="aquaTreeBranch" class="pl-4 border-l border-slate-800/80 space-y-2 ml-2 mt-1 transition-all duration-300">
+                  
+                  <!-- Aqua Interior Collapsible -->
+                  <div>
+                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('aquaInteriorBranch', 'aquaInteriorIcon')">
+                      <span class="flex items-center gap-1.5">
+                        <i id="aquaInteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Interior
+                      </span>
+                    </div>
+                    <div id="aquaInteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
+                      <button onclick="setPaintTreeFilter('Aqua', 'Interior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-fill-drip text-[10px] text-amber-500/70"></i> Top coat (Interior Products)</button>
+                      <button onclick="setPaintTreeFilter('Aqua', 'Interior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
+                    </div>
+                  </div>
+
+                  <!-- Aqua Exterior Collapsible -->
+                  <div>
+                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('aquaExteriorBranch', 'aquaExteriorIcon')">
+                      <span class="flex items-center gap-1.5">
+                        <i id="aquaExteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Exterior
+                      </span>
+                    </div>
+                    <div id="aquaExteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
+                      <button onclick="setPaintTreeFilter('Aqua', 'Exterior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-house-chimney-crack text-[10px] text-amber-500/70"></i> Top coat (Exterior Product)</button>
+                      <button onclick="setPaintTreeFilter('Aqua', 'Exterior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
+                    </div>
+                  </div>
+
+                  <!-- Aqua Waterproofing Leaf -->
+                  <button onclick="setPaintTreeFilter('Aqua', 'Waterproofing', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-droplet-slash text-amber-500/70"></i> Waterproofing</button>
+
+                  <!-- Aqua Enamel Leaf -->
+                  <button onclick="setPaintTreeFilter('Aqua', 'Enamel', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-paint-roller text-amber-500/70"></i> Enamel</button>
+
+                  <!-- Aqua Wood Coating Leaf -->
+                  <button onclick="setPaintTreeFilter('Aqua', 'Wood Coating', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-tree text-amber-500/70"></i> Wood coating</button>
+
+                  <!-- Aqua Special Products Leaf -->
+                  <button onclick="setPaintTreeFilter('Aqua', 'Special Products', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-wand-magic-sparkles text-amber-500/70"></i> Special products</button>
+
+                  <!-- Aqua Undercoat Leaf -->
+                  <button onclick="setPaintTreeFilter('Aqua', 'Undercoat', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-shield text-amber-500/70"></i> Undercoat</button>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Main Catalog Grid -->
+        <div class="lg:col-span-9">
+          <!-- Products Grid Container -->
+          <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+        </div>
+
+      </div>
     </section>
 
     <!-- Contractor & Wholesale Hotline Banner -->
@@ -709,12 +843,98 @@
         </div>
 
         <div>
-          <label class="font-semibold text-slate-300 block mb-1">Image URL (Optional)</label>
-          <input type="url" id="newProdImg" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          <label class="font-semibold text-slate-300 block mb-1">Product Image (Upload Local File or Paste URL)</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <input type="file" id="newProdFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-slate-300 text-[11px]" onchange="previewLocalImage(this, 'newProdImgPreview', 'newProdImg')" />
+            <input type="url" id="newProdImg" placeholder="Or paste image URL https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          </div>
+          <div class="mt-2 text-center hidden" id="newProdImgPreviewContainer">
+            <img id="newProdImgPreview" src="" class="h-20 w-auto object-cover rounded-lg mx-auto border border-slate-800 shadow" />
+          </div>
         </div>
 
         <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
           <i class="fa-solid fa-circle-check"></i> Save Product & Show on Storefront
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Edit Product Modal -->
+  <div id="adminEditProductModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleEditProductModal()"></div>
+
+    <div class="relative max-w-lg mx-auto my-8 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-10 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black">
+            <i class="fa-solid fa-pen text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-display text-lg font-bold text-white">Edit Product Details</h3>
+            <p class="text-[11px] text-amber-400">Modify title, specifications, price, or stock levels</p>
+          </div>
+        </div>
+        <button onclick="toggleEditProductModal()" class="text-slate-400 hover:text-white text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="editProductForm" onsubmit="handleEditProductSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="editProdId" />
+        
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Product Title / Full Name</label>
+          <input type="text" id="editProdTitle" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-semibold text-slate-300 block mb-1">Department / Category</label>
+            <select id="editProdCategory" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+              <option value="Synthetic Enamel Paints">Synthetic Enamel Paints</option>
+              <option value="Acrylic Lacquer Sprays">Acrylic Lacquer Sprays</option>
+              <option value="Adhesives & Glues">Adhesives & Glues</option>
+              <option value="Paint Brushes & Tools">Paint Brushes & Tools</option>
+              <option value="Padlocks & Security">Padlocks & Security</option>
+              <option value="Power & Scale Tools">Power & Scale Tools</option>
+              <option value="Hammers & Striking Tools">Hammers & Striking Tools</option>
+              <option value="Cutting Blades & Discs">Cutting Blades & Discs</option>
+              <option value="Marine Coatings">Marine Coatings</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-semibold text-slate-300 block mb-1">Brand Name</label>
+            <input type="text" id="editProdBrand" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Specifications / Product Details</label>
+          <input type="text" id="editProdSpecs" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1 font-bold">Product Variants (Edit size, price & stock)</label>
+          <div id="editVariantsContainer" class="space-y-2 max-h-40 overflow-y-auto p-2 bg-slate-950 rounded-xl border border-slate-800">
+            <!-- Dynamic Variant Rows -->
+          </div>
+          <button type="button" onclick="addEditVariantRow()" class="mt-2 text-xs font-bold text-amber-400 hover:text-amber-300"><i class="fa-solid fa-plus-circle mr-1"></i> Add Variant Row</button>
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1 font-bold">Product Image (Upload Local File or Paste URL)</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            <input type="file" id="editProdFile" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-slate-300 text-[11px]" onchange="previewLocalImage(this, 'editProdImgPreview', 'editProdImg')" />
+            <input type="url" id="editProdImg" placeholder="Or paste image URL https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          </div>
+          <div class="mt-2 text-center" id="editProdImgPreviewContainer">
+            <img id="editProdImgPreview" src="" class="h-20 w-auto object-cover rounded-lg mx-auto border border-slate-800 shadow" />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
+          <i class="fa-solid fa-circle-check"></i> Save Changes & Update Storefront
         </button>
       </form>
     </div>
@@ -1036,12 +1256,13 @@
   <script>
     // Full Store Inventory Data Store matching all SRS Modules & Categories
     let productsData = JSON.parse(localStorage.getItem('mrb_productsData')) || [
-      // 1. Synthetic Enamel Paints
+      // === BERGER PAINTS BRAND SEED DATA ===
       {
         id: 101,
         title: 'Berger Robbialac Synthetic Gloss Enamel (Yellow / White)',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
+        paintType: 'Enamel',
         specs: 'High Gloss Finish • Wood & Metal Protection • Durable Shield',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
@@ -1050,18 +1271,224 @@
         ]
       },
       {
+        id: 1012,
+        title: 'Berger Luxury Silk Emulsion (Interior Top Coat)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Silk Finish • Highly Washable • Luxury Wall Coating',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 650, stock: 25 },
+          { name: '3.64 Litre Gallon Tin', price: 2450, stock: 15 }
+        ]
+      },
+      {
+        id: 1013,
+        title: 'Berger Interior Wall Sealer (Interior Primer)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Interior',
+        paintSubtype: 'Primers',
+        specs: 'Anti-Alkali • Excellent Adhesion sealer for New Walls',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 420, stock: 30 },
+          { name: '3.64 Litre Can', price: 1550, stock: 20 }
+        ]
+      },
+      {
+        id: 1014,
+        title: 'Berger WeatherCoat All Guard (Exterior Top Coat)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: 'Dirt Pick-Up Resistance • UV Protection Shield • 10-Year Protection',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 850, stock: 20 },
+          { name: '3.64 Litre Gallon Tin', price: 3100, stock: 12 }
+        ]
+      },
+      {
+        id: 1015,
+        title: 'Berger Exterior Sealer (Exterior Primer)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Primers',
+        specs: 'Moisture Barrier • High Binding Strength for Exterior Walls',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 450, stock: 30 }
+        ]
+      },
+      {
+        id: 1016,
+        title: 'Berger DampShield Elasto Waterproofing Coating',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Waterproofing',
+        specs: 'Elastomeric Waterproof Membrane • Resist Up To 7 Bar Hydrostatic Pressure',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 980, stock: 20 }
+        ]
+      },
+      {
+        id: 1017,
+        title: 'Berger Woodkeeper Clear Lacquer Polyurethane Wood Coating',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Wood Coating',
+        specs: 'Scratch Resistant Polyurethane Gloss Finish for Furniture',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 1200, stock: 15 }
+        ]
+      },
+      {
+        id: 1018,
+        title: 'Berger Illusions Metallic Special Effects Design Paint',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Special Products',
+        specs: 'Vibrant Metallic Sheen Design Finish for Highlight Walls',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 1400, stock: 10 }
+        ]
+      },
+      {
+        id: 1019,
+        title: 'Berger Robbialac Undercoat White Paint Sealer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Undercoat',
+        specs: 'Superior Opacity Undercoat for Enamel Paint & Wood Fillers',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 460, stock: 35 }
+        ]
+      },
+
+      // === AQUA PAINTS BRAND SEED DATA ===
+      {
         id: 102,
-        title: 'Aqua Paints Rongila Synthetic Gloss Enamel (Brill White - Tk 430)',
+        title: 'Aqua Paints Rongila Synthetic Gloss Enamel (Brill White)',
         category: 'Synthetic Enamel Paints',
         brand: 'Aqua',
+        paintType: 'Enamel',
         specs: 'Shade: Brill White • High Gloss Finish • 0.91 Litre MRP Tk 430',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
           { name: '0.91 Litre Tin (Brill White)', price: 430, stock: 35 }
         ]
       },
+      {
+        id: 1022,
+        title: 'Aqua Gold Interior Emulsion (Interior Top Coat)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Excellent Scrub Resistance • Smooth Finish • Low VOC',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 580, stock: 25 }
+        ]
+      },
+      {
+        id: 1023,
+        title: 'Aqua Wall Sealer Primer (Interior Primer)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Primers',
+        specs: 'Water Resistant Primer for Alkaline Interior Walls',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 380, stock: 30 }
+        ]
+      },
+      {
+        id: 1024,
+        title: 'Aqua WeatherShield Exterior (Exterior Top Coat)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: 'Heavy Rain Protect • Weatherproof Exterior Coating',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 750, stock: 20 }
+        ]
+      },
+      {
+        id: 1025,
+        title: 'Aqua Exterior Sealer Primer (Exterior Primer)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Exterior',
+        paintSubtype: 'Primers',
+        specs: 'Optimal Penetration Exterior Plaster sealer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 400, stock: 25 }
+        ]
+      },
+      {
+        id: 1026,
+        title: 'Aqua DampStop Waterproofing Coating',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Waterproofing',
+        specs: 'Resists High Salt Dampness & Alkaline attacks',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 880, stock: 20 }
+        ]
+      },
+      {
+        id: 1027,
+        title: 'Aqua WoodShine Clear Wood Lacquer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Wood Coating',
+        specs: 'High Transparency Natural Wood Protection Finish',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 1100, stock: 15 }
+        ]
+      },
+      {
+        id: 1028,
+        title: 'Aqua Special Texture Paint (Rough Coating)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Special Products',
+        specs: 'Decorative Textured Sand/Stucco Finish Design',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 1300, stock: 12 }
+        ]
+      },
+      {
+        id: 1029,
+        title: 'Aqua Undercoat Sealer White Paint',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Undercoat',
+        specs: 'High Build Matt Base Undercoat sealer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 420, stock: 30 }
+        ]
+      },
 
-      // 2. Acrylic Lacquer Sprays
+      // === OTHER CORE HARDWARE & ACCESSORIES ===
       {
         id: 103,
         title: 'JM Acrylic Lacquer Spray 400ml (37 Light Green / Clear Gloss)',
@@ -1074,8 +1501,6 @@
           { name: '400ml Spray Can (Clear Gloss)', price: 220, stock: 30 }
         ]
       },
-
-      // 3. Adhesives & Glues
       {
         id: 104,
         title: 'Fevicol 1K PUR Polyurethane Wood Adhesive & Super Glue',
@@ -1088,8 +1513,6 @@
           { name: 'Super Glue 3g Tube (Pack of 5)', price: 100, stock: 50 }
         ]
       },
-
-      // 4. Paint Brushes & Tools
       {
         id: 105,
         title: 'Wooden Handle Paint Brush (Size 125 / 4 Inch) & Wire Brushes',
@@ -1102,8 +1525,6 @@
           { name: '4-Row Steel Wire Scraping Brush', price: 85, stock: 60 }
         ]
       },
-
-      // 5. Padlocks & Security
       {
         id: 106,
         title: 'HMBR Stainless Steel Heavy Duty Top Security Padlock (50mm)',
@@ -1116,8 +1537,6 @@
           { name: '60mm Heavy Duty Lock', price: 320, stock: 15 }
         ]
       },
-
-      // 6. Power & Scale Tools
       {
         id: 107,
         title: 'Omega Digital Price Computing Scale (Type ACS 30kg) & Drills',
@@ -1130,8 +1549,6 @@
           { name: 'XParT 100W Electric Glue Gun Kit', price: 650, stock: 20 }
         ]
       },
-
-      // 7. Hammers & Striking Tools
       {
         id: 108,
         title: 'Heavy Duty Claw Hammer 500g & Sledgehammer 2kg (Rubber Grip)',
@@ -1144,8 +1561,6 @@
           { name: '2kg Heavy Sledgehammer', price: 580, stock: 12 }
         ]
       },
-
-      // 8. Cutting Blades & Discs
       {
         id: 109,
         title: '4 Inch Diamond Tile & Marble Cutting Disc / Iron Grinding Disc',
@@ -1158,8 +1573,6 @@
           { name: '4" Iron Metal Cutting Disc (Pack of 5)', price: 180, stock: 30 }
         ]
       },
-
-      // 9. Marine Coatings
       {
         id: 110,
         title: 'Polac / Rainbow Marine Anti-Corrosive Red Oxide Paint',
@@ -1208,6 +1621,11 @@
     let isAdminUnlocked = false;
     let cart = [];
     let activeCategory = 'all';
+    
+    // Paint Brand Tree Explorer State variables
+    let activeBrandFilter = 'all';
+    let activePaintTypeFilter = 'all';
+    let activePaintSubtypeFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', () => { 
       renderAuthNav();
@@ -1589,6 +2007,33 @@
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
       const filtered = productsData.filter(item => {
+        // Search matching
+        const matchesSearch = !searchVal || 
+          item.title.toLowerCase().includes(searchVal) || 
+          item.category.toLowerCase().includes(searchVal) || 
+          item.brand.toLowerCase().includes(searchVal) || 
+          item.specs.toLowerCase().includes(searchVal);
+
+        if (!matchesSearch) return false;
+
+        // Brand Tree Explorer filter
+        if (activeBrandFilter !== 'all') {
+          const matchesBrand = item.brand.toLowerCase() === activeBrandFilter.toLowerCase();
+          if (!matchesBrand) return false;
+
+          if (activePaintTypeFilter !== 'all') {
+            const matchesType = item.paintType && item.paintType.toLowerCase() === activePaintTypeFilter.toLowerCase();
+            if (!matchesType) return false;
+
+            if (activePaintSubtypeFilter !== 'all') {
+              const matchesSubtype = item.paintSubtype && item.paintSubtype.toLowerCase() === activePaintSubtypeFilter.toLowerCase();
+              if (!matchesSubtype) return false;
+            }
+          }
+          return true;
+        }
+
+        // Traditional Category Grid matching
         const catKey = activeCategory.toLowerCase();
         const matchesCategory = activeCategory === 'all' || 
           item.category.toLowerCase().includes(catKey) || 
@@ -1597,13 +2042,7 @@
           item.specs.toLowerCase().includes(catKey) ||
           item.brand.toLowerCase().includes(catKey);
 
-        const matchesSearch = !searchVal || 
-          item.title.toLowerCase().includes(searchVal) || 
-          item.category.toLowerCase().includes(searchVal) || 
-          item.brand.toLowerCase().includes(searchVal) || 
-          item.specs.toLowerCase().includes(searchVal);
-
-        return matchesCategory && matchesSearch;
+        return matchesCategory;
       });
 
       if (filtered.length === 0) {
@@ -1795,10 +2234,12 @@
               <td class="p-3.5 font-semibold text-slate-200">৳ ${v.price}</td>
               <td class="p-3.5 font-extrabold ${v.stock < 10 ? 'text-amber-400' : 'text-slate-100'}">${v.stock}</td>
               <td class="p-3.5">${status}</td>
-              <td class="p-3.5 text-right">
-                <div class="inline-flex items-center gap-1.5">
-                  <button onclick="adjustStock(${prod.id}, ${vIdx}, -5)" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg font-bold text-[11px]">-5</button>
-                  <button onclick="adjustStock(${prod.id}, ${vIdx}, 10)" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold text-[11px] shadow">+10</button>
+              <td class="p-3.5 text-right font-bold">
+                <div class="inline-flex items-center gap-2">
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, -5)" class="px-2 py-1 bg-slate-950 border border-slate-800 text-slate-300 rounded hover:text-white transition" title="Reduce Stock by 5">-5</button>
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, 10)" class="px-2 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-400 border border-amber-500/40 rounded transition" title="Add 10 to Stock">+10</button>
+                  <button onclick="openEditProductModal(${prod.id})" class="p-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded transition" title="Edit Product"><i class="fa-solid fa-pencil"></i></button>
+                  <button onclick="deleteProduct(${prod.id})" class="p-2 bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/30 rounded transition" title="Delete Product"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
               </td>
             </tr>
@@ -1821,6 +2262,217 @@
         renderInventoryTable();
         renderProducts();
         saveState();
+      }
+    }
+
+    // --- Paint Tree Explorer & Filter functions ---
+    function toggleTreeNode(branchId, iconId) {
+      const branch = document.getElementById(branchId);
+      const icon = document.getElementById(iconId);
+      if (branch.classList.contains('hidden')) {
+        branch.classList.remove('hidden');
+        icon.className = "fa-solid fa-folder-open text-amber-500";
+      } else {
+        branch.classList.add('hidden');
+        icon.className = "fa-solid fa-folder text-slate-500";
+      }
+    }
+
+    function setPaintTreeFilter(brand, type, subtype, element) {
+      activeBrandFilter = brand;
+      activePaintTypeFilter = type;
+      activePaintSubtypeFilter = subtype;
+      activeCategory = 'all'; // override main categories
+
+      // Clear highlighted states of tree leafs
+      document.querySelectorAll('.tree-leaf').forEach(leaf => {
+        leaf.classList.remove('text-amber-400', 'font-black');
+        leaf.classList.add('text-slate-400');
+      });
+      if (element) {
+        element.classList.remove('text-slate-400');
+        element.classList.add('text-amber-400', 'font-black');
+      }
+
+      // Display active tree filter badge
+      const badgeContainer = document.getElementById('activeFilterBadgeContainer');
+      const badgeText = document.getElementById('activeFilterBadgeText');
+      badgeContainer.classList.remove('hidden');
+      
+      let label = `${brand}`;
+      if (type !== 'all') label += ` › ${type}`;
+      if (subtype) label += ` › ${subtype}`;
+      badgeText.innerText = `Tree: ${label}`;
+
+      // Deselect all category cards
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('category-card-active'));
+
+      renderProducts();
+      
+      const target = document.getElementById('productsGridSection');
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearAllFilters() {
+      activeBrandFilter = 'all';
+      activePaintTypeFilter = 'all';
+      activePaintSubtypeFilter = 'all';
+      activeCategory = 'all';
+
+      document.querySelectorAll('.tree-leaf').forEach(leaf => {
+        leaf.classList.remove('text-amber-400', 'font-black');
+        leaf.classList.add('text-slate-400');
+      });
+
+      const badgeContainer = document.getElementById('activeFilterBadgeContainer');
+      badgeContainer.classList.add('hidden');
+
+      // Highlight All category card
+      const cards = document.querySelectorAll('.cat-card');
+      cards.forEach(c => c.classList.remove('category-card-active'));
+      if (cards[0]) cards[0].classList.add('category-card-active');
+
+      document.getElementById('catalogHeading').innerText = 'Catalog Products';
+
+      renderProducts();
+    }
+
+    // --- Local Disk Image Upload & Base64 Reader Helper ---
+    function previewLocalImage(input, imgElementId, urlInputId) {
+      const file = input.files[0];
+      const preview = document.getElementById(imgElementId);
+      const container = preview.parentElement;
+      const urlInput = document.getElementById(urlInputId);
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          container.classList.remove('hidden');
+          // Set base64 string to urlInput so that product submission logic catches it as normal
+          urlInput.value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // --- Product Edit / Delete / Management Functions ---
+    function toggleEditProductModal() {
+      document.getElementById('adminEditProductModal').classList.toggle('hidden');
+    }
+
+    function openEditProductModal(productId) {
+      const product = productsData.find(p => p.id === productId);
+      if (!product) return;
+
+      document.getElementById('editProdId').value = product.id;
+      document.getElementById('editProdTitle').value = product.title;
+      document.getElementById('editProdCategory').value = product.category;
+      document.getElementById('editProdBrand').value = product.brand;
+      document.getElementById('editProdSpecs').value = product.specs;
+      document.getElementById('editProdImg').value = product.image.startsWith('data:') ? '' : product.image;
+
+      const preview = document.getElementById('editProdImgPreview');
+      preview.src = product.image;
+      document.getElementById('editProdImgPreviewContainer').classList.remove('hidden');
+
+      // Clear file input
+      document.getElementById('editProdFile').value = '';
+
+      // Load variants
+      const container = document.getElementById('editVariantsContainer');
+      container.innerHTML = '';
+      product.variants.forEach(v => {
+        addEditVariantRow(v.name, v.price, v.stock);
+      });
+
+      // Show Edit Modal
+      toggleEditProductModal();
+    }
+
+    function addEditVariantRow(name = '', price = '', stock = '') {
+      const container = document.getElementById('editVariantsContainer');
+      const div = document.createElement('div');
+      div.className = "grid grid-cols-3 gap-2 items-center bg-slate-900 p-2 rounded-lg border border-slate-800";
+      div.innerHTML = `
+        <input type="text" placeholder="Size / Variant Name" value="${name}" required class="variant-name bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 text-xs" />
+        <input type="number" placeholder="Price BDT" value="${price}" required min="1" class="variant-price bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 text-xs" />
+        <input type="number" placeholder="Stock Qty" value="${stock}" required min="0" class="variant-stock bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 text-xs" />
+      `;
+      container.appendChild(div);
+    }
+
+    function handleEditProductSubmit(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('editProdId').value);
+      const title = document.getElementById('editProdTitle').value.trim();
+      const category = document.getElementById('editProdCategory').value;
+      const brand = document.getElementById('editProdBrand').value.trim();
+      const specs = document.getElementById('editProdSpecs').value.trim();
+      
+      let image = document.getElementById('editProdImg').value.trim();
+      const previewSrc = document.getElementById('editProdImgPreview').src;
+      if (!image && previewSrc.startsWith('data:')) {
+        image = previewSrc; // use uploaded base64 local image
+      }
+      if (!image) {
+        image = 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=600&q=80';
+      }
+
+      // Collect variants
+      const container = document.getElementById('editVariantsContainer');
+      const nameInputs = container.querySelectorAll('.variant-name');
+      const priceInputs = container.querySelectorAll('.variant-price');
+      const stockInputs = container.querySelectorAll('.variant-stock');
+
+      const variants = [];
+      for (let i = 0; i < nameInputs.length; i++) {
+        variants.push({
+          name: nameInputs[i].value.trim(),
+          price: parseFloat(priceInputs[i].value),
+          stock: parseInt(stockInputs[i].value)
+        });
+      }
+
+      if (variants.length === 0) {
+        alert('Please add at least one variant for the product.');
+        return;
+      }
+
+      // Find and update item
+      const productIdx = productsData.findIndex(p => p.id === id);
+      if (productIdx !== -1) {
+        productsData[productIdx].title = title;
+        productsData[productIdx].category = category;
+        productsData[productIdx].brand = brand;
+        productsData[productIdx].specs = specs;
+        productsData[productIdx].image = image;
+        productsData[productIdx].variants = variants;
+        
+        // Auto assign paint properties if category matches paints
+        if (brand.toLowerCase() === 'berger' || brand.toLowerCase() === 'aqua') {
+          productsData[productIdx].paintType = category.includes('Enamel') ? 'Enamel' : 
+                                               category.includes('Marine') ? 'Undercoat' : 'Interior';
+        }
+
+        saveState();
+        renderProducts();
+        renderInventoryTable();
+        toggleEditProductModal();
+        alert(`Product "${title}" updated successfully!`);
+      }
+    }
+
+    function deleteProduct(productId) {
+      const product = productsData.find(p => p.id === productId);
+      if (!product) return;
+
+      if (confirm(`Are you absolutely sure you want to delete "${product.title}" from store inventory?`)) {
+        productsData = productsData.filter(p => p.id !== productId);
+        saveState();
+        renderProducts();
+        renderInventoryTable();
+        alert('Product deleted successfully.');
       }
     }
 
