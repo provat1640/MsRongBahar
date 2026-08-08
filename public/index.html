@@ -62,7 +62,7 @@
     }
     .glass-card {
       background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-card:hover {
@@ -77,6 +77,18 @@
       background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.15), transparent 70%),
                   radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.12), transparent 70%);
     }
+    /* Vibrant Colorful Admin Badges & Cards */
+    .admin-stat-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.3s ease;
+    }
+    .admin-stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950 paint-splash-bg relative">
@@ -89,7 +101,7 @@
     <a href="tel:+8801722452836" class="underline hover:text-white transition font-black ml-2"><i class="fa-solid fa-phone"></i> 01722452836</a>
   </div>
 
-  <!-- Header / Navigation (Clean Customer View) -->
+  <!-- Header / Navigation (Clean Customer View with Admin under Login/Register) -->
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
       
@@ -124,7 +136,7 @@
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-sm"></i>
       </div>
 
-      <!-- Action Buttons (Customer View) -->
+      <!-- Action Buttons -->
       <div class="flex items-center gap-2 sm:gap-3">
         <!-- Paint Calculator Trigger -->
         <button 
@@ -143,22 +155,13 @@
           <i class="fa-solid fa-clipboard-question text-amber-400"></i> Request Item
         </button>
 
-        <!-- Admin Portal Access (Passcode Protected) -->
-        <button 
-          onclick="openAdminModal()"
-          class="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition flex items-center gap-1.5"
-          title="Shop Manager Portal"
-        >
-          <i class="fa-solid fa-user-shield"></i> <span class="hidden md:inline">Admin Portal</span>
-        </button>
-
-        <!-- Auth / Profile Button -->
+        <!-- Login / Register / Admin Portal Dropdown Trigger -->
         <div id="authNavContainer">
           <button 
             onclick="toggleAuthModal('login')"
             class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-200 text-xs font-bold transition flex items-center gap-1.5"
           >
-            <i class="fa-solid fa-user text-amber-400"></i> Login
+            <i class="fa-solid fa-user text-amber-400"></i> Login / Register
           </button>
         </div>
 
@@ -483,26 +486,32 @@
     </div>
   </div>
 
-  <!-- Customer Mobile & Password Login / Registration Modal -->
+  <!-- Auth, Customer Sign In, Register & Admin Portal Modal -->
   <div id="authModal" class="fixed inset-0 z-50 hidden">
-    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleAuthModal()"></div>
+    <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-md" onclick="toggleAuthModal()"></div>
 
-    <div class="relative max-w-md mx-auto my-12 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-10 space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <div class="flex gap-4">
-          <button id="authTabLoginBtn" onclick="switchAuthTab('login')" class="font-display text-lg font-bold text-amber-400 border-b-2 border-amber-400 pb-1">
+    <div class="relative max-w-md mx-auto my-8 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-10 space-y-6">
+      
+      <!-- Unified Header Tabs (Login / Register / Admin Portal) -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex gap-3 text-xs font-extrabold">
+          <button id="authTabLoginBtn" onclick="switchAuthTab('login')" class="text-amber-400 border-b-2 border-amber-400 pb-2">
             Customer Login
           </button>
-          <button id="authTabRegisterBtn" onclick="switchAuthTab('register')" class="font-display text-lg font-bold text-slate-400 hover:text-white pb-1">
-            Register Account
+          <button id="authTabRegisterBtn" onclick="switchAuthTab('register')" class="text-slate-400 hover:text-white pb-2">
+            Register
+          </button>
+          <!-- ADMIN PORTAL NESTED INSIDE LOGIN/REGISTER SECTION -->
+          <button id="authTabAdminBtn" onclick="switchAuthTab('admin')" class="text-amber-500/80 hover:text-amber-400 pb-2 flex items-center gap-1">
+            <i class="fa-solid fa-user-shield text-xs"></i> Admin Portal
           </button>
         </div>
-        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-white text-xl">
+        <button onclick="toggleAuthModal()" class="text-slate-400 hover:text-white text-xl pb-2">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- Mobile Number & Password Login Form -->
+      <!-- Tab 1: Customer Login Form -->
       <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
         <div>
           <label class="text-xs font-semibold text-slate-400 block mb-1">Mobile Phone Number</label>
@@ -518,12 +527,12 @@
             <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-500 text-xs"></i>
           </div>
         </div>
-        <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2">
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
           <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
         </button>
       </form>
 
-      <!-- Register Form -->
+      <!-- Tab 2: Customer Registration Form -->
       <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3 hidden">
         <div>
           <label class="text-xs font-semibold text-slate-400 block mb-1">Full Name</label>
@@ -549,6 +558,36 @@
           Create Account
         </button>
       </form>
+
+      <!-- Tab 3: Admin Portal Passcode Login View (Nested inside Login/Register) -->
+      <form id="adminAuthForm" onsubmit="handleAdminAuth(event)" class="space-y-4 hidden text-left">
+        <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center">
+          <i class="fa-solid fa-user-shield text-2xl text-amber-400 mb-1"></i>
+          <h4 class="font-bold text-white text-sm">Shop Manager Control Center</h4>
+          <p class="text-[11px] text-amber-400/90">Authorized store owners & staff portal</p>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-1">Manager Mobile Phone</label>
+          <div class="relative">
+            <input type="tel" id="adminMobile" required placeholder="01722452836" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500" />
+            <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-500 text-xs"></i>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-1">Security Passcode / Password</label>
+          <div class="relative">
+            <input type="password" id="adminPasscode" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500" />
+            <i class="fa-solid fa-key absolute left-3 top-3 text-slate-500 text-xs"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
+          <i class="fa-solid fa-unlock text-sm"></i> Unlock Admin Control Center
+        </button>
+      </form>
+
     </div>
   </div>
 
@@ -600,7 +639,7 @@
     </div>
   </div>
 
-  <!-- Admin Add New Product Modal (Accessible via Admin Portal) -->
+  <!-- Admin Add New Product Modal (Accessible via Admin Dashboard) -->
   <div id="adminAddProductModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleAddProductModal()"></div>
 
@@ -681,165 +720,162 @@
     </div>
   </div>
 
-  <!-- Admin Control Center Modal (Restricted Manager Access) -->
+  <!-- Ultra-Colorful & Modern Admin Control Center Modal -->
   <div id="adminPanelModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="fixed inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeAdminModal()"></div>
 
-    <div class="relative max-w-6xl mx-auto my-6 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-10 space-y-6">
+    <div class="relative max-w-6xl mx-auto my-6 p-6 lg:p-8 bg-slate-900/95 border border-amber-500/20 rounded-3xl shadow-2xl z-10 space-y-6">
       
-      <!-- Admin Secure Mobile & Passcode Login View -->
-      <div id="adminLoginView" class="max-w-md mx-auto py-8 space-y-6 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl font-bold mx-auto border border-amber-500/30">
-          <i class="fa-solid fa-user-shield"></i>
-        </div>
-        <div>
-          <h3 class="font-display text-2xl font-extrabold text-white">M/S Rong Bahar Admin Portal</h3>
-          <p class="text-xs text-slate-400 mt-1">Enter Manager mobile number & confidential passcode</p>
-        </div>
-        <form onsubmit="handleAdminAuth(event)" class="space-y-4 text-left">
-          <div>
-            <label class="text-xs font-semibold text-slate-400 block mb-1">Manager Mobile Number</label>
-            <div class="relative">
-              <input type="tel" id="adminMobile" required placeholder="Enter mobile number" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500" />
-              <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-500 text-xs"></i>
-            </div>
-          </div>
-          <div>
-            <label class="text-xs font-semibold text-slate-400 block mb-1">Security Passcode / Password</label>
-            <div class="relative">
-              <input type="password" id="adminPasscode" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-amber-500" />
-              <i class="fa-solid fa-key absolute left-3 top-3 text-slate-500 text-xs"></i>
-            </div>
-          </div>
-          <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-unlock"></i> Unlock Admin Portal
-          </button>
-        </form>
-      </div>
-
-      <!-- Admin Dashboard Main View (With Add Product & Inventory Manager) -->
-      <div id="adminDashboardView" class="hidden space-y-6">
+      <!-- Admin Dashboard Main View (Colorful Modern Aesthetics) -->
+      <div id="adminDashboardView" class="space-y-6">
         
-        <!-- Admin Header with Add Product Action -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800 pb-4 gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-xl font-black">
-              <i class="fa-solid fa-user-gear"></i>
+        <!-- Vibrant Admin Banner & Header Bar -->
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 text-slate-950 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-slate-950 text-amber-400 flex items-center justify-center text-2xl font-black shadow-lg border border-amber-400/30">
+              <i class="fa-solid fa-sliders"></i>
             </div>
             <div>
-              <h3 class="font-display text-xl font-extrabold text-white">Shop Admin Control Center</h3>
-              <p class="text-xs text-amber-400 font-medium">Logged in as Manager (01722452836)</p>
+              <span class="px-2.5 py-0.5 bg-slate-950 text-amber-400 text-[10px] font-black uppercase rounded-full tracking-wider">Store Administration</span>
+              <h3 class="font-display text-2xl font-black tracking-tight text-slate-950 leading-tight mt-0.5">M/S Rong Bahar Control Center</h3>
+              <p class="text-xs font-bold text-slate-900">Manager Access: Habib (01722452836)</p>
             </div>
           </div>
           
           <div class="flex items-center gap-3">
-            <!-- PROMINENT ADD PRODUCT BUTTON INSIDE ADMIN PORTAL -->
+            <!-- PROMINENT VIBRANT ADD PRODUCT BUTTON -->
             <button 
               onclick="toggleAddProductModal()" 
-              class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg transition"
+              class="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-amber-400 font-black rounded-xl text-xs flex items-center gap-2 shadow-xl transition border border-amber-400/30"
             >
-              <i class="fa-solid fa-plus-circle text-sm"></i> Add New Product
+              <i class="fa-solid fa-plus-circle text-base"></i> Add New Product
             </button>
 
-            <button onclick="lockAdminPanel()" class="px-3 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 text-xs font-bold rounded-xl transition">
-              <i class="fa-solid fa-lock mr-1"></i> Lock Panel
+            <button onclick="lockAdminPanel()" class="px-3.5 py-2.5 bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition border border-white/20">
+              <i class="fa-solid fa-lock mr-1"></i> Lock
             </button>
-            <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white text-2xl">
+            <button onclick="closeAdminModal()" class="text-slate-950 hover:text-white text-2xl transition">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
 
-        <!-- Admin Navigation Tabs -->
+        <!-- Sleek & Modern Colorful Tabs -->
         <div class="flex flex-wrap border-b border-slate-800 text-xs font-bold gap-2">
-          <button id="adminTabInventoryBtn" onclick="switchAdminTab('inventory')" class="px-4 py-2.5 text-amber-400 border-b-2 border-amber-400">
-            <i class="fa-solid fa-boxes-packing mr-1.5"></i> Inventory Manager & Stock
+          <button id="adminTabInventoryBtn" onclick="switchAdminTab('inventory')" class="px-5 py-3 text-amber-400 border-b-2 border-amber-400 bg-amber-500/10 rounded-t-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-boxes-packing text-amber-400"></i> Inventory Manager & Stock
           </button>
-          <button id="adminTabOrdersBtn" onclick="switchAdminTab('orders')" class="px-4 py-2.5 text-slate-400 hover:text-white">
-            <i class="fa-solid fa-truck-ramp-box mr-1.5"></i> Orders & Delivery
+          <button id="adminTabOrdersBtn" onclick="switchAdminTab('orders')" class="px-5 py-3 text-slate-400 hover:text-white rounded-t-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-truck-fast text-emerald-400"></i> Orders & Delivery
           </button>
-          <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="px-4 py-2.5 text-slate-400 hover:text-white">
-            <i class="fa-solid fa-users mr-1.5"></i> Registered Customers
+          <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="px-5 py-3 text-slate-400 hover:text-white rounded-t-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-users text-cyan-400"></i> Registered Customers
           </button>
-          <button id="adminTabRequestsBtn" onclick="switchAdminTab('requests')" class="px-4 py-2.5 text-slate-400 hover:text-white">
-            <i class="fa-solid fa-clipboard-list mr-1.5"></i> Customer Requests
+          <button id="adminTabRequestsBtn" onclick="switchAdminTab('requests')" class="px-5 py-3 text-slate-400 hover:text-white rounded-t-xl transition flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-pink-400"></i> Customer Requests
           </button>
         </div>
 
-        <!-- Tab 1: Inventory Management & Add Product Button (Inside Admin Portal) -->
-        <div id="adminTabInventory" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div>
-              <h4 class="font-bold text-sm text-slate-200">Store Inventory & Catalog Manager</h4>
-              <p class="text-[11px] text-slate-400">View stock levels, price valuations or add new items to storefront</p>
-            </div>
-            
-            <!-- ADD PRODUCT BUTTON INSIDE INVENTORY MANAGER -->
-            <button 
-              onclick="toggleAddProductModal()" 
-              class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition shrink-0"
-            >
-              <i class="fa-solid fa-plus-circle text-sm"></i> Add New Product
-            </button>
-          </div>
-
+        <!-- Tab 1: Inventory Management & Modern Stat Cards -->
+        <div id="adminTabInventory" class="space-y-5">
+          
+          <!-- Modern Colorful Stat Cards -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span class="text-[11px] text-slate-400 font-semibold block">Total Catalog Items</span>
-              <span id="invTotalItems" class="text-2xl font-black text-white">0</span>
+            
+            <div class="admin-stat-card p-5 rounded-2xl space-y-2 border-l-4 border-l-blue-500">
+              <div class="flex items-center justify-between text-blue-400">
+                <span class="text-xs font-extrabold uppercase tracking-wider">Catalog Items</span>
+                <i class="fa-solid fa-layer-group text-lg"></i>
+              </div>
+              <span id="invTotalItems" class="text-3xl font-black text-white block">0</span>
+              <span class="text-[11px] text-slate-400 font-medium">Unique Paint & Tool items</span>
             </div>
-            <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span class="text-[11px] text-slate-400 font-semibold block">Total Stock Quantity</span>
-              <span id="invTotalStock" class="text-2xl font-black text-amber-400">0</span>
+
+            <div class="admin-stat-card p-5 rounded-2xl space-y-2 border-l-4 border-l-emerald-500">
+              <div class="flex items-center justify-between text-emerald-400">
+                <span class="text-xs font-extrabold uppercase tracking-wider">Total Stock</span>
+                <i class="fa-solid fa-cubes text-lg"></i>
+              </div>
+              <span id="invTotalStock" class="text-3xl font-black text-emerald-400 block">0</span>
+              <span class="text-[11px] text-slate-400 font-medium">Available Tins & Units</span>
             </div>
-            <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span class="text-[11px] text-slate-400 font-semibold block">Low-Stock Warnings</span>
-              <span id="invLowStockCount" class="text-2xl font-black text-rose-400">0</span>
+
+            <div class="admin-stat-card p-5 rounded-2xl space-y-2 border-l-4 border-l-rose-500">
+              <div class="flex items-center justify-between text-rose-400">
+                <span class="text-xs font-extrabold uppercase tracking-wider">Low Stock</span>
+                <i class="fa-solid fa-triangle-exclamation text-lg animate-pulse"></i>
+              </div>
+              <span id="invLowStockCount" class="text-3xl font-black text-rose-400 block">0</span>
+              <span class="text-[11px] text-slate-400 font-medium">Items under 10 units</span>
             </div>
-            <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span class="text-[11px] text-slate-400 font-semibold block">Catalog Valuation</span>
-              <span id="invTotalValue" class="text-2xl font-black text-emerald-400">৳ 0</span>
+
+            <div class="admin-stat-card p-5 rounded-2xl space-y-2 border-l-4 border-l-amber-500">
+              <div class="flex items-center justify-between text-amber-400">
+                <span class="text-xs font-extrabold uppercase tracking-wider">Stock Valuation</span>
+                <i class="fa-solid fa-coins text-lg"></i>
+              </div>
+              <span id="invTotalValue" class="text-3xl font-black text-amber-400 block">৳ 0</span>
+              <span class="text-[11px] text-slate-400 font-medium">Total Shop Stock Value</span>
+            </div>
+
+          </div>
+
+          <!-- Inventory Actions & Table -->
+          <div class="space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+              <div>
+                <h4 class="font-bold text-sm text-slate-200">Catalog Restock & Pricing Table</h4>
+                <p class="text-[11px] text-amber-400 font-medium">Click quick restock (+10 / -5) to update live storefront quantities</p>
+              </div>
+              
+              <button 
+                onclick="toggleAddProductModal()" 
+                class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition shrink-0"
+              >
+                <i class="fa-solid fa-plus-circle text-sm"></i> Add New Product
+              </button>
+            </div>
+
+            <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
+              <table class="w-full text-left text-xs text-slate-300">
+                <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+                  <tr>
+                    <th class="p-3.5">Product Name</th>
+                    <th class="p-3.5">Category</th>
+                    <th class="p-3.5">Variant / Specifications</th>
+                    <th class="p-3.5">Price</th>
+                    <th class="p-3.5">In Stock</th>
+                    <th class="p-3.5">Status</th>
+                    <th class="p-3.5 text-right">Quick Restock</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60">
+                  <!-- Rendered via JS -->
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
-                <tr>
-                  <th class="p-3">Product Name</th>
-                  <th class="p-3">Category</th>
-                  <th class="p-3">Variant / Specifications</th>
-                  <th class="p-3">Price</th>
-                  <th class="p-3">In Stock</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-right">Quick Restock</th>
-                </tr>
-              </thead>
-              <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60">
-                <!-- Rendered via JS -->
-              </tbody>
-            </table>
-          </div>
         </div>
 
         <!-- Tab 2: Product Delivery & Orders List -->
         <div id="adminTabOrders" class="space-y-4 hidden">
           <div class="flex justify-between items-center">
             <h4 class="font-bold text-sm text-slate-200">Customer Orders & Delivery Tracker</h4>
-            <span id="orderCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Orders</span>
+            <span id="orderCountBadge" class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full text-xs font-bold">0 Orders</span>
           </div>
 
           <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
             <table class="w-full text-left text-xs text-slate-300">
               <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
                 <tr>
-                  <th class="p-3">Order ID</th>
-                  <th class="p-3">Customer Name</th>
-                  <th class="p-3">Phone</th>
-                  <th class="p-3">Delivery Address</th>
-                  <th class="p-3">Items Purchased</th>
-                  <th class="p-3">Total BDT</th>
-                  <th class="p-3">Delivery Status</th>
+                  <th class="p-3.5">Order ID</th>
+                  <th class="p-3.5">Customer Name</th>
+                  <th class="p-3.5">Phone</th>
+                  <th class="p-3.5">Delivery Address</th>
+                  <th class="p-3.5">Items Purchased</th>
+                  <th class="p-3.5">Total BDT</th>
+                  <th class="p-3.5">Delivery Status</th>
                 </tr>
               </thead>
               <tbody id="adminOrdersTableBody" class="divide-y divide-slate-800/60">
@@ -853,18 +889,18 @@
         <div id="adminTabUsers" class="space-y-4 hidden">
           <div class="flex justify-between items-center">
             <h4 class="font-bold text-sm text-slate-200">Registered Platform Customers</h4>
-            <span id="userCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Registered</span>
+            <span id="userCountBadge" class="px-3 py-1 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-full text-xs font-bold">0 Registered</span>
           </div>
 
           <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
             <table class="w-full text-left text-xs text-slate-300">
               <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
                 <tr>
-                  <th class="p-3">Customer Name</th>
-                  <th class="p-3">Phone Number</th>
-                  <th class="p-3">Email Address</th>
-                  <th class="p-3">Full Delivery Address</th>
-                  <th class="p-3">Role</th>
+                  <th class="p-3.5">Customer Name</th>
+                  <th class="p-3.5">Phone Number</th>
+                  <th class="p-3.5">Email Address</th>
+                  <th class="p-3.5">Full Delivery Address</th>
+                  <th class="p-3.5">Role</th>
                 </tr>
               </thead>
               <tbody id="adminUsersTableBody" class="divide-y divide-slate-800/60">
@@ -878,20 +914,20 @@
         <div id="adminTabRequests" class="space-y-4 hidden">
           <div class="flex justify-between items-center">
             <h4 class="font-bold text-sm text-slate-200">Customer Unlisted Product Requests</h4>
-            <span id="requestCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Requests</span>
+            <span id="requestCountBadge" class="px-3 py-1 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-full text-xs font-bold">0 Requests</span>
           </div>
 
           <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
             <table class="w-full text-left text-xs text-slate-300">
               <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
                 <tr>
-                  <th class="p-3">Customer Name</th>
-                  <th class="p-3">Phone</th>
-                  <th class="p-3">Requested Product</th>
-                  <th class="p-3">Quantity</th>
-                  <th class="p-3">Notes</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-right">Action</th>
+                  <th class="p-3.5">Customer Name</th>
+                  <th class="p-3.5">Phone</th>
+                  <th class="p-3.5">Requested Product</th>
+                  <th class="p-3.5">Quantity</th>
+                  <th class="p-3.5">Notes</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody id="adminRequestsTableBody" class="divide-y divide-slate-800/60">
@@ -1251,8 +1287,11 @@
         container.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-amber-400 hidden lg:inline">Hi, ${currentUser.name.split(' ')[0]}</span>
+            <button onclick="toggleAuthModal('login')" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition">
+              <i class="fa-solid fa-user-gear text-amber-400"></i> Account
+            </button>
             <button onclick="handleLogout()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-400 text-xs font-bold transition">
-              <i class="fa-solid fa-right-from-bracket"></i> Logout
+              <i class="fa-solid fa-right-from-bracket"></i>
             </button>
           </div>
         `;
@@ -1279,19 +1318,30 @@
     function switchAuthTab(tab) {
       const loginBtn = document.getElementById('authTabLoginBtn');
       const regBtn = document.getElementById('authTabRegisterBtn');
+      const adminBtn = document.getElementById('authTabAdminBtn');
+      
       const loginForm = document.getElementById('loginForm');
       const regForm = document.getElementById('registerForm');
+      const adminForm = document.getElementById('adminAuthForm');
+
+      // Reset styles
+      loginBtn.className = "text-slate-400 hover:text-white pb-2";
+      regBtn.className = "text-slate-400 hover:text-white pb-2";
+      adminBtn.className = "text-amber-500/80 hover:text-amber-400 pb-2 flex items-center gap-1";
+
+      loginForm.classList.add('hidden');
+      regForm.classList.add('hidden');
+      adminForm.classList.add('hidden');
 
       if (tab === 'login') {
-        loginBtn.className = "font-display text-lg font-bold text-amber-400 border-b-2 border-amber-400 pb-1";
-        regBtn.className = "font-display text-lg font-bold text-slate-400 hover:text-white pb-1";
+        loginBtn.className = "text-amber-400 border-b-2 border-amber-400 pb-2 font-bold";
         loginForm.classList.remove('hidden');
-        regForm.classList.add('hidden');
-      } else {
-        regBtn.className = "font-display text-lg font-bold text-amber-400 border-b-2 border-amber-400 pb-1";
-        loginBtn.className = "font-display text-lg font-bold text-slate-400 hover:text-white pb-1";
+      } else if (tab === 'register') {
+        regBtn.className = "text-amber-400 border-b-2 border-amber-400 pb-2 font-bold";
         regForm.classList.remove('hidden');
-        loginForm.classList.add('hidden');
+      } else if (tab === 'admin') {
+        adminBtn.className = "text-amber-400 border-b-2 border-amber-400 pb-2 font-bold flex items-center gap-1";
+        adminForm.classList.remove('hidden');
       }
     }
 
@@ -1418,27 +1468,6 @@
       alert(`Success! Product "${title}" (৳${price}) has been added and is now LIVE on your storefront!`);
     }
 
-    function openAdminModal() {
-      const modal = document.getElementById('adminPanelModal');
-      modal.classList.remove('hidden');
-      
-      const loginView = document.getElementById('adminLoginView');
-      const dashView = document.getElementById('adminDashboardView');
-
-      if (isAdminUnlocked) {
-        loginView.classList.add('hidden');
-        dashView.classList.remove('hidden');
-        renderAdminTables();
-      } else {
-        loginView.classList.remove('hidden');
-        dashView.classList.add('hidden');
-      }
-    }
-
-    function closeAdminModal() {
-      document.getElementById('adminPanelModal').classList.add('hidden');
-    }
-
     function handleAdminAuth(e) {
       e.preventDefault();
       const mobile = document.getElementById('adminMobile').value.trim();
@@ -1446,8 +1475,10 @@
       
       if ((mobile === '01722452836' || mobile === '01700000000' || mobile.length >= 11) && (code === 'Habib123' || code === '01722452836')) {
         isAdminUnlocked = true;
-        document.getElementById('adminLoginView').classList.add('hidden');
-        document.getElementById('adminDashboardView').classList.remove('hidden');
+        toggleAuthModal(); // Close auth modal
+        
+        const modal = document.getElementById('adminPanelModal');
+        modal.classList.remove('hidden');
         renderAdminTables();
       } else {
         alert('Invalid Manager Mobile Number or Security Passcode!');
@@ -1456,8 +1487,12 @@
 
     function lockAdminPanel() {
       isAdminUnlocked = false;
-      document.getElementById('adminLoginView').classList.remove('hidden');
-      document.getElementById('adminDashboardView').classList.add('hidden');
+      document.getElementById('adminPanelModal').classList.add('hidden');
+      alert('Admin Control Center Locked.');
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminPanelModal').classList.add('hidden');
     }
 
     function switchAdminTab(tab) {
@@ -1466,10 +1501,10 @@
         const btn = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
         const content = document.getElementById(`adminTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (t === tab) {
-          btn.className = "px-4 py-2.5 text-amber-400 border-b-2 border-amber-400";
+          btn.className = "px-5 py-3 text-amber-400 border-b-2 border-amber-400 bg-amber-500/10 rounded-t-xl transition flex items-center gap-2 font-bold";
           content.classList.remove('hidden');
         } else {
-          btn.className = "px-4 py-2.5 text-slate-400 hover:text-white";
+          btn.className = "px-5 py-3 text-slate-400 hover:text-white rounded-t-xl transition flex items-center gap-2 font-bold";
           content.classList.add('hidden');
         }
       });
@@ -1482,14 +1517,14 @@
       
       ordersTbody.innerHTML = ordersList.map((ord, idx) => `
         <tr class="hover:bg-slate-900/60 transition">
-          <td class="p-3 font-bold text-amber-400">${ord.id}</td>
-          <td class="p-3 font-semibold text-slate-100">${ord.customerName}</td>
-          <td class="p-3 text-slate-300"><a href="tel:${ord.phone}" class="underline text-amber-400">${ord.phone}</a></td>
-          <td class="p-3 text-slate-400">${ord.address}</td>
-          <td class="p-3 text-slate-300 max-w-xs truncate">${ord.items}</td>
-          <td class="p-3 font-extrabold text-emerald-400">৳ ${ord.total}</td>
-          <td class="p-3">
-            <select onchange="updateOrderStatus(${idx}, this.value)" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-[11px] text-amber-400 font-bold focus:outline-none">
+          <td class="p-3.5 font-bold text-amber-400">${ord.id}</td>
+          <td class="p-3.5 font-semibold text-slate-100">${ord.customerName}</td>
+          <td class="p-3.5 text-slate-300"><a href="tel:${ord.phone}" class="underline text-amber-400 font-bold">${ord.phone}</a></td>
+          <td class="p-3.5 text-slate-400">${ord.address}</td>
+          <td class="p-3.5 text-slate-300 max-w-xs truncate">${ord.items}</td>
+          <td class="p-3.5 font-extrabold text-emerald-400">৳ ${ord.total}</td>
+          <td class="p-3.5">
+            <select onchange="updateOrderStatus(${idx}, this.value)" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-amber-400 font-bold focus:outline-none focus:border-amber-500">
               <option value="Pending" ${ord.status === 'Pending' ? 'selected' : ''}>Pending</option>
               <option value="Out for Delivery" ${ord.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
               <option value="Delivered" ${ord.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
@@ -1504,11 +1539,11 @@
 
       usersTbody.innerHTML = usersList.map(u => `
         <tr class="hover:bg-slate-900/60 transition">
-          <td class="p-3 font-bold text-slate-100">${u.name}</td>
-          <td class="p-3 text-amber-400 font-semibold">${u.phone}</td>
-          <td class="p-3 text-slate-400">${u.email || 'N/A'}</td>
-          <td class="p-3 text-slate-300">${u.address}</td>
-          <td class="p-3"><span class="px-2 py-0.5 ${u.role === 'ADMIN' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-300'} rounded text-[10px] font-bold">${u.role}</span></td>
+          <td class="p-3.5 font-bold text-slate-100">${u.name}</td>
+          <td class="p-3.5 text-amber-400 font-semibold">${u.phone}</td>
+          <td class="p-3.5 text-slate-400">${u.email || 'N/A'}</td>
+          <td class="p-3.5 text-slate-300">${u.address}</td>
+          <td class="p-3.5"><span class="px-2.5 py-1 ${u.role === 'ADMIN' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-300'} rounded-md text-[10px] font-extrabold">${u.role}</span></td>
         </tr>
       `).join('');
 
@@ -1521,14 +1556,14 @@
 
       reqTbody.innerHTML = productRequestsList.map((req, idx) => `
         <tr class="hover:bg-slate-900/60 transition">
-          <td class="p-3 font-bold text-slate-100">${req.customerName}</td>
-          <td class="p-3 text-amber-400 font-semibold"><a href="tel:${req.phone}" class="underline">${req.phone}</a></td>
-          <td class="p-3 font-bold text-white">${req.productName}</td>
-          <td class="p-3 text-slate-300">${req.quantity}</td>
-          <td class="p-3 text-slate-400 italic">${req.notes}</td>
-          <td class="p-3"><span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded text-[10px] font-bold">${req.status}</span></td>
-          <td class="p-3 text-right">
-            <button onclick="fulfillRequest(${idx})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-[10px]">
+          <td class="p-3.5 font-bold text-slate-100">${req.customerName}</td>
+          <td class="p-3.5 text-amber-400 font-semibold"><a href="tel:${req.phone}" class="underline">${req.phone}</a></td>
+          <td class="p-3.5 font-bold text-white">${req.productName}</td>
+          <td class="p-3.5 text-slate-300">${req.quantity}</td>
+          <td class="p-3.5 text-slate-400 italic">${req.notes}</td>
+          <td class="p-3.5"><span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-md text-[10px] font-bold">${req.status}</span></td>
+          <td class="p-3.5 text-right">
+            <button onclick="fulfillRequest(${idx})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[10px] shadow transition">
               Mark Contacted
             </button>
           </td>
@@ -1747,23 +1782,23 @@
           if (v.stock < 10) lowStockCount += 1;
 
           const status = v.stock > 10 
-            ? `<span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold text-[10px]">In Stock</span>`
+            ? `<span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full font-bold text-[10px]">In Stock</span>`
             : v.stock > 0
-            ? `<span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full font-bold text-[10px]">Low Stock</span>`
-            : `<span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 rounded-full font-bold text-[10px]">Out of Stock</span>`;
+            ? `<span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full font-bold text-[10px]">Low Stock</span>`
+            : `<span class="px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/40 rounded-full font-bold text-[10px]">Out of Stock</span>`;
 
           html += `
-            <tr class="hover:bg-slate-900/60 transition">
-              <td class="p-3 font-semibold text-slate-100">${prod.title}</td>
-              <td class="p-3 text-slate-400">${prod.category}</td>
-              <td class="p-3 font-bold text-amber-400">${v.name}</td>
-              <td class="p-3 font-semibold text-slate-200">৳ ${v.price}</td>
-              <td class="p-3 font-extrabold ${v.stock < 10 ? 'text-amber-400' : 'text-slate-100'}">${v.stock}</td>
-              <td class="p-3">${status}</td>
-              <td class="p-3 text-right">
+            <tr class="hover:bg-slate-900/80 transition">
+              <td class="p-3.5 font-semibold text-slate-100">${prod.title}</td>
+              <td class="p-3.5 text-slate-400">${prod.category}</td>
+              <td class="p-3.5 font-bold text-amber-400">${v.name}</td>
+              <td class="p-3.5 font-semibold text-slate-200">৳ ${v.price}</td>
+              <td class="p-3.5 font-extrabold ${v.stock < 10 ? 'text-amber-400' : 'text-slate-100'}">${v.stock}</td>
+              <td class="p-3.5">${status}</td>
+              <td class="p-3.5 text-right">
                 <div class="inline-flex items-center gap-1.5">
-                  <button onclick="adjustStock(${prod.id}, ${vIdx}, -5)" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded font-bold text-[11px]">-5</button>
-                  <button onclick="adjustStock(${prod.id}, ${vIdx}, 10)" class="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded font-bold text-[11px]">+10</button>
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, -5)" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded-lg font-bold text-[11px]">-5</button>
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, 10)" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg font-bold text-[11px] shadow">+10</button>
                 </div>
               </td>
             </tr>
