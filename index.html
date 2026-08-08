@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M/S Rong Bahar - Hardware & Paint Store Pakundia, Kishoreganj</title>
+  <meta name="description" content="Authentic Berger paints, synthetic enamels, HMBR security padlocks, Fevicol adhesives, PVC plumbing, BRB cables & contractor tools at M/S Rong Bahar Pakundia." />
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fffbe6',
+              100: '#fff3b8',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+              900: '#78350f',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .glow-amber {
+      box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.25);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.25);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-bold text-xs py-2 px-4 text-center tracking-wide flex items-center justify-center gap-3">
+    <span><i class="fa-solid fa-store mr-1"></i> Pakundia's Premier Hardware & Paint Wholesale Hub</span>
+    <span class="hidden md:inline">•</span>
+    <span class="hidden md:inline"><i class="fa-solid fa-truck-fast mr-1"></i> Same-Day Delivery in Kishoreganj District</span>
+    <a href="tel:+8801722452836" class="underline hover:text-white transition font-black ml-2"><i class="fa-solid fa-phone"></i> 01722452836</a>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-fill-drip text-slate-950 text-xl font-bold"></i>
+        </div>
+        <div>
+          <span class="font-display font-black text-xl lg:text-2xl text-white tracking-tight leading-none block">
+            M/S RONG BAHAR
+          </span>
+          <span class="text-[10px] uppercase font-semibold tracking-wider text-amber-400 block">
+            Hardware & Paint Store
+          </span>
+        </div>
+      </a>
+
+      <!-- Quick Search Bar -->
+      <div class="hidden md:flex flex-1 max-w-md mx-4 relative">
+        <input 
+          type="text" 
+          id="searchInput"
+          placeholder="Search Berger paint, HMBR lock, Fevicol PUR, PVC pipe..." 
+          class="w-full bg-slate-900 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition"
+          onkeyup="filterProducts()"
+        />
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="https://wa.me/8801722452836" target="_blank" class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition">
+          <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+        </a>
+
+        <!-- Cart Trigger Button -->
+        <button 
+          onclick="toggleCartModal()"
+          class="relative flex items-center gap-2.5 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg transition text-xs sm:text-sm"
+        >
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="hidden sm:inline">Cart</span>
+          <span id="cartCountBadge" class="bg-slate-950 text-amber-400 text-[11px] font-black rounded-full px-2 py-0.5 min-w-[20px] text-center">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow">
+
+    <!-- Hero Banner Section -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 py-16 px-4 lg:px-8">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-amber-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+        
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-wider">
+            <i class="fa-solid fa-shield-halved"></i> Authentic Hardware & Construction Materials
+          </div>
+
+          <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+            Original Paints, Tools & <br class="hidden sm:inline" />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600">
+              Hardware Direct to Site
+            </span>
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+            M/S Rong Bahar is Pakundia's trusted distributor for Berger Robbialac synthetic enamels, HMBR top security padlocks, Fevicol 1K PUR glue, RFL PVC plumbing, and BRB copper building wires.
+          </p>
+
+          <!-- Quick Tags -->
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-2 text-xs font-semibold text-slate-400">
+            <span class="text-slate-500">Popular Brands:</span>
+            <button onclick="setSearchFilter('Berger')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">Berger Paints</button>
+            <button onclick="setSearchFilter('HMBR')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">HMBR Lock</button>
+            <button onclick="setSearchFilter('Fevicol')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">Fevicol PUR</button>
+            <button onclick="setSearchFilter('BRB')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-lg border border-slate-700 transition">BRB Wires</button>
+          </div>
+        </div>
+
+        <!-- Right Store Information Card -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="w-full max-w-md glass-card rounded-3xl p-6 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 class="text-lg font-extrabold text-white">M/S Rong Bahar Main Shop</h3>
+                <p class="text-xs text-amber-400 font-medium"><i class="fa-solid fa-location-dot mr-1"></i> Mothkhola Road, Pakundia, Kishoreganj</p>
+              </div>
+              <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-bold">
+                Open Now
+              </span>
+            </div>
+
+            <div class="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=800&q=80" 
+                alt="Hardware Store Interior" 
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+              <span class="absolute bottom-3 left-4 text-xs font-bold text-slate-200"><i class="fa-solid fa-warehouse mr-1 text-amber-400"></i> Wholesale & Retail Counter</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block font-medium">Pakundia Coverage</span>
+                <span class="font-bold text-slate-100">Same-Day Express</span>
+              </div>
+              <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block font-medium">Payment Methods</span>
+                <span class="font-bold text-emerald-400">COD, bKash & Nagad</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Categories Grid Section -->
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-12 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between border-b border-slate-800 pb-4 gap-2">
+        <div>
+          <h2 class="font-display text-2xl font-extrabold text-white tracking-tight">Explore Shop Departments</h2>
+          <p class="text-xs text-slate-400">Browse categories for paint, security, plumbing, electrical & masonry</p>
+        </div>
+        <span class="text-xs text-amber-400 font-semibold"><i class="fa-solid fa-layer-group"></i> 8 Active Product Lines</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        
+        <!-- Category 1 -->
+        <div onclick="setCategoryFilter('all')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">All Products</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Full Catalog</p>
+        </div>
+
+        <!-- Category 2 -->
+        <div onclick="setCategoryFilter('Security Hardware')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Security & Padlocks</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">HMBR 50-70mm Locks</p>
+        </div>
+
+        <!-- Category 3 -->
+        <div onclick="setCategoryFilter('Paints')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-paint-roller"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Paints & Enamels</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Berger Synthetic Gloss</p>
+        </div>
+
+        <!-- Category 4 -->
+        <div onclick="setCategoryFilter('Adhesives')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-bottle-droplet"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Adhesives & Glues</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Fevicol 1K PUR Polyurethane</p>
+        </div>
+
+        <!-- Category 5 -->
+        <div onclick="setCategoryFilter('Tools')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Painting Tools</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Flat Brushes 2"-5"</p>
+        </div>
+
+        <!-- Category 6 -->
+        <div onclick="setCategoryFilter('Plumbing')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-faucet-drip"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Plumbing & Taps</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">RFL PVC Pipes & Brass Taps</p>
+        </div>
+
+        <!-- Category 7 -->
+        <div onclick="setCategoryFilter('Electrical')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Electrical & Wires</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Super Star LED & BRB Cables</p>
+        </div>
+
+        <!-- Category 8 -->
+        <div onclick="setCategoryFilter('Sanitary')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+            <i class="fa-solid fa-toilet"></i>
+          </div>
+          <h3 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">Sanitaryware</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Ceramic Commodes & Faucets</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Product Showcase Section -->
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 id="catalogHeading" class="font-display text-2xl font-extrabold text-white tracking-tight">Catalog Products</h2>
+          <p class="text-xs text-slate-400">Select sizes/variants to view live pricing</p>
+        </div>
+      </div>
+
+      <!-- Products Grid Container -->
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Products will be rendered dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- Contractor & Wholesale Hotline Banner -->
+    <section class="max-w-7xl mx-auto px-4 lg:px-8 py-12">
+      <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-3xl p-8 lg:p-12 text-slate-950 flex flex-col lg:flex-row items-center justify-between gap-8 shadow-2xl">
+        <div class="space-y-3 max-w-2xl text-center lg:text-left">
+          <span class="px-3.5 py-1 bg-slate-950 text-amber-400 rounded-full text-xs font-black uppercase tracking-wider">
+            Pakundia Contractor & Project Rate
+          </span>
+          <h2 class="font-display text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+            Need Bulk Paint Drums, Locks, or Construction Glue?
+          </h2>
+          <p class="text-slate-900 font-semibold text-sm sm:text-base">
+            Contact store owner directly for special contractor discount quotes on Berger paints, Fevicol 1K PUR, HMBR locks, or site building materials.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 shrink-0 w-full sm:w-auto">
+          <a href="tel:+8801722452836" class="w-full sm:w-auto px-6 py-4 bg-slate-950 hover:bg-slate-900 text-amber-400 font-black rounded-2xl shadow-xl transition flex items-center justify-center gap-2 text-sm">
+            <i class="fa-solid fa-phone"></i> Call 01722452836
+          </a>
+          <a href="https://wa.me/8801722452836" target="_blank" class="w-full sm:w-auto px-6 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-2xl shadow-xl transition text-sm flex items-center justify-center gap-2">
+            <i class="fa-brands fa-whatsapp text-lg"></i> WhatsApp Wholesale
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Slide-Over Shopping Cart Modal -->
+  <div id="cartModal" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleCartModal()"></div>
+
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-slate-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl z-10">
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+          <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-cart-shopping text-amber-400"></i> Shopping Cart
+          </h3>
+          <button onclick="toggleCartModal()" class="text-slate-400 hover:text-white text-xl">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div id="cartItemsList" class="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+          <!-- Cart Items populated by JS -->
+        </div>
+      </div>
+
+      <!-- Cart Footer & Checkout Form -->
+      <div class="border-t border-slate-800 pt-4 space-y-4">
+        <div class="flex justify-between items-center text-slate-300">
+          <span class="text-sm font-semibold">Total Amount:</span>
+          <span id="cartTotal" class="text-2xl font-black text-amber-400">৳ 0</span>
+        </div>
+
+        <!-- Checkout Info -->
+        <form id="checkoutForm" onsubmit="handleCheckout(event)" class="space-y-3">
+          <input 
+            type="text" 
+            id="custName" 
+            required 
+            placeholder="Your Full Name" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
+          />
+          <input 
+            type="tel" 
+            id="custPhone" 
+            required 
+            placeholder="Mobile Phone (017...)" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
+          />
+          <input 
+            type="text" 
+            id="custAddress" 
+            required 
+            placeholder="Delivery Address in Pakundia / Kishoreganj" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
+          />
+
+          <button 
+            type="submit" 
+            class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2"
+          >
+            <i class="fa-solid fa-paper-plane"></i> Place Cash On Delivery Order
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-800 py-12 px-4 lg:px-8 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-bold">
+            <i class="fa-solid fa-fill-drip"></i>
+          </div>
+          <span class="font-display font-extrabold text-white text-base">M/S RONG BAHAR</span>
+        </div>
+        <p class="leading-relaxed">
+          Authorized Bangladeshi Hardware, Berger Paint finishes & structural building material store based in Pakundia, Kishoreganj.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 text-sm mb-3">Store Location</h4>
+        <p class="leading-relaxed">
+          Mothkhola Road, Pakundia<br />
+          District: Kishoreganj, Dhaka Division<br />
+          Bangladesh
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 text-sm mb-3">Customer Service</h4>
+        <p class="leading-relaxed">
+          Hotline: 01722452836<br />
+          WhatsApp: +8801722452836<br />
+          Hours: Sat - Thu (8:00 AM - 9:00 PM)
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 text-sm mb-3">Accepted Payments</h4>
+        <div class="flex flex-wrap gap-2 text-slate-300 font-bold">
+          <span class="px-2.5 py-1 bg-slate-900 rounded border border-slate-800">Cash on Delivery</span>
+          <span class="px-2.5 py-1 bg-pink-950 text-pink-400 rounded border border-pink-900">bKash</span>
+          <span class="px-2.5 py-1 bg-orange-950 text-orange-400 rounded border border-orange-900">Nagad</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto border-t border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+      <p>&copy; 2026 M/S Rong Bahar. All rights reserved.</p>
+      <p class="text-slate-500">Hardware & Paint Retail Management System BD</p>
+    </div>
+  </footer>
+
+  <!-- Embedded JavaScript Application Code -->
+  <script>
+    // Product Data Store
+    const productsData = [
+      {
+        id: 1,
+        title: 'HMBR Stainless Steel Heavy Security Padlock',
+        category: 'Security Hardware',
+        image: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '50mm Lock', price: 220 },
+          { name: '60mm Lock', price: 320 },
+          { name: '70mm Lock', price: 400 }
+        ]
+      },
+      {
+        id: 2,
+        title: 'Berger Robbialac Super Gloss Synthetic Enamel – Blue',
+        category: 'Paints',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 540 },
+          { name: '3.64 Litre Can', price: 1980 },
+          { name: '18.2 Litre Drum', price: 7900 }
+        ]
+      },
+      {
+        id: 3,
+        title: 'Fevicol 1K PUR Polyurethane Wood Glue',
+        category: 'Adhesives',
+        image: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '125g Bottle', price: 250 },
+          { name: '250g Bottle', price: 450 },
+          { name: '500g Bottle', price: 744 },
+          { name: '1kg Heavy Pack', price: 1350 }
+        ]
+      },
+      {
+        id: 4,
+        title: 'Professional Industrial Flat Paint Brush Series',
+        category: 'Tools',
+        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '2 Inch Brush', price: 60 },
+          { name: '3 Inch Brush', price: 95 },
+          { name: '4 Inch Brush', price: 130 },
+          { name: '5 Inch Brush', price: 180 }
+        ]
+      },
+      {
+        id: 5,
+        title: 'Sattar Solid Brass Heavy Water Tap & Faucet',
+        category: 'Plumbing',
+        image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.5 Inch Bib Cock', price: 380 },
+          { name: '0.5 Inch Pillar Basin Tap', price: 580 },
+          { name: 'Concealed Stop Cock', price: 720 }
+        ]
+      },
+      {
+        id: 6,
+        title: 'Super Star Energy Saving High Lumen LED Bulb',
+        category: 'Electrical',
+        image: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '5 Watt Bulb', price: 120 },
+          { name: '9 Watt Bulb', price: 180 },
+          { name: '12 Watt Bulb', price: 240 },
+          { name: '18 Watt Panel', price: 380 }
+        ]
+      },
+      {
+        id: 7,
+        title: 'BRB 99.99% Electrolytic Pure Copper Building Wires',
+        category: 'Electrical',
+        image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1.5 RM Wire (100m)', price: 2800 },
+          { name: '2.5 RM Wire (100m)', price: 4200 },
+          { name: '4.0 RM Wire (100m)', price: 6500 }
+        ]
+      },
+      {
+        id: 8,
+        title: 'Charu Deluxe Ceramic Single-Piece Sanitary Commode',
+        category: 'Sanitary',
+        image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: 'Single-Piece Commode', price: 4800 },
+          { name: 'Dual-Flush Cistern Tank', price: 1650 }
+        ]
+      }
+    ];
+
+    let cart = [];
+    let activeCategory = 'all';
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+    });
+
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+      const filtered = productsData.filter(item => {
+        const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+        const matchesSearch = item.title.toLowerCase().includes(searchVal) || item.category.toLowerCase().includes(searchVal);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500">
+            <i class="fa-solid fa-box-open text-4xl mb-3 block text-slate-600"></i>
+            <p>No products found matching your search.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(product => {
+        const defaultVar = product.variants[0];
+        return `
+          <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between p-4 space-y-4 group">
+            <div class="space-y-3">
+              <div class="relative aspect-4/3 rounded-xl overflow-hidden bg-slate-950">
+                <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <span class="absolute top-2 left-2 px-2.5 py-0.5 bg-amber-500/90 text-slate-950 font-extrabold text-[10px] uppercase rounded-full">
+                  ${product.category}
+                </span>
+              </div>
+              <h3 class="font-bold text-sm text-slate-100 line-clamp-2 leading-snug">${product.title}</h3>
+            </div>
+
+            <div class="space-y-3 border-t border-slate-800/80 pt-3">
+              <div>
+                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Select Size / Unit:</label>
+                <select id="var-select-${product.id}" onchange="updatePriceDisplay(${product.id})" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                  ${product.variants.map((v, idx) => `<option value="${idx}">${v.name} - ৳${v.price}</option>`).join('')}
+                </select>
+              </div>
+
+              <div class="flex items-center justify-between pt-1">
+                <div>
+                  <span class="text-[10px] text-slate-500 uppercase font-bold block">Price</span>
+                  <span id="price-val-${product.id}" class="text-lg font-black text-amber-400">৳ ${defaultVar.price}</span>
+                </div>
+                <button 
+                  onclick="addToCart(${product.id})"
+                  class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+                >
+                  <i class="fa-solid fa-plus"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updatePriceDisplay(productId) {
+      const product = productsData.find(p => p.id === productId);
+      const selectedIndex = document.getElementById(`var-select-${productId}`).value;
+      const selectedVariant = product.variants[selectedIndex];
+      document.getElementById(`price-val-${productId}`).innerText = `৳ ${selectedVariant.price}`;
+    }
+
+    function addToCart(productId) {
+      const product = productsData.find(p => p.id === productId);
+      const selectedIndex = document.getElementById(`var-select-${productId}`).value;
+      const selectedVariant = product.variants[selectedIndex];
+
+      const itemKey = `${product.id}-${selectedVariant.name}`;
+      const existing = cart.find(i => i.key === itemKey);
+
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          key: itemKey,
+          title: product.title,
+          variant: selectedVariant.name,
+          price: selectedVariant.price,
+          qty: 1
+        });
+      }
+
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cartItemsList');
+      const badge = document.getElementById('cartCountBadge');
+      const totalEl = document.getElementById('cartTotal');
+
+      const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
+      const totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+      badge.innerText = totalItems;
+      totalEl.innerText = `৳ ${totalPrice.toLocaleString()}`;
+
+      if (cart.length === 0) {
+        list.innerHTML = `
+          <div class="py-8 text-center text-slate-500">
+            <i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-600 block"></i>
+            Your cart is empty.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = cart.map(item => `
+        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between gap-3 text-xs">
+          <div class="flex-1">
+            <h4 class="font-bold text-slate-100 line-clamp-1">${item.title}</h4>
+            <p class="text-amber-400 text-[11px] font-semibold">${item.variant} • ৳${item.price}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="changeQty('${item.key}', -1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold">-</button>
+            <span class="font-bold text-slate-100">${item.qty}</span>
+            <button onclick="changeQty('${item.key}', 1)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-bold">+</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function changeQty(key, delta) {
+      const item = cart.find(i => i.key === key);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.key !== key);
+      }
+      renderCart();
+    }
+
+    function toggleCartModal() {
+      const modal = document.getElementById('cartModal');
+      modal.classList.toggle('hidden');
+    }
+
+    function setSearchFilter(query) {
+      const input = document.getElementById('searchInput');
+      input.value = query;
+      filterProducts();
+    }
+
+    function setCategoryFilter(category) {
+      activeCategory = category;
+      const heading = document.getElementById('catalogHeading');
+      heading.innerText = category === 'all' ? 'Catalog Products' : `${category} Department`;
+      renderProducts();
+    }
+
+    function filterProducts() {
+      renderProducts();
+    }
+
+    function handleCheckout(e) {
+      e.preventDefault();
+      if (cart.length === 0) {
+        alert('Your cart is empty! Add products first.');
+        return;
+      }
+      const name = document.getElementById('custName').value;
+      const phone = document.getElementById('custPhone').value;
+      const address = document.getElementById('custAddress').value;
+
+      alert(`Thank you, ${name}! Your Cash on Delivery order has been submitted.\nWe will call ${phone} to confirm delivery to ${address}.`);
+      cart = [];
+      renderCart();
+      toggleCartModal();
+      document.getElementById('checkoutForm').reset();
+    }
+  </script>
+</body>
+</html>

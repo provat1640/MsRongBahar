@@ -249,6 +249,94 @@ async function main() {
     },
   });
 
+  // 5b. Sattar / Sharika Premium Solid Brass Water Tap & Faucet Series
+  await prisma.product.create({
+    data: {
+      title: 'Sattar Heavy Solid Brass Water Tap & Faucet Series',
+      slug: 'sattar-brass-tap-series',
+      description: 'Heavy chrome-plated solid brass water bib cock, pillar basin faucet, and stop cock valve for lifetime leakproof operation.',
+      categoryId: catPlumbing.id,
+      basePrice: 380,
+      stock: 65,
+      sku: 'PLM-TAP-SATTAR',
+      unit: 'Size (Inch / mm)',
+      images: JSON.stringify(['/products/2423.jpg', '/products/2422.jpg']),
+      variants: {
+        create: [
+          { name: '0.5 Inch Heavy Brass Bib Cock', price: 380, stock: 30, sku: 'PLM-TAP-05BIB' },
+          { name: '0.5 Inch Pillar Basin Tap', price: 580, stock: 20, sku: 'PLM-TAP-05BAS' },
+          { name: 'Concealed Stop Cock Valve', price: 720, stock: 15, sku: 'PLM-TAP-STPCK' },
+        ],
+      },
+    },
+  });
+
+  // 5c. RFL Sanitary Comfy Basin Faucet & Hand Shower Set
+  await prisma.product.create({
+    data: {
+      title: 'RFL Sanitary Comfy Basin Faucet & Hand Shower Set',
+      slug: 'rfl-sanitary-faucet-shower-set',
+      description: 'High pressure ABS & chrome plated bathroom basin fittings, wall sink tap, and flexible push hand shower kit.',
+      categoryId: catPlumbing.id,
+      basePrice: 450,
+      stock: 55,
+      sku: 'PLM-SNT-COMFY',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2424.jpg']),
+      variants: {
+        create: [
+          { name: 'Chrome Basin Pillar Tap', price: 450, stock: 25, sku: 'PLM-SNT-BAPIL' },
+          { name: 'Flexible Hand Shower Sprayer Set', price: 490, stock: 20, sku: 'PLM-SNT-HSHWR' },
+          { name: 'Swivel Wall Sink Tap', price: 650, stock: 10, sku: 'PLM-SNT-WSINK' },
+        ],
+      },
+    },
+  });
+
+  // 5d. Charu / Royal Deluxe Ceramic Sanitary Commode & Cistern Set
+  await prisma.product.create({
+    data: {
+      title: 'Charu Deluxe Ceramic Sanitary Commode & Flushing Cistern',
+      slug: 'charu-ceramic-commode-cistern',
+      description: 'Vitreous china stain-resistant ceramic single-piece sanitary commode with dual-flush water tank cistern.',
+      categoryId: catPlumbing.id,
+      basePrice: 4800,
+      stock: 35,
+      sku: 'PLM-CMD-CHARU',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2424.jpg', '/products/2423.jpg']),
+      variants: {
+        create: [
+          { name: 'White Single-Piece Commode', price: 4800, stock: 8, sku: 'PLM-CMD-1PC' },
+          { name: 'Dual-Flush Cistern Water Tank', price: 1650, stock: 12, sku: 'PLM-CMD-CSTRN' },
+          { name: 'Soft-Closing Seat Cover', price: 650, stock: 15, sku: 'PLM-CMD-SEAT' },
+        ],
+      },
+    },
+  });
+
+  // 5e. LIRA PVC Waste Hose & Stainless Sink Strainer Trap
+  await prisma.product.create({
+    data: {
+      title: 'LIRA PVC Waste Hose & Stainless Steel Sink Coupling Strainer',
+      slug: 'lira-waste-hose-sink-strainer',
+      description: 'Flexible expandable PVC basin waste hose, anti-odor floor drain trap, and heavy stainless steel kitchen sink strainer coupling.',
+      categoryId: catPlumbing.id,
+      basePrice: 120,
+      stock: 80,
+      sku: 'PLM-WST-LIRA',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2422.jpg']),
+      variants: {
+        create: [
+          { name: '1.5 Inch Flexible Hose (3 Feet)', price: 120, stock: 35, sku: 'PLM-WST-HOSE' },
+          { name: 'Stainless Steel Sink Coupling Strainer', price: 220, stock: 25, sku: 'PLM-WST-STRN' },
+          { name: 'Anti-Odor Floor Drain Trap', price: 180, stock: 20, sku: 'PLM-WST-TRAP' },
+        ],
+      },
+    },
+  });
+
   // 6. Super Star High Lumen Energy LED Bulb Series (Sub-units: 5W, 9W, 12W, 18W)
   await prisma.product.create({
     data: {
@@ -267,6 +355,117 @@ async function main() {
           { name: '9 Watt LED Bulb', price: 180, stock: 60, sku: 'ELE-LED-09W' },
           { name: '12 Watt LED Bulb', price: 240, stock: 40, sku: 'ELE-LED-12W' },
           { name: '18 Watt LED Panel', price: 380, stock: 25, sku: 'ELE-LED-18W' },
+        ],
+      },
+    },
+  });
+
+  // 6b. BRB Copper Electrical Building Wires Series
+  await prisma.product.create({
+    data: {
+      title: 'BRB Cables 99.99% Electrolytic Pure Copper Building Wires',
+      slug: 'brb-copper-building-wires-series',
+      description: 'BSTI certified 99.99% pure copper PVC insulated fire-retardant electrical building wire coils (100 Meters Coil).',
+      categoryId: catElectrical.id,
+      basePrice: 2800,
+      stock: 35,
+      sku: 'ELE-CBL-BRB',
+      unit: 'Diameter (Inch / mm)',
+      images: JSON.stringify(['/products/2426.jpg', '/products/2425.jpg']),
+      variants: {
+        create: [
+          { name: '1.5 RM Red Phase Wire (100m Coil)', price: 2800, stock: 15, sku: 'ELE-CBL-15RM' },
+          { name: '2.5 RM Blue Neutral Wire (100m Coil)', price: 4200, stock: 12, sku: 'ELE-CBL-25RM' },
+          { name: '4.0 RM Green Earth Wire (100m Coil)', price: 6500, stock: 8, sku: 'ELE-CBL-40RM' },
+        ],
+      },
+    },
+  });
+
+  // 6c. Super Star / Click Deluxe Piano & Gang Switch Board Series
+  await prisma.product.create({
+    data: {
+      title: 'Super Star Deluxe Flame-Retardant Gang Switch Board Series',
+      slug: 'super-star-gang-switch-series',
+      description: 'Elegant flame-retardant polycarbonate piano modular gang switch board and 13A universal socket with child safety shutter.',
+      categoryId: catElectrical.id,
+      basePrice: 110,
+      stock: 120,
+      sku: 'ELE-SWT-GANG',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2427.jpg']),
+      variants: {
+        create: [
+          { name: '1-Gang Light Switch', price: 110, stock: 40, sku: 'ELE-SWT-1GANG' },
+          { name: '2-Gang Light Switch', price: 160, stock: 35, sku: 'ELE-SWT-2GANG' },
+          { name: '3-Gang Light Switch', price: 210, stock: 25, sku: 'ELE-SWT-3GANG' },
+          { name: '13A Universal Power Socket', price: 240, stock: 20, sku: 'ELE-SWT-13ASCK' },
+        ],
+      },
+    },
+  });
+
+  // 6d. Super Star / Schneider Single Pole MCB Circuit Breaker Series
+  await prisma.product.create({
+    data: {
+      title: 'Schneider / Super Star Single Pole MCB Miniature Circuit Breaker',
+      slug: 'schneider-mcb-circuit-breaker-series',
+      description: 'High interrupting capacity thermal-magnetic MCB circuit breaker for household short circuit and overload protection.',
+      categoryId: catElectrical.id,
+      basePrice: 320,
+      stock: 90,
+      sku: 'ELE-MCB-SERIES',
+      unit: 'Power (Watt / Pcs)',
+      images: JSON.stringify(['/products/2426.jpg']),
+      variants: {
+        create: [
+          { name: 'Single Pole 6A MCB', price: 320, stock: 25, sku: 'ELE-MCB-06A' },
+          { name: 'Single Pole 10A MCB', price: 320, stock: 30, sku: 'ELE-MCB-10A' },
+          { name: 'Single Pole 16A MCB', price: 350, stock: 20, sku: 'ELE-MCB-16A' },
+          { name: 'Single Pole 32A MCB', price: 400, stock: 15, sku: 'ELE-MCB-32A' },
+        ],
+      },
+    },
+  });
+
+  // 6e. Super Star / Vision Heavy Duty Ceiling Fan & Exhaust Fan
+  await prisma.product.create({
+    data: {
+      title: 'Vision / Super Star Energy Efficient Ceiling & Exhaust Fan',
+      slug: 'vision-superstar-ceiling-exhaust-fan',
+      description: 'Aerodynamic aluminum blade high-speed ceiling fan and whisper-quiet window exhaust fan for home and kitchen ventilation.',
+      categoryId: catElectrical.id,
+      basePrice: 1150,
+      stock: 45,
+      sku: 'ELE-FAN-SERIES',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2427.jpg', '/products/2425.jpg']),
+      variants: {
+        create: [
+          { name: '56 Inch Deluxe Ceiling Fan', price: 3250, stock: 15, sku: 'ELE-FAN-56IN' },
+          { name: '9 Inch Window Exhaust Fan', price: 1150, stock: 18, sku: 'ELE-FAN-09EXH' },
+          { name: '12 Inch High-Speed Exhaust Fan', price: 1550, stock: 12, sku: 'ELE-FAN-12EXH' },
+        ],
+      },
+    },
+  });
+
+  // 6f. Super Star Multi-Plug Power Strip Extension Board
+  await prisma.product.create({
+    data: {
+      title: 'Super Star Heavy-Duty Multi-Plug Extension Power Strip',
+      slug: 'super-star-extension-power-strip',
+      description: 'Heavy duty copper bar surge protected multi-plug extension board with master power switch and high voltage reset fuse.',
+      categoryId: catElectrical.id,
+      basePrice: 380,
+      stock: 60,
+      sku: 'ELE-EXT-STRIP',
+      unit: 'Quantity (Piece / Pack)',
+      images: JSON.stringify(['/products/2425.jpg']),
+      variants: {
+        create: [
+          { name: '3-Yard 4-Port Socket Strip', price: 380, stock: 35, sku: 'ELE-EXT-3YD' },
+          { name: '5-Yard Heavy Surge Protector Strip', price: 620, stock: 25, sku: 'ELE-EXT-5YD' },
         ],
       },
     },
