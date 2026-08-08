@@ -54,12 +54,6 @@
     .glass-card:hover {
       border-color: rgba(245, 158, 11, 0.4);
     }
-    .glow-amber {
-      box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.25);
-    }
-    .glow-cyan {
-      box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.25);
-    }
   </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
@@ -105,6 +99,16 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-3">
+        <!-- Stock Inventory Checkup Trigger -->
+        <button 
+          onclick="toggleInventoryModal()"
+          class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition flex items-center gap-2"
+          title="Manager Inventory Checkup"
+        >
+          <i class="fa-solid fa-boxes-packing text-amber-400"></i>
+          <span class="hidden md:inline">Stock Checkup</span>
+        </button>
+
         <a href="https://wa.me/8801722452836" target="_blank" class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition">
           <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
         </a>
@@ -210,7 +214,7 @@
 
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         
-        <!-- Category 1 -->
+        <!-- Category Items -->
         <div onclick="setCategoryFilter('all')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-boxes-stacked"></i>
@@ -219,7 +223,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">Full Catalog</p>
         </div>
 
-        <!-- Category 2 -->
         <div onclick="setCategoryFilter('Security Hardware')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-lock"></i>
@@ -228,7 +231,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">HMBR 50-70mm Locks</p>
         </div>
 
-        <!-- Category 3 -->
         <div onclick="setCategoryFilter('Paints')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-paint-roller"></i>
@@ -237,7 +239,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">Berger Synthetic Gloss</p>
         </div>
 
-        <!-- Category 4 -->
         <div onclick="setCategoryFilter('Adhesives')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-bottle-droplet"></i>
@@ -246,7 +247,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">Fevicol 1K PUR Polyurethane</p>
         </div>
 
-        <!-- Category 5 -->
         <div onclick="setCategoryFilter('Tools')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -255,7 +255,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">Flat Brushes 2"-5"</p>
         </div>
 
-        <!-- Category 6 -->
         <div onclick="setCategoryFilter('Plumbing')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-faucet-drip"></i>
@@ -264,7 +263,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">RFL PVC Pipes & Brass Taps</p>
         </div>
 
-        <!-- Category 7 -->
         <div onclick="setCategoryFilter('Electrical')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-bolt"></i>
@@ -273,7 +271,6 @@
           <p class="text-[11px] text-slate-400 mt-0.5">Super Star LED & BRB Cables</p>
         </div>
 
-        <!-- Category 8 -->
         <div onclick="setCategoryFilter('Sanitary')" class="cursor-pointer group glass-card p-4 rounded-2xl transition hover:-translate-y-1">
           <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold mb-3 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
             <i class="fa-solid fa-toilet"></i>
@@ -290,14 +287,12 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
           <h2 id="catalogHeading" class="font-display text-2xl font-extrabold text-white tracking-tight">Catalog Products</h2>
-          <p class="text-xs text-slate-400">Select sizes/variants to view live pricing</p>
+          <p class="text-xs text-slate-400">Select sizes/variants to view live pricing and stock</p>
         </div>
       </div>
 
       <!-- Products Grid Container -->
-      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <!-- Products will be rendered dynamically via JS -->
-      </div>
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </section>
 
     <!-- Contractor & Wholesale Hotline Banner -->
@@ -328,9 +323,80 @@
 
   </main>
 
+  <!-- Inventory Checkup & Stock Management Modal -->
+  <div id="inventoryModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-950/85 backdrop-blur-md" onclick="toggleInventoryModal()"></div>
+
+    <div class="relative max-w-5xl mx-auto my-8 p-6 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl z-10 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold">
+            <i class="fa-solid fa-boxes-packing"></i>
+          </div>
+          <div>
+            <h3 class="font-display text-xl font-extrabold text-white">Manager Inventory & Stock Checkup</h3>
+            <p class="text-xs text-amber-400 font-medium">M/S Rong Bahar Shop Catalog Summary</p>
+          </div>
+        </div>
+        <button onclick="toggleInventoryModal()" class="text-slate-400 hover:text-white text-2xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Inventory KPI Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+          <span class="text-[11px] text-slate-400 font-semibold block">Total Catalog Items</span>
+          <span id="invTotalItems" class="text-2xl font-black text-white">0</span>
+        </div>
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+          <span class="text-[11px] text-slate-400 font-semibold block">Total Quantity in Stock</span>
+          <span id="invTotalStock" class="text-2xl font-black text-amber-400">0</span>
+        </div>
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+          <span class="text-[11px] text-slate-400 font-semibold block">Low-Stock Warnings (&lt;10)</span>
+          <span id="invLowStockCount" class="text-2xl font-black text-rose-400">0</span>
+        </div>
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+          <span class="text-[11px] text-slate-400 font-semibold block">Estimated Catalog Value</span>
+          <span id="invTotalValue" class="text-2xl font-black text-emerald-400">৳ 0</span>
+        </div>
+      </div>
+
+      <!-- Inventory Table -->
+      <div class="space-y-3">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <h4 class="font-bold text-sm text-slate-200">Stock Items Breakdown</h4>
+          <button onclick="copyInventoryReport()" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 transition">
+            <i class="fa-solid fa-copy"></i> Copy Restock List
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+              <tr>
+                <th class="p-3">Product Name</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Variant / Size</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">In Stock</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Quick Restock</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Slide-Over Shopping Cart Modal -->
   <div id="cartModal" class="fixed inset-0 z-50 hidden">
-    <!-- Backdrop -->
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleCartModal()"></div>
 
     <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-slate-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl z-10">
@@ -344,47 +410,21 @@
           </button>
         </div>
 
-        <!-- Cart Items List -->
-        <div id="cartItemsList" class="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
-          <!-- Cart Items populated by JS -->
-        </div>
+        <div id="cartItemsList" class="space-y-4 max-h-[50vh] overflow-y-auto pr-1"></div>
       </div>
 
-      <!-- Cart Footer & Checkout Form -->
       <div class="border-t border-slate-800 pt-4 space-y-4">
         <div class="flex justify-between items-center text-slate-300">
           <span class="text-sm font-semibold">Total Amount:</span>
           <span id="cartTotal" class="text-2xl font-black text-amber-400">৳ 0</span>
         </div>
 
-        <!-- Checkout Info -->
         <form id="checkoutForm" onsubmit="handleCheckout(event)" class="space-y-3">
-          <input 
-            type="text" 
-            id="custName" 
-            required 
-            placeholder="Your Full Name" 
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
-          />
-          <input 
-            type="tel" 
-            id="custPhone" 
-            required 
-            placeholder="Mobile Phone (017...)" 
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
-          />
-          <input 
-            type="text" 
-            id="custAddress" 
-            required 
-            placeholder="Delivery Address in Pakundia / Kishoreganj" 
-            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" 
-          />
+          <input type="text" id="custName" required placeholder="Your Full Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+          <input type="tel" id="custPhone" required placeholder="Mobile Phone (017...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+          <input type="text" id="custAddress" required placeholder="Delivery Address in Pakundia / Kishoreganj" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
 
-          <button 
-            type="submit" 
-            class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2"
-          >
+          <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-paper-plane"></i> Place Cash On Delivery Order
           </button>
         </form>
@@ -402,27 +442,17 @@
           </div>
           <span class="font-display font-extrabold text-white text-base">M/S RONG BAHAR</span>
         </div>
-        <p class="leading-relaxed">
-          Authorized Bangladeshi Hardware, Berger Paint finishes & structural building material store based in Pakundia, Kishoreganj.
-        </p>
+        <p class="leading-relaxed">Authorized Bangladeshi Hardware, Berger Paint finishes & structural building material store based in Pakundia, Kishoreganj.</p>
       </div>
 
       <div>
         <h4 class="font-bold text-slate-200 text-sm mb-3">Store Location</h4>
-        <p class="leading-relaxed">
-          Mothkhola Road, Pakundia<br />
-          District: Kishoreganj, Dhaka Division<br />
-          Bangladesh
-        </p>
+        <p class="leading-relaxed">Mothkhola Road, Pakundia<br />District: Kishoreganj, Dhaka Division<br />Bangladesh</p>
       </div>
 
       <div>
         <h4 class="font-bold text-slate-200 text-sm mb-3">Customer Service</h4>
-        <p class="leading-relaxed">
-          Hotline: 01722452836<br />
-          WhatsApp: +8801722452836<br />
-          Hours: Sat - Thu (8:00 AM - 9:00 PM)
-        </p>
+        <p class="leading-relaxed">Hotline: 01722452836<br />WhatsApp: +8801722452836<br />Hours: Sat - Thu (8:00 AM - 9:00 PM)</p>
       </div>
 
       <div>
@@ -443,7 +473,7 @@
 
   <!-- Embedded JavaScript Application Code -->
   <script>
-    // Product Data Store
+    // Product & Stock Data Store
     const productsData = [
       {
         id: 1,
@@ -451,9 +481,9 @@
         category: 'Security Hardware',
         image: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '50mm Lock', price: 220 },
-          { name: '60mm Lock', price: 320 },
-          { name: '70mm Lock', price: 400 }
+          { name: '50mm Lock', price: 220, stock: 25 },
+          { name: '60mm Lock', price: 320, stock: 12 },
+          { name: '70mm Lock', price: 400, stock: 8 }
         ]
       },
       {
@@ -462,9 +492,9 @@
         category: 'Paints',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '0.91 Litre Can', price: 540 },
-          { name: '3.64 Litre Can', price: 1980 },
-          { name: '18.2 Litre Drum', price: 7900 }
+          { name: '0.91 Litre Can', price: 540, stock: 35 },
+          { name: '3.64 Litre Can', price: 1980, stock: 15 },
+          { name: '18.2 Litre Drum', price: 7900, stock: 5 }
         ]
       },
       {
@@ -473,10 +503,10 @@
         category: 'Adhesives',
         image: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '125g Bottle', price: 250 },
-          { name: '250g Bottle', price: 450 },
-          { name: '500g Bottle', price: 744 },
-          { name: '1kg Heavy Pack', price: 1350 }
+          { name: '125g Bottle', price: 250, stock: 30 },
+          { name: '250g Bottle', price: 450, stock: 25 },
+          { name: '500g Bottle', price: 744, stock: 20 },
+          { name: '1kg Heavy Pack', price: 1350, stock: 10 }
         ]
       },
       {
@@ -485,10 +515,10 @@
         category: 'Tools',
         image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '2 Inch Brush', price: 60 },
-          { name: '3 Inch Brush', price: 95 },
-          { name: '4 Inch Brush', price: 130 },
-          { name: '5 Inch Brush', price: 180 }
+          { name: '2 Inch Brush', price: 60, stock: 50 },
+          { name: '3 Inch Brush', price: 95, stock: 40 },
+          { name: '4 Inch Brush', price: 130, stock: 35 },
+          { name: '5 Inch Brush', price: 180, stock: 25 }
         ]
       },
       {
@@ -497,9 +527,9 @@
         category: 'Plumbing',
         image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '0.5 Inch Bib Cock', price: 380 },
-          { name: '0.5 Inch Pillar Basin Tap', price: 580 },
-          { name: 'Concealed Stop Cock', price: 720 }
+          { name: '0.5 Inch Bib Cock', price: 380, stock: 30 },
+          { name: '0.5 Inch Pillar Basin Tap', price: 580, stock: 20 },
+          { name: 'Concealed Stop Cock', price: 720, stock: 15 }
         ]
       },
       {
@@ -508,10 +538,10 @@
         category: 'Electrical',
         image: 'https://images.unsplash.com/photo-1550985616-10810253b84d?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '5 Watt Bulb', price: 120 },
-          { name: '9 Watt Bulb', price: 180 },
-          { name: '12 Watt Bulb', price: 240 },
-          { name: '18 Watt Panel', price: 380 }
+          { name: '5 Watt Bulb', price: 120, stock: 50 },
+          { name: '9 Watt Bulb', price: 180, stock: 60 },
+          { name: '12 Watt Bulb', price: 240, stock: 40 },
+          { name: '18 Watt Panel', price: 380, stock: 25 }
         ]
       },
       {
@@ -520,9 +550,9 @@
         category: 'Electrical',
         image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1.5 RM Wire (100m)', price: 2800 },
-          { name: '2.5 RM Wire (100m)', price: 4200 },
-          { name: '4.0 RM Wire (100m)', price: 6500 }
+          { name: '1.5 RM Wire (100m)', price: 2800, stock: 15 },
+          { name: '2.5 RM Wire (100m)', price: 4200, stock: 12 },
+          { name: '4.0 RM Wire (100m)', price: 6500, stock: 8 }
         ]
       },
       {
@@ -531,8 +561,8 @@
         category: 'Sanitary',
         image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: 'Single-Piece Commode', price: 4800 },
-          { name: 'Dual-Flush Cistern Tank', price: 1650 }
+          { name: 'Single-Piece Commode', price: 4800, stock: 8 },
+          { name: 'Dual-Flush Cistern Tank', price: 1650, stock: 12 }
         ]
       }
     ];
@@ -540,9 +570,8 @@
     let cart = [];
     let activeCategory = 'all';
 
-    // Initialize application
-    document.addEventListener('DOMContentLoaded', () => {
-      renderProducts();
+    document.addEventListener('DOMContentLoaded', () => { 
+      renderProducts(); 
     });
 
     function renderProducts() {
@@ -556,25 +585,24 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-500">
-            <i class="fa-solid fa-box-open text-4xl mb-3 block text-slate-600"></i>
-            <p>No products found matching your search.</p>
-          </div>
-        `;
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500"><i class="fa-solid fa-box-open text-4xl mb-3 block text-slate-600"></i><p>No products found matching your search.</p></div>`;
         return;
       }
 
       grid.innerHTML = filtered.map(product => {
         const defaultVar = product.variants[0];
+        const stockBadge = defaultVar.stock > 10 
+          ? `<span class="text-emerald-400 font-bold text-[11px]"><i class="fa-solid fa-circle-check"></i> In Stock (${defaultVar.stock})</span>`
+          : defaultVar.stock > 0 
+          ? `<span class="text-amber-400 font-bold text-[11px]"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock (${defaultVar.stock})</span>`
+          : `<span class="text-rose-500 font-bold text-[11px]"><i class="fa-solid fa-circle-xmark"></i> Out of Stock</span>`;
+
         return `
           <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between p-4 space-y-4 group">
             <div class="space-y-3">
               <div class="relative aspect-4/3 rounded-xl overflow-hidden bg-slate-950">
                 <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <span class="absolute top-2 left-2 px-2.5 py-0.5 bg-amber-500/90 text-slate-950 font-extrabold text-[10px] uppercase rounded-full">
-                  ${product.category}
-                </span>
+                <span class="absolute top-2 left-2 px-2.5 py-0.5 bg-amber-500/90 text-slate-950 font-extrabold text-[10px] uppercase rounded-full">${product.category}</span>
               </div>
               <h3 class="font-bold text-sm text-slate-100 line-clamp-2 leading-snug">${product.title}</h3>
             </div>
@@ -587,14 +615,20 @@
                 </select>
               </div>
 
+              <div class="flex items-center justify-between text-xs pt-0.5">
+                <span id="stock-badge-${product.id}">${stockBadge}</span>
+              </div>
+
               <div class="flex items-center justify-between pt-1">
                 <div>
                   <span class="text-[10px] text-slate-500 uppercase font-bold block">Price</span>
                   <span id="price-val-${product.id}" class="text-lg font-black text-amber-400">৳ ${defaultVar.price}</span>
                 </div>
                 <button 
-                  onclick="addToCart(${product.id})"
-                  class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+                  id="add-btn-${product.id}"
+                  onclick="addToCart(${product.id})" 
+                  ${defaultVar.stock === 0 ? 'disabled' : ''}
+                  class="px-3.5 py-2 ${defaultVar.stock === 0 ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-amber-500 hover:bg-amber-400 text-slate-950'} font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
                 >
                   <i class="fa-solid fa-plus"></i> Add
                 </button>
@@ -609,7 +643,25 @@
       const product = productsData.find(p => p.id === productId);
       const selectedIndex = document.getElementById(`var-select-${productId}`).value;
       const selectedVariant = product.variants[selectedIndex];
+      
       document.getElementById(`price-val-${productId}`).innerText = `৳ ${selectedVariant.price}`;
+      
+      const badge = document.getElementById(`stock-badge-${productId}`);
+      const btn = document.getElementById(`add-btn-${productId}`);
+
+      if (selectedVariant.stock > 10) {
+        badge.innerHTML = `<span class="text-emerald-400 font-bold text-[11px]"><i class="fa-solid fa-circle-check"></i> In Stock (${selectedVariant.stock})</span>`;
+        btn.disabled = false;
+        btn.className = "px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition";
+      } else if (selectedVariant.stock > 0) {
+        badge.innerHTML = `<span class="text-amber-400 font-bold text-[11px]"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock (${selectedVariant.stock})</span>`;
+        btn.disabled = false;
+        btn.className = "px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition";
+      } else {
+        badge.innerHTML = `<span class="text-rose-500 font-bold text-[11px]"><i class="fa-solid fa-circle-xmark"></i> Out of Stock</span>`;
+        btn.disabled = true;
+        btn.className = "px-3.5 py-2 bg-slate-800 text-slate-500 cursor-not-allowed font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition";
+      }
     }
 
     function addToCart(productId) {
@@ -617,21 +669,20 @@
       const selectedIndex = document.getElementById(`var-select-${productId}`).value;
       const selectedVariant = product.variants[selectedIndex];
 
+      if (selectedVariant.stock <= 0) return;
+
       const itemKey = `${product.id}-${selectedVariant.name}`;
       const existing = cart.find(i => i.key === itemKey);
 
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({
-          key: itemKey,
-          title: product.title,
-          variant: selectedVariant.name,
-          price: selectedVariant.price,
-          qty: 1
-        });
+      if (existing) { 
+        if (existing.qty < selectedVariant.stock) {
+          existing.qty += 1; 
+        } else {
+          alert(`Only ${selectedVariant.stock} units available in stock!`);
+        }
+      } else { 
+        cart.push({ key: itemKey, title: product.title, variant: selectedVariant.name, price: selectedVariant.price, qty: 1 }); 
       }
-
       renderCart();
     }
 
@@ -647,12 +698,7 @@
       totalEl.innerText = `৳ ${totalPrice.toLocaleString()}`;
 
       if (cart.length === 0) {
-        list.innerHTML = `
-          <div class="py-8 text-center text-slate-500">
-            <i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-600 block"></i>
-            Your cart is empty.
-          </div>
-        `;
+        list.innerHTML = `<div class="py-8 text-center text-slate-500"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-600 block"></i>Your cart is empty.</div>`;
         return;
       }
 
@@ -675,40 +721,109 @@
       const item = cart.find(i => i.key === key);
       if (!item) return;
       item.qty += delta;
-      if (item.qty <= 0) {
-        cart = cart.filter(i => i.key !== key);
-      }
+      if (item.qty <= 0) { cart = cart.filter(i => i.key !== key); }
       renderCart();
     }
 
     function toggleCartModal() {
-      const modal = document.getElementById('cartModal');
+      document.getElementById('cartModal').classList.toggle('hidden');
+    }
+
+    // Inventory Checkup Functions
+    function toggleInventoryModal() {
+      const modal = document.getElementById('inventoryModal');
       modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        renderInventoryTable();
+      }
+    }
+
+    function renderInventoryTable() {
+      const tbody = document.getElementById('inventoryTableBody');
+      let totalItems = 0;
+      let totalStock = 0;
+      let lowStockCount = 0;
+      let totalValue = 0;
+
+      let html = '';
+
+      productsData.forEach(prod => {
+        prod.variants.forEach((v, vIdx) => {
+          totalItems += 1;
+          totalStock += v.stock;
+          totalValue += (v.price * v.stock);
+
+          if (v.stock < 10) lowStockCount += 1;
+
+          const status = v.stock > 10 
+            ? `<span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-bold text-[10px]">In Stock</span>`
+            : v.stock > 0
+            ? `<span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full font-bold text-[10px]">Low Stock</span>`
+            : `<span class="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/30 rounded-full font-bold text-[10px]">Out of Stock</span>`;
+
+          html += `
+            <tr class="hover:bg-slate-900/60 transition">
+              <td class="p-3 font-semibold text-slate-100">${prod.title}</td>
+              <td class="p-3 text-slate-400">${prod.category}</td>
+              <td class="p-3 font-bold text-amber-400">${v.name}</td>
+              <td class="p-3 font-semibold text-slate-200">৳ ${v.price}</td>
+              <td class="p-3 font-extrabold ${v.stock < 10 ? 'text-amber-400' : 'text-slate-100'}">${v.stock}</td>
+              <td class="p-3">${status}</td>
+              <td class="p-3 text-right">
+                <div class="inline-flex items-center gap-1.5">
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, -5)" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 rounded font-bold text-[11px]">-5</button>
+                  <button onclick="adjustStock(${prod.id}, ${vIdx}, 10)" class="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded font-bold text-[11px]">+10</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      });
+
+      tbody.innerHTML = html;
+
+      document.getElementById('invTotalItems').innerText = totalItems;
+      document.getElementById('invTotalStock').innerText = totalStock.toLocaleString();
+      document.getElementById('invLowStockCount').innerText = lowStockCount;
+      document.getElementById('invTotalValue').innerText = `৳ ${totalValue.toLocaleString()}`;
+    }
+
+    function adjustStock(productId, vIdx, amount) {
+      const prod = productsData.find(p => p.id === productId);
+      if (prod && prod.variants[vIdx]) {
+        prod.variants[vIdx].stock = Math.max(0, prod.variants[vIdx].stock + amount);
+        renderInventoryTable();
+        renderProducts();
+      }
+    }
+
+    function copyInventoryReport() {
+      let report = `M/S RONG BAHAR PAKUNDIA - INVENTORY STOCK REPORT\nDate: ${new Date().toLocaleDateString()}\n----------------------------------------\n`;
+      productsData.forEach(p => {
+        p.variants.forEach(v => {
+          report += `${p.title} (${v.name}) | Price: ৳${v.price} | Stock: ${v.stock} units\n`;
+        });
+      });
+      navigator.clipboard.writeText(report);
+      alert('Inventory Restock Report copied to clipboard!');
     }
 
     function setSearchFilter(query) {
-      const input = document.getElementById('searchInput');
-      input.value = query;
+      document.getElementById('searchInput').value = query;
       filterProducts();
     }
 
     function setCategoryFilter(category) {
       activeCategory = category;
-      const heading = document.getElementById('catalogHeading');
-      heading.innerText = category === 'all' ? 'Catalog Products' : `${category} Department`;
+      document.getElementById('catalogHeading').innerText = category === 'all' ? 'Catalog Products' : `${category} Department`;
       renderProducts();
     }
 
-    function filterProducts() {
-      renderProducts();
-    }
+    function filterProducts() { renderProducts(); }
 
     function handleCheckout(e) {
       e.preventDefault();
-      if (cart.length === 0) {
-        alert('Your cart is empty! Add products first.');
-        return;
-      }
+      if (cart.length === 0) { alert('Your cart is empty! Add products first.'); return; }
       const name = document.getElementById('custName').value;
       const phone = document.getElementById('custPhone').value;
       const address = document.getElementById('custAddress').value;
