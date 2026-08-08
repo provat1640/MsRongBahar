@@ -89,7 +89,7 @@
     <a href="tel:+8801722452836" class="underline hover:text-white transition font-black ml-2"><i class="fa-solid fa-phone"></i> 01722452836</a>
   </div>
 
-  <!-- Header / Navigation -->
+  <!-- Header / Navigation (Clean Customer View) -->
   <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
       
@@ -124,18 +124,8 @@
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-sm"></i>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Action Buttons (Customer View) -->
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- DIRECT ADD PRODUCT BUTTON ON HEADER -->
-        <button 
-          onclick="toggleAddProductModal()"
-          class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md"
-          title="Add New Product to Storefront"
-        >
-          <i class="fa-solid fa-plus-circle text-sm"></i>
-          <span class="hidden sm:inline">Add Product</span>
-        </button>
-
         <!-- Paint Calculator Trigger -->
         <button 
           onclick="togglePaintCalcModal()"
@@ -145,13 +135,21 @@
           <i class="fa-solid fa-calculator"></i> Paint Calc
         </button>
 
-        <!-- Admin Panel Trigger -->
+        <!-- Request Unlisted Product Button -->
+        <button 
+          onclick="toggleProductRequestModal()"
+          class="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition"
+        >
+          <i class="fa-solid fa-clipboard-question text-amber-400"></i> Request Item
+        </button>
+
+        <!-- Admin Portal Access (Passcode Protected) -->
         <button 
           onclick="openAdminModal()"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition flex items-center gap-1.5"
-          title="Admin Control Center"
+          class="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition flex items-center gap-1.5"
+          title="Shop Manager Portal"
         >
-          <i class="fa-solid fa-user-shield text-amber-400"></i> <span class="hidden md:inline">Admin Panel</span>
+          <i class="fa-solid fa-user-shield"></i> <span class="hidden md:inline">Admin Portal</span>
         </button>
 
         <!-- Auth / Profile Button -->
@@ -202,14 +200,14 @@
             Order authentic Berger, Nippon, Aqua & Polac Paints, Red Oxide Primers, Clear Varnishes, Glue Guns, Omega Digital Scales, and Tools directly from Pakundia's trusted shop.
           </p>
 
-          <!-- Action Buttons -->
+          <!-- Customer Action Buttons -->
           <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-            <button onclick="toggleAddProductModal()" class="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xl transition">
-              <i class="fa-solid fa-plus-circle text-base"></i> Add New Product to Store
+            <button onclick="togglePaintCalcModal()" class="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-xl transition">
+              <i class="fa-solid fa-calculator text-base"></i> Calculate Required Paint Liters
             </button>
 
-            <button onclick="togglePaintCalcModal()" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition">
-              <i class="fa-solid fa-calculator"></i> Calculate Required Paint Liters
+            <button onclick="toggleProductRequestModal()" class="px-5 py-3 bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-400 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition">
+              <i class="fa-solid fa-clipboard-question"></i> Request Unlisted Item
             </button>
           </div>
         </div>
@@ -376,10 +374,10 @@
         <!-- Action Controls Above Product Grid -->
         <div class="flex items-center gap-3">
           <button 
-            onclick="toggleAddProductModal()" 
-            class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+            onclick="toggleProductRequestModal()" 
+            class="px-4 py-2 bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 font-bold rounded-xl text-xs flex items-center gap-1.5 transition"
           >
-            <i class="fa-solid fa-plus-circle"></i> Add Product
+            <i class="fa-solid fa-clipboard-question text-amber-400"></i> Request Unlisted Item
           </button>
         </div>
       </div>
@@ -424,21 +422,14 @@
 
   </main>
 
-  <!-- PERSISTENT FLOATING QUICK ACTION BUTTON BAR -->
+  <!-- PERSISTENT FLOATING CUSTOMER ACTION BAR -->
   <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2.5">
     <button 
-      onclick="toggleAddProductModal()" 
+      onclick="togglePaintCalcModal()" 
       class="px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-2xl shadow-2xl text-xs flex items-center gap-2 transition hover:scale-105 border border-amber-300/40"
-      title="Add New Item to Shop Front"
+      title="Open Paint Quantity Calculator"
     >
-      <i class="fa-solid fa-plus-circle text-base"></i> Add New Product
-    </button>
-    <button 
-      onclick="openAdminModal()" 
-      class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold rounded-2xl shadow-2xl text-xs flex items-center gap-2 transition hover:scale-105 border border-slate-800"
-      title="Open Inventory Management"
-    >
-      <i class="fa-solid fa-boxes-stacked"></i> Inventory Manager
+      <i class="fa-solid fa-calculator text-base"></i> Paint Calc
     </button>
   </div>
 
@@ -609,7 +600,7 @@
     </div>
   </div>
 
-  <!-- Admin Add New Product Modal -->
+  <!-- Admin Add New Product Modal (Accessible via Admin Portal) -->
   <div id="adminAddProductModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleAddProductModal()"></div>
 
@@ -690,7 +681,7 @@
     </div>
   </div>
 
-  <!-- Admin Panel Modal -->
+  <!-- Admin Control Center Modal (Restricted Manager Access) -->
   <div id="adminPanelModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="fixed inset-0 bg-slate-950/90 backdrop-blur-md" onclick="closeAdminModal()"></div>
 
@@ -721,15 +712,15 @@
             </div>
           </div>
           <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-unlock"></i> Unlock Admin Panel
+            <i class="fa-solid fa-unlock"></i> Unlock Admin Portal
           </button>
         </form>
       </div>
 
-      <!-- Admin Dashboard Main View -->
+      <!-- Admin Dashboard Main View (With Add Product & Inventory Manager) -->
       <div id="adminDashboardView" class="hidden space-y-6">
         
-        <!-- Admin Header -->
+        <!-- Admin Header with Add Product Action -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800 pb-4 gap-3">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-xl font-black">
@@ -742,7 +733,15 @@
           </div>
           
           <div class="flex items-center gap-3">
-            <button onclick="lockAdminPanel()" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 text-xs font-bold rounded-xl transition">
+            <!-- PROMINENT ADD PRODUCT BUTTON INSIDE ADMIN PORTAL -->
+            <button 
+              onclick="toggleAddProductModal()" 
+              class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg transition"
+            >
+              <i class="fa-solid fa-plus-circle text-sm"></i> Add New Product
+            </button>
+
+            <button onclick="lockAdminPanel()" class="px-3 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 text-xs font-bold rounded-xl transition">
               <i class="fa-solid fa-lock mr-1"></i> Lock Panel
             </button>
             <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white text-2xl">
@@ -753,81 +752,29 @@
 
         <!-- Admin Navigation Tabs -->
         <div class="flex flex-wrap border-b border-slate-800 text-xs font-bold gap-2">
-          <button id="adminTabOrdersBtn" onclick="switchAdminTab('orders')" class="px-4 py-2.5 text-amber-400 border-b-2 border-amber-400">
+          <button id="adminTabInventoryBtn" onclick="switchAdminTab('inventory')" class="px-4 py-2.5 text-amber-400 border-b-2 border-amber-400">
+            <i class="fa-solid fa-boxes-packing mr-1.5"></i> Inventory Manager & Stock
+          </button>
+          <button id="adminTabOrdersBtn" onclick="switchAdminTab('orders')" class="px-4 py-2.5 text-slate-400 hover:text-white">
             <i class="fa-solid fa-truck-ramp-box mr-1.5"></i> Orders & Delivery
           </button>
           <button id="adminTabUsersBtn" onclick="switchAdminTab('users')" class="px-4 py-2.5 text-slate-400 hover:text-white">
             <i class="fa-solid fa-users mr-1.5"></i> Registered Customers
-          </button>
-          <button id="adminTabInventoryBtn" onclick="switchAdminTab('inventory')" class="px-4 py-2.5 text-slate-400 hover:text-white">
-            <i class="fa-solid fa-boxes-packing mr-1.5"></i> Stock & Inventory
           </button>
           <button id="adminTabRequestsBtn" onclick="switchAdminTab('requests')" class="px-4 py-2.5 text-slate-400 hover:text-white">
             <i class="fa-solid fa-clipboard-list mr-1.5"></i> Customer Requests
           </button>
         </div>
 
-        <!-- Tab 1: Product Delivery & Orders List -->
-        <div id="adminTabOrders" class="space-y-4">
-          <div class="flex justify-between items-center">
-            <h4 class="font-bold text-sm text-slate-200">Customer Orders & Delivery Tracker</h4>
-            <span id="orderCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Orders</span>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
-                <tr>
-                  <th class="p-3">Order ID</th>
-                  <th class="p-3">Customer Name</th>
-                  <th class="p-3">Phone</th>
-                  <th class="p-3">Delivery Address</th>
-                  <th class="p-3">Items Purchased</th>
-                  <th class="p-3">Total BDT</th>
-                  <th class="p-3">Delivery Status</th>
-                </tr>
-              </thead>
-              <tbody id="adminOrdersTableBody" class="divide-y divide-slate-800/60">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 2: Registered Users & Addresses List -->
-        <div id="adminTabUsers" class="space-y-4 hidden">
-          <div class="flex justify-between items-center">
-            <h4 class="font-bold text-sm text-slate-200">Registered Platform Customers</h4>
-            <span id="userCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Registered</span>
-          </div>
-
-          <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
-                <tr>
-                  <th class="p-3">Customer Name</th>
-                  <th class="p-3">Phone Number</th>
-                  <th class="p-3">Email Address</th>
-                  <th class="p-3">Full Delivery Address</th>
-                  <th class="p-3">Role</th>
-                </tr>
-              </thead>
-              <tbody id="adminUsersTableBody" class="divide-y divide-slate-800/60">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 3: Inventory Management & Add Product Button -->
-        <div id="adminTabInventory" class="space-y-4 hidden">
+        <!-- Tab 1: Inventory Management & Add Product Button (Inside Admin Portal) -->
+        <div id="adminTabInventory" class="space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
             <div>
-              <h4 class="font-bold text-sm text-slate-200">Store Inventory & Catalog Management</h4>
+              <h4 class="font-bold text-sm text-slate-200">Store Inventory & Catalog Manager</h4>
               <p class="text-[11px] text-slate-400">View stock levels, price valuations or add new items to storefront</p>
             </div>
             
-            <!-- ADD PRODUCT ICON BUTTON -->
+            <!-- ADD PRODUCT BUTTON INSIDE INVENTORY MANAGER -->
             <button 
               onclick="toggleAddProductModal()" 
               class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition shrink-0"
@@ -870,6 +817,58 @@
               </thead>
               <tbody id="inventoryTableBody" class="divide-y divide-slate-800/60">
                 <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Product Delivery & Orders List -->
+        <div id="adminTabOrders" class="space-y-4 hidden">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-sm text-slate-200">Customer Orders & Delivery Tracker</h4>
+            <span id="orderCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Orders</span>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+                <tr>
+                  <th class="p-3">Order ID</th>
+                  <th class="p-3">Customer Name</th>
+                  <th class="p-3">Phone</th>
+                  <th class="p-3">Delivery Address</th>
+                  <th class="p-3">Items Purchased</th>
+                  <th class="p-3">Total BDT</th>
+                  <th class="p-3">Delivery Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminOrdersTableBody" class="divide-y divide-slate-800/60">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Registered Users & Addresses List -->
+        <div id="adminTabUsers" class="space-y-4 hidden">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-sm text-slate-200">Registered Platform Customers</h4>
+            <span id="userCountBadge" class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold">0 Registered</span>
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+                <tr>
+                  <th class="p-3">Customer Name</th>
+                  <th class="p-3">Phone Number</th>
+                  <th class="p-3">Email Address</th>
+                  <th class="p-3">Full Delivery Address</th>
+                  <th class="p-3">Role</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody" class="divide-y divide-slate-800/60">
+                <!-- Populated via JS -->
               </tbody>
             </table>
           </div>
@@ -1580,9 +1579,6 @@
             <div class="flex items-center justify-center gap-3">
               <button onclick="setCategoryFilter('all')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition">
                 Show All Products
-              </button>
-              <button onclick="toggleAddProductModal()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">
-                + Add Item to This Category
               </button>
             </div>
           </div>
