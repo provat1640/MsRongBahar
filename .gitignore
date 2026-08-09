@@ -36,3 +36,10 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Database files
+prisma/*.db
+prisma/*.db-journal
+
+# Local product images / data (not for deployment)
+Ms Rong Bahar products/
+
