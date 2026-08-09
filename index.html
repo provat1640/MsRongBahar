@@ -395,130 +395,153 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- Left Sidebar: Paint Brand Explorer Tree -->
+        <!-- Left Sidebar: Online Product Browsing Box & Real-Time Stock Analyzer -->
         <div class="lg:col-span-3 space-y-4">
-          <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-4 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-sitemap"></i> Paint Brand Explorer Tree
-              </h3>
-              <button onclick="clearAllFilters()" class="text-[10px] text-slate-400 hover:text-white underline transition">Clear</button>
+          <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-4 shadow-xl relative overflow-hidden">
+            
+            <!-- Card Header & Clear Filter Action -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs font-bold shadow-sm border border-amber-500/30">
+                  <i class="fa-solid fa-store"></i>
+                </div>
+                <div>
+                  <h3 class="text-xs font-black uppercase text-white tracking-wider">Online Product Box</h3>
+                  <p class="text-[10px] text-amber-400 font-semibold">Browse Paint Stocks & Prices</p>
+                </div>
+              </div>
+              <button onclick="clearAllFilters()" class="text-[10px] text-slate-400 hover:text-amber-400 underline transition font-bold">Clear All</button>
             </div>
 
-            <!-- Collapsible Tree Structures -->
-            <div class="space-y-3.5 text-xs font-semibold select-none text-left">
+            <!-- Interactive Brand Switcher Tabs -->
+            <div>
+              <label class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1.5"><i class="fa-solid fa-tags text-amber-400 mr-1"></i> Filter By Brand</label>
+              <div class="grid grid-cols-3 gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+                <button id="brandTabAll" onclick="selectBrowsingBrand('all', this)" class="py-1.5 rounded-lg bg-amber-500 text-slate-950 transition shadow">All</button>
+                <button id="brandTabBerger" onclick="selectBrowsingBrand('Berger', this)" class="py-1.5 rounded-lg text-slate-300 hover:text-white transition">Berger</button>
+                <button id="brandTabAqua" onclick="selectBrowsingBrand('Aqua', this)" class="py-1.5 rounded-lg text-slate-300 hover:text-white transition">Aqua</button>
+              </div>
+            </div>
+
+            <!-- Live Stock Analysis Summary Box -->
+            <div class="p-3 rounded-2xl bg-slate-950/90 border border-slate-800/80 space-y-2 text-xs">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-300 border-b border-slate-800/60 pb-1.5">
+                <span><i class="fa-solid fa-chart-pie text-amber-400 mr-1"></i> Live Stock Analysis</span>
+                <span id="browsingTotalItemsBadge" class="text-amber-400 font-extrabold">29 Items</span>
+              </div>
               
-              <!-- Berger Paint Node -->
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-slate-200 hover:text-amber-400 cursor-pointer py-1 transition" onclick="toggleTreeNode('bergerTreeBranch', 'bergerTreeIcon')">
-                  <span class="flex items-center gap-2">
-                    <i id="bergerTreeIcon" class="fa-solid fa-folder-open text-amber-500"></i> Berger Paints
-                  </span>
-                  <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-black tracking-wide">Brand</span>
+              <div class="grid grid-cols-3 gap-1 text-[10px] text-center font-black">
+                <div class="p-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400">
+                  <span id="browsingInStockCount">0</span>
+                  <span class="block text-[9px] font-normal text-slate-400">In Stock</span>
                 </div>
-                
-                <div id="bergerTreeBranch" class="pl-4 border-l border-slate-800/80 space-y-2 ml-2 mt-1 transition-all duration-300">
-                  
-                  <!-- Berger Interior Collapsible -->
-                  <div>
-                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('bergerInteriorBranch', 'bergerInteriorIcon')">
-                      <span class="flex items-center gap-1.5">
-                        <i id="bergerInteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Interior
-                      </span>
-                    </div>
-                    <div id="bergerInteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
-                      <button onclick="setPaintTreeFilter('Berger', 'Interior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-fill-drip text-[10px] text-amber-500/70"></i> Top coat (Interior Products)</button>
-                      <button onclick="setPaintTreeFilter('Berger', 'Interior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
-                    </div>
-                  </div>
+                <div class="p-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
+                  <span id="browsingLowStockCount">0</span>
+                  <span class="block text-[9px] font-normal text-slate-400">Low Stock</span>
+                </div>
+                <div class="p-1.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400">
+                  <span id="browsingOutStockCount">0</span>
+                  <span class="block text-[9px] font-normal text-slate-400">Out Stock</span>
+                </div>
+              </div>
+            </div>
 
-                  <!-- Berger Exterior Collapsible -->
-                  <div>
-                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('bergerExteriorBranch', 'bergerExteriorIcon')">
-                      <span class="flex items-center gap-1.5">
-                        <i id="bergerExteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Exterior
-                      </span>
-                    </div>
-                    <div id="bergerExteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
-                      <button onclick="setPaintTreeFilter('Berger', 'Exterior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-house-chimney-crack text-[10px] text-amber-500/70"></i> Top coat (Exterior Product)</button>
-                      <button onclick="setPaintTreeFilter('Berger', 'Exterior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
-                    </div>
-                  </div>
-
-                  <!-- Berger Waterproofing Leaf -->
-                  <button onclick="setPaintTreeFilter('Berger', 'Waterproofing', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-droplet-slash text-amber-500/70"></i> Waterproofing</button>
-
-                  <!-- Berger Enamel Leaf -->
-                  <button onclick="setPaintTreeFilter('Berger', 'Enamel', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-paint-roller text-amber-500/70"></i> Enamel</button>
-
-                  <!-- Berger Wood Coating Leaf -->
-                  <button onclick="setPaintTreeFilter('Berger', 'Wood Coating', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-tree text-amber-500/70"></i> Wood coating</button>
-
-                  <!-- Berger Special Products Leaf -->
-                  <button onclick="setPaintTreeFilter('Berger', 'Special Products', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-wand-magic-sparkles text-amber-500/70"></i> Special products</button>
-
-                  <!-- Berger Undercoat Leaf -->
-                  <button onclick="setPaintTreeFilter('Berger', 'Undercoat', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-shield text-amber-500/70"></i> Undercoat</button>
-
+            <!-- Online Product Browsing Categories Box -->
+            <div class="space-y-2 text-xs font-semibold select-none text-left">
+              <label class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block mb-1"><i class="fa-solid fa-list-check text-amber-400 mr-1"></i> Browse Categories & Price</label>
+              
+              <!-- Category 1: Interior Paints -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition space-y-1.5">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleBrowsingCategory('boxInteriorSub')">
+                  <span class="flex items-center gap-2 text-slate-100 font-bold hover:text-amber-400 transition">
+                    <i class="fa-solid fa-paint-roller text-amber-500"></i> Interior Paints
+                  </span>
+                  <span class="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-black" id="countBadgeInterior">9 Items</span>
+                </div>
+                <div id="boxInteriorSub" class="pl-3 border-l border-amber-500/20 space-y-1 pt-1 text-[11px]">
+                  <button onclick="setPaintTreeFilter(activeBrandFilter, 'Interior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-amber-400 py-1 flex items-center justify-between transition">
+                    <span><i class="fa-solid fa-fill-drip text-[10px] text-amber-500/70 mr-1.5"></i> Top Coats (Silk/Emulsion)</span>
+                    <span class="text-[9px] text-emerald-400 font-bold">৳350 - ৳12.5k</span>
+                  </button>
+                  <button onclick="setPaintTreeFilter(activeBrandFilter, 'Interior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-amber-400 py-1 flex items-center justify-between transition">
+                    <span><i class="fa-solid fa-brush text-[10px] text-amber-500/70 mr-1.5"></i> Primers & Wall Sealers</span>
+                    <span class="text-[9px] text-emerald-400 font-bold">৳380 - ৳1.4k</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- Aqua Paint Node -->
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-slate-200 hover:text-amber-400 cursor-pointer py-1 transition" onclick="toggleTreeNode('aquaTreeBranch', 'aquaTreeIcon')">
-                  <span class="flex items-center gap-2">
-                    <i id="aquaTreeIcon" class="fa-solid fa-folder-open text-amber-500"></i> Aqua Paints
+              <!-- Category 2: Exterior Paints -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition space-y-1.5">
+                <div class="flex items-center justify-between cursor-pointer" onclick="toggleBrowsingCategory('boxExteriorSub')">
+                  <span class="flex items-center gap-2 text-slate-100 font-bold hover:text-amber-400 transition">
+                    <i class="fa-solid fa-house-chimney-crack text-amber-500"></i> Exterior Paints
                   </span>
-                  <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-black tracking-wide">Brand</span>
+                  <span class="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-black" id="countBadgeExterior">10 Items</span>
                 </div>
-                
-                <div id="aquaTreeBranch" class="pl-4 border-l border-slate-800/80 space-y-2 ml-2 mt-1 transition-all duration-300">
-                  
-                  <!-- Aqua Interior Collapsible -->
-                  <div>
-                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('aquaInteriorBranch', 'aquaInteriorIcon')">
-                      <span class="flex items-center gap-1.5">
-                        <i id="aquaInteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Interior
-                      </span>
-                    </div>
-                    <div id="aquaInteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
-                      <button onclick="setPaintTreeFilter('Aqua', 'Interior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-fill-drip text-[10px] text-amber-500/70"></i> Top coat (Interior Products)</button>
-                      <button onclick="setPaintTreeFilter('Aqua', 'Interior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
-                    </div>
-                  </div>
-
-                  <!-- Aqua Exterior Collapsible -->
-                  <div>
-                    <div class="flex items-center justify-between text-slate-300 hover:text-amber-400 cursor-pointer py-0.5" onclick="toggleTreeNode('aquaExteriorBranch', 'aquaExteriorIcon')">
-                      <span class="flex items-center gap-1.5">
-                        <i id="aquaExteriorIcon" class="fa-solid fa-folder-open text-amber-500/85"></i> Exterior
-                      </span>
-                    </div>
-                    <div id="aquaExteriorBranch" class="pl-4 border-l border-slate-800/60 space-y-1 ml-1.5 mt-0.5">
-                      <button onclick="setPaintTreeFilter('Aqua', 'Exterior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-house-chimney-crack text-[10px] text-amber-500/70"></i> Top coat (Exterior Product)</button>
-                      <button onclick="setPaintTreeFilter('Aqua', 'Exterior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-white py-0.5 block flex items-center gap-1.5 text-[11px] transition"><i class="fa-solid fa-brush text-[10px] text-amber-500/70"></i> Primers</button>
-                    </div>
-                  </div>
-
-                  <!-- Aqua Waterproofing Leaf -->
-                  <button onclick="setPaintTreeFilter('Aqua', 'Waterproofing', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-droplet-slash text-amber-500/70"></i> Waterproofing</button>
-
-                  <!-- Aqua Enamel Leaf -->
-                  <button onclick="setPaintTreeFilter('Aqua', 'Enamel', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-paint-roller text-amber-500/70"></i> Enamel</button>
-
-                  <!-- Aqua Wood Coating Leaf -->
-                  <button onclick="setPaintTreeFilter('Aqua', 'Wood Coating', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-tree text-amber-500/70"></i> Wood coating</button>
-
-                  <!-- Aqua Special Products Leaf -->
-                  <button onclick="setPaintTreeFilter('Aqua', 'Special Products', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-wand-magic-sparkles text-amber-500/70"></i> Special products</button>
-
-                  <!-- Aqua Undercoat Leaf -->
-                  <button onclick="setPaintTreeFilter('Aqua', 'Undercoat', '', this)" class="tree-leaf text-left w-full text-slate-300 hover:text-amber-400 py-0.5 block flex items-center gap-1.5 transition"><i class="fa-solid fa-shield text-amber-500/70"></i> Undercoat</button>
-
+                <div id="boxExteriorSub" class="pl-3 border-l border-amber-500/20 space-y-1 pt-1 text-[11px]">
+                  <button onclick="setPaintTreeFilter(activeBrandFilter, 'Exterior', 'Top Coat', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-amber-400 py-1 flex items-center justify-between transition">
+                    <span><i class="fa-solid fa-cloud-sun-rain text-[10px] text-amber-500/70 mr-1.5"></i> WeatherShield Top Coats</span>
+                    <span class="text-[9px] text-emerald-400 font-bold">৳650 - ৳14.5k</span>
+                  </button>
+                  <button onclick="setPaintTreeFilter(activeBrandFilter, 'Exterior', 'Primers', this)" class="tree-leaf text-left w-full text-slate-400 hover:text-amber-400 py-1 flex items-center justify-between transition">
+                    <span><i class="fa-solid fa-shield-halved text-[10px] text-amber-500/70 mr-1.5"></i> Exterior Sealer Primers</span>
+                    <span class="text-[9px] text-emerald-400 font-bold">৳400 - ৳1.6k</span>
+                  </button>
                 </div>
+              </div>
+
+              <!-- Category 3: Synthetic Enamel & Metal -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+                <button onclick="setPaintTreeFilter(activeBrandFilter, 'Enamel', '', this)" class="tree-leaf w-full flex items-center justify-between text-slate-100 hover:text-amber-400 font-bold py-0.5 transition">
+                  <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-door-closed text-amber-500"></i> Wood & Metal Enamel
+                  </span>
+                  <span class="text-[9px] text-emerald-400 font-bold">৳120 - ৳1.9k</span>
+                </button>
+              </div>
+
+              <!-- Category 4: Wood Coating -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+                <button onclick="setPaintTreeFilter(activeBrandFilter, 'Wood Coating', '', this)" class="tree-leaf w-full flex items-center justify-between text-slate-100 hover:text-amber-400 font-bold py-0.5 transition">
+                  <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-tree text-amber-500"></i> Wood Coating & Varnish
+                  </span>
+                  <span class="text-[9px] text-emerald-400 font-bold">৳1.1k - ৳1.4k</span>
+                </button>
+              </div>
+
+              <!-- Category 5: Waterproofing -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+                <button onclick="setPaintTreeFilter(activeBrandFilter, 'Waterproofing', '', this)" class="tree-leaf w-full flex items-center justify-between text-slate-100 hover:text-amber-400 font-bold py-0.5 transition">
+                  <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-droplet-slash text-amber-500"></i> Waterproofing Systems
+                  </span>
+                  <span class="text-[9px] text-emerald-400 font-bold">৳880 - ৳3.6k</span>
+                </button>
+              </div>
+
+              <!-- Category 6: Undercoats & Primers -->
+              <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/40 transition">
+                <button onclick="setPaintTreeFilter(activeBrandFilter, 'Undercoat', '', this)" class="tree-leaf w-full flex items-center justify-between text-slate-100 hover:text-amber-400 font-bold py-0.5 transition">
+                  <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-amber-500"></i> Undercoats & Putty
+                  </span>
+                  <span class="text-[9px] text-emerald-400 font-bold">৳280 - ৳1.6k</span>
+                </button>
               </div>
 
             </div>
+
+            <!-- Quick Budget Range Filters -->
+            <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
+              <span class="text-[10px] uppercase font-extrabold text-slate-400 block"><i class="fa-solid fa-filter-circle-dollar text-amber-400 mr-1"></i> Quick Price Filter</span>
+              <div class="grid grid-cols-3 gap-1 text-[10px] font-bold text-center">
+                <button onclick="filterByPriceRange(0, 500)" class="p-1.5 bg-slate-950 border border-slate-800 hover:border-amber-500/50 rounded-lg text-slate-300 hover:text-amber-400 transition">&lt; ৳500</button>
+                <button onclick="filterByPriceRange(500, 1500)" class="p-1.5 bg-slate-950 border border-slate-800 hover:border-amber-500/50 rounded-lg text-slate-300 hover:text-amber-400 transition">৳500-1.5k</button>
+                <button onclick="filterByPriceRange(1500, 99999)" class="p-1.5 bg-slate-950 border border-slate-800 hover:border-amber-500/50 rounded-lg text-slate-300 hover:text-amber-400 transition">&gt; ৳1.5k</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1256,235 +1279,412 @@
   <script>
     // Full Store Inventory Data Store matching all SRS Modules & Categories
     let productsData = JSON.parse(localStorage.getItem('mrb_productsData')) || [
-      // === BERGER PAINTS BRAND SEED DATA ===
+      // === BERGER PAINTS BD PRODUCTS ===
       {
         id: 101,
-        title: 'Berger Robbialac Synthetic Gloss Enamel (Yellow / White)',
+        title: 'Berger Robbialac Super Gloss Synthetic Enamel',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
         paintType: 'Enamel',
-        specs: 'High Gloss Finish • Wood & Metal Protection • Durable Shield',
+        specs: 'High Gloss Protective Shield • Wood & Metal Protection',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '0.91 Litre Tin', price: 440, stock: 35 },
-          { name: '3.64 Litre Gallon Tin', price: 1650, stock: 15 }
+          { name: '0.455 Litre Can', price: 240, stock: 40 },
+          { name: '0.91 Litre Tin', price: 450, stock: 35 },
+          { name: '3.64 Litre Gallon', price: 1700, stock: 20 }
+        ]
+      },
+      {
+        id: 1011,
+        title: 'Berger Easy Clean Fresh Interior Silk Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Stain Resistant • Fresh Fragrance • Luxury Silk Washable Finish',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '3.64 Litre Gallon', price: 2650, stock: 20 },
+          { name: '18.2 Litre Drum', price: 12500, stock: 8 }
         ]
       },
       {
         id: 1012,
-        title: 'Berger Luxury Silk Emulsion (Interior Top Coat)',
+        title: 'Berger Robbialac Acrylic Premium Emulsion',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
         paintType: 'Interior',
         paintSubtype: 'Top Coat',
-        specs: 'Silk Finish • Highly Washable • Luxury Wall Coating',
+        specs: 'Smooth Matt Finish • Superior Coverage • Rich Interior Wall Coating',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 650, stock: 25 },
-          { name: '3.64 Litre Gallon Tin', price: 2450, stock: 15 }
+          { name: '0.91 Litre Tin', price: 480, stock: 35 },
+          { name: '3.64 Litre Gallon', price: 1850, stock: 18 },
+          { name: '18.2 Litre Drum', price: 8900, stock: 10 }
         ]
       },
       {
         id: 1013,
-        title: 'Berger Interior Wall Sealer (Interior Primer)',
+        title: 'Berger Radiance Interior Emulsion (RIN)',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
         paintType: 'Interior',
-        paintSubtype: 'Primers',
-        specs: 'Anti-Alkali • Excellent Adhesion sealer for New Walls',
+        paintSubtype: 'Top Coat',
+        specs: 'Affordable Economy Wall Emulsion • Elegant Soft Sheen',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 420, stock: 30 },
-          { name: '3.64 Litre Can', price: 1550, stock: 20 }
+          { name: '0.91 Litre Tin', price: 380, stock: 40 },
+          { name: '3.64 Litre Gallon', price: 1450, stock: 25 },
+          { name: '18.2 Litre Drum', price: 6800, stock: 12 }
         ]
       },
       {
         id: 1014,
-        title: 'Berger WeatherCoat All Guard (Exterior Top Coat)',
+        title: 'Berger Robbialac SPD Vinyl Emulsion',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Exterior',
+        paintType: 'Interior',
         paintSubtype: 'Top Coat',
-        specs: 'Dirt Pick-Up Resistance • UV Protection Shield • 10-Year Protection',
+        specs: 'Vinyl Co-Polymer Emulsion • Smooth Durable Finish',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 850, stock: 20 },
-          { name: '3.64 Litre Gallon Tin', price: 3100, stock: 12 }
+          { name: '0.91 Litre Tin', price: 350, stock: 30 },
+          { name: '3.64 Litre Gallon', price: 1320, stock: 20 }
         ]
       },
       {
         id: 1015,
-        title: 'Berger Exterior Sealer (Exterior Primer)',
+        title: 'Berger Breathe Easy Interior Waterbased Emulsion',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Exterior',
-        paintSubtype: 'Primers',
-        specs: 'Moisture Barrier • High Binding Strength for Exterior Walls',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Zero VOC • Odorless Health Shield • Eco-Friendly Paint',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 450, stock: 30 }
+          { name: '0.91 Litre Tin', price: 580, stock: 15 },
+          { name: '3.64 Litre Gallon', price: 2250, stock: 10 }
         ]
       },
       {
         id: 1016,
-        title: 'Berger DampShield Elasto Waterproofing Coating',
+        title: 'Berger Waterbased Interior Wall Sealer Primer',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Waterproofing',
-        specs: 'Elastomeric Waterproof Membrane • Resist Up To 7 Bar Hydrostatic Pressure',
+        paintType: 'Interior',
+        paintSubtype: 'Primers',
+        specs: 'Anti-Alkali • Strong Adhesion Sealer for Plaster Walls',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 980, stock: 20 }
+          { name: '0.91 Litre Can', price: 420, stock: 30 },
+          { name: '3.64 Litre Can', price: 1550, stock: 20 }
         ]
       },
       {
         id: 1017,
-        title: 'Berger Woodkeeper Clear Lacquer Polyurethane Wood Coating',
+        title: 'Berger WeatherCoat Supreme Plus Exterior',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Wood Coating',
-        specs: 'Scratch Resistant Polyurethane Gloss Finish for Furniture',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: '10-Year Weather Protection • Rain Shield • Anti-Fungal Barrier',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 1200, stock: 15 }
+          { name: '1 Litre Can', price: 920, stock: 25 },
+          { name: '3.64 Litre Gallon', price: 3450, stock: 12 }
         ]
       },
       {
         id: 1018,
-        title: 'Berger Illusions Metallic Special Effects Design Paint',
+        title: 'Berger WeatherCoat AntiDirt LongLife Exterior',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Special Products',
-        specs: 'Vibrant Metallic Sheen Design Finish for Highlight Walls',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: '7-Year Protection • Anti-Dust Coating • Weather Barrier',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 820, stock: 20 },
+          { name: '3.64 Litre Gallon', price: 3100, stock: 15 },
+          { name: '18.2 Litre Drum', price: 14500, stock: 5 }
+        ]
+      },
+      {
+        id: 1019,
+        title: 'Berger WeatherCoat Smooth Exterior Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: '100% Pure Acrylic Exterior Paint • Smooth Protective Layer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 650, stock: 30 },
+          { name: '3.64 Litre Gallon', price: 2400, stock: 18 }
+        ]
+      },
+      {
+        id: 1020,
+        title: 'Berger Eco Coat Exterior Anti-Pollution',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: 'Environment Friendly Anti-Pollution Exterior Coating',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '3.64 Litre Gallon', price: 2850, stock: 14 }
+        ]
+      },
+      {
+        id: 1021,
+        title: 'Berger Durocem Cement Paint Powder',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: 'Heavy Duty Exterior Solid Cement Base Paint',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '5 KG Pack', price: 320, stock: 50 },
+          { name: '20 KG Bag', price: 1200, stock: 30 }
+        ]
+      },
+      {
+        id: 1022,
+        title: 'Berger Exterior Sealer Primer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Exterior',
+        paintSubtype: 'Primers',
+        specs: 'Moisture Lock Barrier • High Binding Exterior Primer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 450, stock: 30 },
+          { name: '3.64 Litre Can', price: 1600, stock: 15 }
+        ]
+      },
+      {
+        id: 1023,
+        title: 'Berger Robbialac Synthetic Enamel Platinum',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Enamel',
+        specs: 'Platinum Grade Ultra High Gloss • Anti-Corrosive Enamel',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Tin', price: 520, stock: 22 },
+          { name: '3.64 Litre Gallon', price: 1950, stock: 12 }
+        ]
+      },
+      {
+        id: 1024,
+        title: 'Berger Woodkeeper Clear Polyurethane Varnish',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Wood Coating',
+        specs: 'Scratch Resistant Polyurethane Gloss Varnish for Furniture',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 1250, stock: 15 }
+        ]
+      },
+      {
+        id: 1025,
+        title: 'Berger Innova PU Wood Lacquer Coating',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Wood Coating',
+        specs: 'Natural Timber Grain High Transparency Polyurethane Lacquer',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
           { name: '1 Litre Can', price: 1400, stock: 10 }
         ]
       },
       {
-        id: 1019,
-        title: 'Berger Robbialac Undercoat White Paint Sealer',
+        id: 1026,
+        title: 'Berger DampShield Elasto Waterproofing Coating',
         category: 'Synthetic Enamel Paints',
         brand: 'Berger',
-        paintType: 'Undercoat',
-        specs: 'Superior Opacity Undercoat for Enamel Paint & Wood Fillers',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 460, stock: 35 }
-        ]
-      },
-
-      // === AQUA PAINTS BRAND SEED DATA ===
-      {
-        id: 102,
-        title: 'Aqua Paints Rongila Synthetic Gloss Enamel (Brill White)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Enamel',
-        specs: 'Shade: Brill White • High Gloss Finish • 0.91 Litre MRP Tk 430',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '0.91 Litre Tin (Brill White)', price: 430, stock: 35 }
-        ]
-      },
-      {
-        id: 1022,
-        title: 'Aqua Gold Interior Emulsion (Interior Top Coat)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Interior',
-        paintSubtype: 'Top Coat',
-        specs: 'Excellent Scrub Resistance • Smooth Finish • Low VOC',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 580, stock: 25 }
-        ]
-      },
-      {
-        id: 1023,
-        title: 'Aqua Wall Sealer Primer (Interior Primer)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Interior',
-        paintSubtype: 'Primers',
-        specs: 'Water Resistant Primer for Alkaline Interior Walls',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 380, stock: 30 }
-        ]
-      },
-      {
-        id: 1024,
-        title: 'Aqua WeatherShield Exterior (Exterior Top Coat)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Exterior',
-        paintSubtype: 'Top Coat',
-        specs: 'Heavy Rain Protect • Weatherproof Exterior Coating',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 750, stock: 20 }
-        ]
-      },
-      {
-        id: 1025,
-        title: 'Aqua Exterior Sealer Primer (Exterior Primer)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Exterior',
-        paintSubtype: 'Primers',
-        specs: 'Optimal Penetration Exterior Plaster sealer',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 400, stock: 25 }
-        ]
-      },
-      {
-        id: 1026,
-        title: 'Aqua DampStop Waterproofing Coating',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
         paintType: 'Waterproofing',
-        specs: 'Resists High Salt Dampness & Alkaline attacks',
+        specs: 'Elastomeric Waterproofing Membrane • 7 Bar Hydrostatic Resistance',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 880, stock: 20 }
+          { name: '1 Litre Can', price: 980, stock: 20 },
+          { name: '4 Litre Bucket', price: 3600, stock: 10 }
         ]
       },
       {
         id: 1027,
+        title: 'Berger Robbialac Undercoat White Sealer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Berger',
+        paintType: 'Undercoat',
+        specs: 'High Opacity Matt Base Undercoat Sealer for Wood & Enamel',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 460, stock: 35 },
+          { name: '3.64 Litre Can', price: 1650, stock: 15 }
+        ]
+      },
+
+      // === AQUA PAINTS BANGLADESH PRODUCTS (NON-INDUSTRIAL) ===
+      {
+        id: 201,
+        title: 'Aqua Muslin Ultra-Premium Silk Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Ultra-Rich Silk Sheen • Smooth Washable Interior Wall Coating',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 620, stock: 25 },
+          { name: '3.64 Litre Gallon', price: 2350, stock: 14 }
+        ]
+      },
+      {
+        id: 202,
+        title: 'Aqua Superstar Premium Plastic Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'High Opacity Smooth Plastic Wall Emulsion',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 440, stock: 30 },
+          { name: '3.64 Litre Gallon', price: 1620, stock: 20 }
+        ]
+      },
+      {
+        id: 203,
+        title: 'Aqua Bright Interior Wall Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Fresh Bright Wall Decor Emulsion Paint',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 370, stock: 35 },
+          { name: '3.64 Litre Gallon', price: 1380, stock: 18 }
+        ]
+      },
+      {
+        id: 204,
+        title: 'Aqua National Distemper Paint',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Top Coat',
+        specs: 'Matte Finish Economy Wall Distemper Paint',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '4 KG Bucket', price: 380, stock: 40 }
+        ]
+      },
+      {
+        id: 205,
+        title: 'Aqua Platina Weatherproof Exterior Emulsion',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Exterior',
+        paintSubtype: 'Top Coat',
+        specs: 'All-Weather UV & Anti-Fungal Exterior Wall Defense',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 780, stock: 22 },
+          { name: '3.64 Litre Gallon', price: 2890, stock: 12 }
+        ]
+      },
+      {
+        id: 206,
+        title: 'Aqua Captain Synthetic Enamel',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Enamel',
+        specs: 'High-Grade Alkyd Gloss Enamel for Wood & Steel Surfaces',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Tin', price: 480, stock: 30 },
+          { name: '3.64 Litre Gallon', price: 1780, stock: 15 }
+        ]
+      },
+      {
+        id: 207,
+        title: 'Aqua Rangila Synthetic Enamel (Brill White / CNG Green)',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Enamel',
+        specs: 'Vibrant Gloss Finish Economy Synthetic Enamel',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.145 Litre Mini', price: 120, stock: 60 },
+          { name: '0.91 Litre Tin', price: 430, stock: 35 }
+        ]
+      },
+      {
+        id: 208,
+        title: 'Aqua Joy Wall Putty Powder',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Undercoat',
+        specs: 'Smooth Crack-Filling Acrylic Base Wall Putty',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '5 KG Pack', price: 280, stock: 45 },
+          { name: '20 KG Bag', price: 950, stock: 25 }
+        ]
+      },
+      {
+        id: 209,
+        title: 'Aqua Super Sealer I Interior & Exterior Primer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Interior',
+        paintSubtype: 'Primers',
+        specs: 'Deep Penetrating Alkali Resistant Concrete Sealer Primer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 390, stock: 30 },
+          { name: '3.64 Litre Can', price: 1420, stock: 18 }
+        ]
+      },
+      {
+        id: 210,
+        title: 'Aqua Challenger Anti-Corrosive Red Oxide Primer',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Undercoat',
+        specs: 'Red Oxide Metal Anti-Rust Defense Primer',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '0.91 Litre Can', price: 390, stock: 35 }
+        ]
+      },
+      {
+        id: 211,
+        title: 'Aqua DampStop Water Proofing Coating',
+        category: 'Synthetic Enamel Paints',
+        brand: 'Aqua',
+        paintType: 'Waterproofing',
+        specs: 'Dampness & Salt Efflorescence Heavy Defense Coating',
+        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
+        variants: [
+          { name: '1 Litre Can', price: 880, stock: 18 }
+        ]
+      },
+      {
+        id: 212,
         title: 'Aqua WoodShine Clear Wood Lacquer',
         category: 'Synthetic Enamel Paints',
         brand: 'Aqua',
         paintType: 'Wood Coating',
-        specs: 'High Transparency Natural Wood Protection Finish',
+        specs: 'High Transparency Protective Varnish for Timber Furniture',
         image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
         variants: [
-          { name: '1 Litre Can', price: 1100, stock: 15 }
-        ]
-      },
-      {
-        id: 1028,
-        title: 'Aqua Special Texture Paint (Rough Coating)',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Special Products',
-        specs: 'Decorative Textured Sand/Stucco Finish Design',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 1300, stock: 12 }
-        ]
-      },
-      {
-        id: 1029,
-        title: 'Aqua Undercoat Sealer White Paint',
-        category: 'Synthetic Enamel Paints',
-        brand: 'Aqua',
-        paintType: 'Undercoat',
-        specs: 'High Build Matt Base Undercoat sealer',
-        image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=600&q=80',
-        variants: [
-          { name: '1 Litre Can', price: 420, stock: 30 }
+          { name: '1 Litre Can', price: 1100, stock: 16 }
         ]
       },
 
@@ -1630,6 +1830,7 @@
     document.addEventListener('DOMContentLoaded', () => { 
       renderAuthNav();
       renderProducts(); 
+      updateBrowsingStockAnalysis();
       saveState();
     });
 
@@ -2016,6 +2217,12 @@
 
         if (!matchesSearch) return false;
 
+        // Price range filter matching
+        const minPriceVal = Math.min(...item.variants.map(v => v.price));
+        if (minPriceVal < activePriceMinFilter || minPriceVal > activePriceMaxFilter) {
+          return false;
+        }
+
         // Brand Tree Explorer filter
         if (activeBrandFilter !== 'all') {
           const matchesBrand = item.brand.toLowerCase() === activeBrandFilter.toLowerCase();
@@ -2031,6 +2238,17 @@
             }
           }
           return true;
+        }
+
+        // Paint Type filter if active
+        if (activePaintTypeFilter !== 'all') {
+          const matchesType = item.paintType && item.paintType.toLowerCase() === activePaintTypeFilter.toLowerCase();
+          if (!matchesType) return false;
+
+          if (activePaintSubtypeFilter !== 'all') {
+            const matchesSubtype = item.paintSubtype && item.paintSubtype.toLowerCase() === activePaintSubtypeFilter.toLowerCase();
+            if (!matchesSubtype) return false;
+          }
         }
 
         // Traditional Category Grid matching
@@ -2265,17 +2483,85 @@
       }
     }
 
-    // --- Paint Tree Explorer & Filter functions ---
-    function toggleTreeNode(branchId, iconId) {
-      const branch = document.getElementById(branchId);
-      const icon = document.getElementById(iconId);
-      if (branch.classList.contains('hidden')) {
-        branch.classList.remove('hidden');
-        icon.className = "fa-solid fa-folder-open text-amber-500";
-      } else {
-        branch.classList.add('hidden');
-        icon.className = "fa-solid fa-folder text-slate-500";
+    // --- Online Product Browsing Box & Real-Time Stock Analyzer Functions ---
+    let activePriceMinFilter = 0;
+    let activePriceMaxFilter = 999999;
+
+    function selectBrowsingBrand(brand, btnEl) {
+      activeBrandFilter = brand;
+      
+      // Update UI active tab button styles
+      ['brandTabAll', 'brandTabBerger', 'brandTabAqua'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) {
+          b.className = "py-1.5 rounded-lg text-slate-300 hover:text-white transition";
+        }
+      });
+      if (btnEl) {
+        btnEl.className = "py-1.5 rounded-lg bg-amber-500 text-slate-950 transition shadow font-black";
       }
+
+      renderProducts();
+      updateBrowsingStockAnalysis();
+    }
+
+    function toggleBrowsingCategory(subId) {
+      const el = document.getElementById(subId);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function filterByPriceRange(min, max) {
+      activePriceMinFilter = min;
+      activePriceMaxFilter = max;
+      activeCategory = 'all';
+
+      const badgeContainer = document.getElementById('activeFilterBadgeContainer');
+      const badgeText = document.getElementById('activeFilterBadgeText');
+      badgeContainer.classList.remove('hidden');
+      badgeText.innerText = `Price: ৳${min} - ${max >= 99999 ? 'Above' : '৳' + max}`;
+
+      renderProducts();
+    }
+
+    function updateBrowsingStockAnalysis() {
+      let inStock = 0;
+      let lowStock = 0;
+      let outStock = 0;
+      let totalFilteredItems = 0;
+
+      productsData.forEach(item => {
+        if (activeBrandFilter !== 'all' && item.brand.toLowerCase() !== activeBrandFilter.toLowerCase()) {
+          return;
+        }
+        totalFilteredItems++;
+        const totalVariantStock = item.variants.reduce((sum, v) => sum + v.stock, 0);
+        if (totalVariantStock > 15) {
+          inStock++;
+        } else if (totalVariantStock > 0) {
+          lowStock++;
+        } else {
+          outStock++;
+        }
+      });
+
+      const totalBadge = document.getElementById('browsingTotalItemsBadge');
+      const inStockEl = document.getElementById('browsingInStockCount');
+      const lowStockEl = document.getElementById('browsingLowStockCount');
+      const outStockEl = document.getElementById('browsingOutStockCount');
+
+      if (totalBadge) totalBadge.innerText = `${totalFilteredItems} Items`;
+      if (inStockEl) inStockEl.innerText = inStock;
+      if (lowStockEl) lowStockEl.innerText = lowStock;
+      if (outStockEl) outStockEl.innerText = outStock;
+
+      // Update category badges in browsing box
+      const intCount = productsData.filter(i => (activeBrandFilter === 'all' || i.brand === activeBrandFilter) && i.paintType === 'Interior').length;
+      const extCount = productsData.filter(i => (activeBrandFilter === 'all' || i.brand === activeBrandFilter) && i.paintType === 'Exterior').length;
+      
+      const badgeInt = document.getElementById('countBadgeInterior');
+      const badgeExt = document.getElementById('countBadgeExterior');
+      if (badgeInt) badgeInt.innerText = `${intCount} Items`;
+      if (badgeExt) badgeExt.innerText = `${extCount} Items`;
     }
 
     function setPaintTreeFilter(brand, type, subtype, element) {
@@ -2283,6 +2569,8 @@
       activePaintTypeFilter = type;
       activePaintSubtypeFilter = subtype;
       activeCategory = 'all'; // override main categories
+      activePriceMinFilter = 0;
+      activePriceMaxFilter = 999999;
 
       // Clear highlighted states of tree leafs
       document.querySelectorAll('.tree-leaf').forEach(leaf => {
@@ -2299,15 +2587,16 @@
       const badgeText = document.getElementById('activeFilterBadgeText');
       badgeContainer.classList.remove('hidden');
       
-      let label = `${brand}`;
+      let label = `${brand === 'all' ? 'All Brands' : brand}`;
       if (type !== 'all') label += ` › ${type}`;
       if (subtype) label += ` › ${subtype}`;
-      badgeText.innerText = `Tree: ${label}`;
+      badgeText.innerText = `Browsing: ${label}`;
 
       // Deselect all category cards
       document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('category-card-active'));
 
       renderProducts();
+      updateBrowsingStockAnalysis();
       
       const target = document.getElementById('productsGridSection');
       if (target) target.scrollIntoView({ behavior: 'smooth' });
@@ -2318,6 +2607,8 @@
       activePaintTypeFilter = 'all';
       activePaintSubtypeFilter = 'all';
       activeCategory = 'all';
+      activePriceMinFilter = 0;
+      activePriceMaxFilter = 999999;
 
       document.querySelectorAll('.tree-leaf').forEach(leaf => {
         leaf.classList.remove('text-amber-400', 'font-black');
@@ -2325,7 +2616,15 @@
       });
 
       const badgeContainer = document.getElementById('activeFilterBadgeContainer');
-      badgeContainer.classList.add('hidden');
+      if (badgeContainer) badgeContainer.classList.add('hidden');
+
+      // Reset brand tabs UI
+      ['brandTabAll', 'brandTabBerger', 'brandTabAqua'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.className = "py-1.5 rounded-lg text-slate-300 hover:text-white transition";
+      });
+      const allTab = document.getElementById('brandTabAll');
+      if (allTab) allTab.className = "py-1.5 rounded-lg bg-amber-500 text-slate-950 transition shadow font-black";
 
       // Highlight All category card
       const cards = document.querySelectorAll('.cat-card');
@@ -2335,6 +2634,7 @@
       document.getElementById('catalogHeading').innerText = 'Catalog Products';
 
       renderProducts();
+      updateBrowsingStockAnalysis();
     }
 
     // --- Local Disk Image Upload & Base64 Reader Helper ---

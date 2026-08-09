@@ -141,24 +141,70 @@ async function main() {
     },
   });
 
+  const catInterior = await prisma.category.create({
+    data: {
+      name: 'Interior Paints',
+      slug: 'interior-paints',
+      description: 'Berger Easy Clean, Robbialac Silk, Aqua Muslin & Superstar interior top coats & primers.',
+      image: '/products/2412.jpg',
+    },
+  });
+
+  const catExterior = await prisma.category.create({
+    data: {
+      name: 'Exterior Paints',
+      slug: 'exterior-paints',
+      description: 'Berger WeatherCoat Supreme & LongLife, Aqua Platina weatherproof exterior paints.',
+      image: '/products/2412.jpg',
+    },
+  });
+
+  const catWaterproofing = await prisma.category.create({
+    data: {
+      name: 'Waterproofing Systems',
+      slug: 'waterproofing-systems',
+      description: 'Berger DampShield Elasto & Aqua DampStop hydrostatic dampness defense coatings.',
+      image: '/products/2412.jpg',
+    },
+  });
+
+  const catWoodCoating = await prisma.category.create({
+    data: {
+      name: 'Wood Coating & Varnish',
+      slug: 'wood-coating-and-varnish',
+      description: 'Berger WoodKeeper PU Varnish, Innova & Aqua WoodShine clear wood lacquers.',
+      image: '/products/2412.jpg',
+    },
+  });
+
+  const catUndercoats = await prisma.category.create({
+    data: {
+      name: 'Undercoats & Putty',
+      slug: 'undercoats-and-putty',
+      description: 'Berger Robbialac Undercoat White Sealer & Aqua Joy Wall Putty.',
+      image: '/products/2412.jpg',
+    },
+  });
+
   // PRODUCTS & MULTI-UNIT SUB-PRODUCTS SEED
 
   // 1. Synthetic Enamel Paints
   await prisma.product.create({
     data: {
-      title: 'Berger Robbialac Synthetic Gloss Enamel (Yellow / White)',
+      title: 'Berger Robbialac Super Gloss Synthetic Enamel',
       slug: 'berger-robbialac-enamel-series',
-      description: 'High gloss synthetic enamel paint for wood & metal protection.',
+      description: 'High gloss protective shield synthetic enamel paint for wood & metal surfaces.',
       categoryId: catEnamel.id,
-      basePrice: 440,
-      stock: 50,
+      basePrice: 240,
+      stock: 95,
       sku: 'BER-ROB-SGE-SERIES',
       unit: 'Volume (Litre)',
       images: JSON.stringify(['/products/2412.jpg']),
       variants: {
         create: [
-          { name: '0.91 Litre Tin', price: 440, stock: 35, sku: 'BER-ROB-SGE-091L' },
-          { name: '3.64 Litre Gallon Tin', price: 1650, stock: 15, sku: 'BER-ROB-SGE-364L' },
+          { name: '0.455 Litre Can', price: 240, stock: 40, sku: 'BER-ROB-SGE-045L' },
+          { name: '0.91 Litre Tin', price: 450, stock: 35, sku: 'BER-ROB-SGE-091L' },
+          { name: '3.64 Litre Gallon', price: 1700, stock: 20, sku: 'BER-ROB-SGE-364L' },
         ],
       },
     },
@@ -166,24 +212,204 @@ async function main() {
 
   await prisma.product.create({
     data: {
-      title: 'Aqua Paints Rongila Synthetic Gloss Enamel (Brill White)',
-      slug: 'aqua-paints-rongila-enamel',
-      description: 'Shade: Brill White • High Gloss Finish • 0.91 Litre MRP Tk 430',
-      categoryId: catEnamel.id,
-      basePrice: 430,
-      stock: 35,
-      sku: 'AQU-RNG-WHITE-091L',
+      title: 'Berger Easy Clean Fresh Interior Silk Emulsion',
+      slug: 'berger-easy-clean-fresh',
+      description: 'Stain resistant fresh fragrance luxury silk washable interior wall coating.',
+      categoryId: catInterior.id,
+      basePrice: 2650,
+      stock: 28,
+      sku: 'BER-EZC-FRESH',
       unit: 'Volume (Litre)',
       images: JSON.stringify(['/products/2412.jpg']),
       variants: {
         create: [
-          { name: '0.91 Litre Tin (Brill White)', price: 430, stock: 35, sku: 'AQU-RNG-091L' },
+          { name: '3.64 Litre Gallon', price: 2650, stock: 20, sku: 'BER-EZC-364L' },
+          { name: '18.2 Litre Drum', price: 12500, stock: 8, sku: 'BER-EZC-182L' },
         ],
       },
     },
   });
 
-  // 2. Acrylic Lacquer Sprays
+  await prisma.product.create({
+    data: {
+      title: 'Berger WeatherCoat Supreme Plus Exterior',
+      slug: 'berger-weathercoat-supreme-plus',
+      description: '10-Year weather protection rain shield anti-fungal exterior wall coating.',
+      categoryId: catExterior.id,
+      basePrice: 920,
+      stock: 37,
+      sku: 'BER-WCS-PLUS',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 920, stock: 25, sku: 'BER-WCS-100L' },
+          { name: '3.64 Litre Gallon', price: 3450, stock: 12, sku: 'BER-WCS-364L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Berger DampShield Elasto Waterproofing Coating',
+      slug: 'berger-dampshield-elasto',
+      description: 'Elastomeric waterproofing membrane with 7 bar hydrostatic resistance.',
+      categoryId: catWaterproofing.id,
+      basePrice: 980,
+      stock: 30,
+      sku: 'BER-DMP-ELASTO',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 980, stock: 20, sku: 'BER-DMP-100L' },
+          { name: '4 Litre Bucket', price: 3600, stock: 10, sku: 'BER-DMP-400L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Berger Woodkeeper Clear Polyurethane Varnish',
+      slug: 'berger-woodkeeper-varnish',
+      description: 'Scratch resistant polyurethane clear gloss varnish for timber furniture.',
+      categoryId: catWoodCoating.id,
+      basePrice: 1250,
+      stock: 15,
+      sku: 'BER-WDK-VARNISH',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 1250, stock: 15, sku: 'BER-WDK-100L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Berger Robbialac Undercoat White Sealer',
+      slug: 'berger-robbialac-undercoat-white',
+      description: 'High opacity matt base undercoat sealer for enamel paint and wood fillers.',
+      categoryId: catUndercoats.id,
+      basePrice: 460,
+      stock: 50,
+      sku: 'BER-ROB-UNDR-WHITE',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '0.91 Litre Can', price: 460, stock: 35, sku: 'BER-UND-091L' },
+          { name: '3.64 Litre Can', price: 1650, stock: 15, sku: 'BER-UND-364L' },
+        ],
+      },
+    },
+  });
+
+  // AQUA PAINTS PRODUCTS
+  await prisma.product.create({
+    data: {
+      title: 'Aqua Muslin Ultra-Premium Silk Emulsion',
+      slug: 'aqua-muslin-silk-emulsion',
+      description: 'Ultra-rich silk sheen smooth washable interior wall coating.',
+      categoryId: catInterior.id,
+      basePrice: 620,
+      stock: 39,
+      sku: 'AQU-MSL-SILK',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 620, stock: 25, sku: 'AQU-MSL-100L' },
+          { name: '3.64 Litre Gallon', price: 2350, stock: 14, sku: 'AQU-MSL-364L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Aqua Platina Weatherproof Exterior Emulsion',
+      slug: 'aqua-platina-exterior',
+      description: 'All-weather UV & anti-fungal exterior wall defense emulsion.',
+      categoryId: catExterior.id,
+      basePrice: 780,
+      stock: 34,
+      sku: 'AQU-PLT-EXT',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 780, stock: 22, sku: 'AQU-PLT-100L' },
+          { name: '3.64 Litre Gallon', price: 2890, stock: 12, sku: 'AQU-PLT-364L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Aqua Captain Synthetic Enamel',
+      slug: 'aqua-captain-synthetic-enamel',
+      description: 'High-grade alkyd gloss enamel for wood & steel surfaces.',
+      categoryId: catEnamel.id,
+      basePrice: 480,
+      stock: 45,
+      sku: 'AQU-CPT-ENAMEL',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '0.91 Litre Tin', price: 480, stock: 30, sku: 'AQU-CPT-091L' },
+          { name: '3.64 Litre Gallon', price: 1780, stock: 15, sku: 'AQU-CPT-364L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Aqua DampStop Water Proofing Coating',
+      slug: 'aqua-dampstop-waterproofing',
+      description: 'Dampness & salt efflorescence heavy defense waterproofing coating.',
+      categoryId: catWaterproofing.id,
+      basePrice: 880,
+      stock: 18,
+      sku: 'AQU-DMP-STOP',
+      unit: 'Volume (Litre)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '1 Litre Can', price: 880, stock: 18, sku: 'AQU-DMP-100L' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      title: 'Aqua Joy Wall Putty Powder',
+      slug: 'aqua-joy-wall-putty',
+      description: 'Smooth crack-filling acrylic base wall putty.',
+      categoryId: catUndercoats.id,
+      basePrice: 280,
+      stock: 70,
+      sku: 'AQU-JOY-PUTTY',
+      unit: 'Weight (gm / kg)',
+      images: JSON.stringify(['/products/2412.jpg']),
+      variants: {
+        create: [
+          { name: '5 KG Pack', price: 280, stock: 45, sku: 'AQU-PUT-5KG' },
+          { name: '20 KG Bag', price: 950, stock: 25, sku: 'AQU-PUT-20KG' },
+        ],
+      },
+    },
+  });
+
+  // HARDWARE TOOLS SEEDS
   await prisma.product.create({
     data: {
       title: 'JM Acrylic Lacquer Spray 400ml (37 Light Green / Clear Gloss)',
@@ -204,7 +430,6 @@ async function main() {
     },
   });
 
-  // 3. Adhesives & Glues
   await prisma.product.create({
     data: {
       title: 'Fevicol 1K PUR Polyurethane Wood Adhesive & Super Glue',
@@ -225,7 +450,6 @@ async function main() {
     },
   });
 
-  // 4. Paint Brushes & Tools
   await prisma.product.create({
     data: {
       title: 'Wooden Handle Paint Brush (Size 125 / 4 Inch) & Wire Brushes',
@@ -246,7 +470,6 @@ async function main() {
     },
   });
 
-  // 5. Padlocks & Security
   await prisma.product.create({
     data: {
       title: 'HMBR Stainless Steel Heavy Duty Top Security Padlock',
