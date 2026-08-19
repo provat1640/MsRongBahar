@@ -739,9 +739,13 @@
             <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-500 text-xs"></i>
           </div>
         </div>
-        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+        <button id="loginSubmitBtn" type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
           <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
         </button>
+        <div class="flex items-center justify-between text-[11px]">
+          <button type="button" onclick="handleAccountRecovery()" class="text-amber-400 hover:text-amber-300 font-semibold">Forgot password?</button>
+          <span id="authStatusMessage" class="text-slate-400"></span>
+        </div>
       </form>
 
       <!-- Tab 2: Customer Registration Form -->
@@ -766,7 +770,7 @@
           <label class="text-xs font-semibold text-slate-400 block mb-1">Full Delivery Address</label>
           <input type="text" id="regAddress" required placeholder="Address in Pakundia / Kishoreganj" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
         </div>
-        <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm transition">
+        <button id="registerSubmitBtn" type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm transition">
           Create Account
         </button>
       </form>
@@ -795,7 +799,7 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
+        <button id="adminAuthSubmitBtn" type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg transition">
           <i class="fa-solid fa-unlock text-sm"></i> Unlock Admin Control Center
         </button>
       </form>
@@ -1152,6 +1156,15 @@
                 </tbody>
               </table>
             </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h5 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Inventory Activity Log</h5>
+                <span class="text-[11px] text-slate-500">Recent 20 changes</span>
+              </div>
+              <div id="inventoryLogList" class="max-h-44 overflow-y-auto space-y-2 text-[11px] text-slate-300">
+                <p class="text-slate-500 italic">No inventory activity yet.</p>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -1285,7 +1298,7 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
+          <button id="checkoutSubmitBtn" type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-paper-plane"></i> Confirm & Place Order
           </button>
         </form>
@@ -1843,10 +1856,13 @@
     ];
 
     // Local Storage State Keys
+    const SESSION_DURATION_MS = 1000 * 60 * 60 * 12;
+    const LOW_STOCK_THRESHOLD = 10;
+    const INVENTORY_LOG_LIMIT = 200;
     let currentUser = JSON.parse(localStorage.getItem('mrb_currentUser')) || null;
     let usersList = JSON.parse(localStorage.getItem('mrb_usersList')) || [
-      { name: 'Rahim Chowdhury', phone: '01812345678', password: 'user123', email: 'rahim@gmail.com', address: 'Mothkhola Bazar Road, Pakundia', role: 'USER' },
-      { name: 'M/S Rong Bahar Manager (Habib)', phone: '01722452836', password: 'Habib123', email: 'habib@rongbahar.com', address: 'Mothkhola Road, Pakundia', role: 'ADMIN' }
+      { id: 'usr-rong-001', name: 'Rahim Chowdhury', phone: '01812345678', password: 'user123', email: 'rahim@gmail.com', address: 'Mothkhola Bazar Road, Pakundia', role: 'USER' },
+      { id: 'usr-rong-admin', name: 'M/S Rong Bahar Manager (Habib)', phone: '01722452836', password: 'Habib123', email: 'habib@rongbahar.com', address: 'Mothkhola Road, Pakundia', role: 'ADMIN' }
     ];
 
     let ordersList = JSON.parse(localStorage.getItem('mrb_ordersList')) || [
@@ -1873,6 +1889,8 @@
       }
     ];
 
+    let inventoryLogs = JSON.parse(localStorage.getItem('mrb_inventoryLogs')) || [];
+    let inventoryVersion = parseInt(localStorage.getItem('mrb_inventoryVersion') || '0', 10);
     let isAdminUnlocked = false;
     let cart = [];
     let activeCategory = 'all';
@@ -1882,19 +1900,210 @@
     let activePaintTypeFilter = 'all';
     let activePaintSubtypeFilter = 'all';
 
-    document.addEventListener('DOMContentLoaded', () => { 
+    function normalizePhone(phone = '') {
+      return String(phone).replace(/\D/g, '');
+    }
+
+    function normalizeEmail(email = '') {
+      return String(email).trim().toLowerCase();
+    }
+
+    function isValidBangladeshPhone(phone) {
+      const digits = normalizePhone(phone);
+      return /^(8801\d{9}|01\d{9})$/.test(digits);
+    }
+
+    function isValidEmail(email) {
+      if (!email) return true;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+    }
+
+    function isStrongPassword(password) {
+      return typeof password === 'string' && password.trim().length >= 6;
+    }
+
+    function createSessionToken() {
+      return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    }
+
+    async function createPasswordHash(password, salt) {
+      if (window.crypto?.subtle) {
+        const enc = new TextEncoder();
+        const digest = await crypto.subtle.digest('SHA-256', enc.encode(`${salt}:${password}`));
+        return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      return btoa(unescape(encodeURIComponent(`${salt}:${password}`)));
+    }
+
+    async function verifyUserPassword(user, passwordInput) {
+      if (!user || !user.passwordHash || !user.passwordSalt) return false;
+      const computed = await createPasswordHash(passwordInput, user.passwordSalt);
+      return computed === user.passwordHash;
+    }
+
+    function getCurrentSession() {
+      const session = JSON.parse(localStorage.getItem('mrb_session') || 'null');
+      if (!session || !session.expiresAt || Date.now() > session.expiresAt) {
+        localStorage.removeItem('mrb_session');
+        return null;
+      }
+      return session;
+    }
+
+    function setCurrentSession(user) {
+      localStorage.setItem('mrb_session', JSON.stringify({
+        userId: user.id,
+        phone: user.phone,
+        token: createSessionToken(),
+        expiresAt: Date.now() + SESSION_DURATION_MS
+      }));
+    }
+
+    function clearCurrentSession() {
+      localStorage.removeItem('mrb_session');
+    }
+
+    function getSafeUser(user) {
+      if (!user) return null;
+      return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email || '',
+        address: user.address || '',
+        role: user.role || 'USER'
+      };
+    }
+
+    function isCurrentUserAdmin() {
+      return !!currentUser && currentUser.role === 'ADMIN';
+    }
+
+    function restoreCurrentUserFromSession() {
+      const session = getCurrentSession();
+      if (!session) {
+        currentUser = null;
+        return;
+      }
+      const linkedUser = usersList.find(u => u.id === session.userId || normalizePhone(u.phone) === normalizePhone(session.phone));
+      currentUser = linkedUser ? getSafeUser(linkedUser) : null;
+      if (!linkedUser) clearCurrentSession();
+    }
+
+    function ensureUserModel(user) {
+      if (!user.id) user.id = `usr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      user.phone = String(user.phone || '').trim();
+      user.email = normalizeEmail(user.email || '');
+      user.role = user.role === 'ADMIN' ? 'ADMIN' : 'USER';
+      user.address = user.address || '';
+      return user;
+    }
+
+    async function migrateLegacyUserPasswords() {
+      let changed = false;
+      for (const user of usersList) {
+        ensureUserModel(user);
+        if (!user.passwordHash || !user.passwordSalt) {
+          const fallbackPassword = String(user.password || '').trim();
+          if (fallbackPassword) {
+            const passwordSalt = createSessionToken();
+            user.passwordSalt = passwordSalt;
+            user.passwordHash = await createPasswordHash(fallbackPassword, passwordSalt);
+            changed = true;
+          }
+        }
+        if (user.password) {
+          delete user.password;
+          changed = true;
+        }
+      }
+      if (changed) saveState();
+    }
+
+    function renderInventoryLogs() {
+      const logList = document.getElementById('inventoryLogList');
+      if (!logList) return;
+      if (!inventoryLogs.length) {
+        logList.innerHTML = `<p class="text-slate-500 italic">No inventory activity yet.</p>`;
+        return;
+      }
+      logList.innerHTML = inventoryLogs.slice(0, 20).map(log => `
+        <div class="p-2.5 rounded-xl border border-slate-800 bg-slate-900/70">
+          <p class="font-semibold text-slate-200">${log.message}</p>
+          <p class="text-slate-500">${new Date(log.at).toLocaleString()}</p>
+        </div>
+      `).join('');
+    }
+
+    function pushInventoryLog(message) {
+      inventoryLogs.unshift({ at: new Date().toISOString(), message });
+      if (inventoryLogs.length > INVENTORY_LOG_LIMIT) {
+        inventoryLogs = inventoryLogs.slice(0, INVENTORY_LOG_LIMIT);
+      }
+    }
+
+    function syncInventorySnapshot() {
+      const latestProducts = JSON.parse(localStorage.getItem('mrb_productsData') || 'null');
+      const latestVersion = parseInt(localStorage.getItem('mrb_inventoryVersion') || '0', 10);
+      if (latestProducts && latestVersion > inventoryVersion) {
+        productsData = latestProducts;
+        inventoryVersion = latestVersion;
+      }
+    }
+
+    function runInventoryTransaction(mutator, logMessage) {
+      syncInventorySnapshot();
+      const didCommit = mutator();
+      if (!didCommit) return false;
+      inventoryVersion += 1;
+      localStorage.setItem('mrb_inventoryVersion', String(inventoryVersion));
+      if (logMessage) pushInventoryLog(logMessage);
+      saveState();
+      return true;
+    }
+
+    function setButtonLoading(button, isLoading, loadingText = 'Processing...') {
+      if (!button) return;
+      if (isLoading) {
+        if (!button.dataset.originalHtml) button.dataset.originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.classList.add('opacity-70', 'cursor-not-allowed');
+        button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${loadingText}`;
+      } else {
+        button.disabled = false;
+        button.classList.remove('opacity-70', 'cursor-not-allowed');
+        if (button.dataset.originalHtml) button.innerHTML = button.dataset.originalHtml;
+      }
+    }
+
+    function closeAllModalsOnEscape(evt) {
+      if (evt.key !== 'Escape') return;
+      ['authModal', 'productRequestModal', 'adminPanelModal', 'adminAddProductModal', 'adminEditProductModal', 'cartModal', 'orderTrackerModal', 'wishlistModal', 'productCompareModal', 'colorVisualizerModal', 'paintCalcModal'].forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && !modal.classList.contains('hidden')) modal.classList.add('hidden');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => { 
+      await migrateLegacyUserPasswords();
+      restoreCurrentUserFromSession();
       renderAuthNav();
       renderProducts(); 
       updateBrowsingStockAnalysis();
+      renderInventoryLogs();
       saveState();
     });
 
+    document.addEventListener('keydown', closeAllModalsOnEscape);
+
     function saveState() {
-      localStorage.setItem('mrb_currentUser', JSON.stringify(currentUser));
+      localStorage.setItem('mrb_currentUser', JSON.stringify(getSafeUser(currentUser)));
       localStorage.setItem('mrb_usersList', JSON.stringify(usersList));
       localStorage.setItem('mrb_ordersList', JSON.stringify(ordersList));
       localStorage.setItem('mrb_productRequests', JSON.stringify(productRequestsList));
       localStorage.setItem('mrb_productsData', JSON.stringify(productsData));
+      localStorage.setItem('mrb_inventoryLogs', JSON.stringify(inventoryLogs));
+      localStorage.setItem('mrb_inventoryVersion', String(inventoryVersion));
     }
 
 
@@ -1974,7 +2183,7 @@
     function renderAuthNav() {
       const container = document.getElementById('authNavContainer');
       if (currentUser) {
-        const isAdmin = currentUser.role === 'ADMIN' || currentUser.phone === '01722452836' || currentUser.phone === 'Habib01722452836';
+        const isAdmin = currentUser.role === 'ADMIN';
         if (isAdmin) {
           container.innerHTML = `
             <div class="flex items-center gap-2">
@@ -1983,6 +2192,9 @@
               </span>
               <button onclick="openAdminPanelModal()" class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black transition shadow-lg flex items-center gap-1.5">
                 <i class="fa-solid fa-gauge-high"></i> <span class="hidden md:inline">Control Panel</span>
+              </button>
+              <button onclick="handleProfileUpdate()" title="Update Profile" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs font-bold transition">
+                <i class="fa-solid fa-id-card"></i>
               </button>
               <button onclick="handleLogout()" title="Logout" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-400 text-xs font-bold transition">
                 <i class="fa-solid fa-right-from-bracket"></i>
@@ -1997,6 +2209,9 @@
               </span>
               <button onclick="toggleOrderTrackerModal()" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-bold transition">
                 <i class="fa-solid fa-clock-rotate-left text-amber-400"></i> My Orders
+              </button>
+              <button onclick="handleProfileUpdate()" title="Update Profile" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs font-bold transition">
+                <i class="fa-solid fa-id-card"></i>
               </button>
               <button onclick="handleLogout()" title="Logout" class="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 text-slate-300 hover:text-rose-400 text-xs font-bold transition">
                 <i class="fa-solid fa-right-from-bracket"></i>
@@ -2017,6 +2232,11 @@
     }
 
     function openAdminPanelModal() {
+      if (!isCurrentUserAdmin()) {
+        alert('Only authenticated ADMIN users can open the control panel.');
+        toggleAuthModal('admin');
+        return;
+      }
       isAdminUnlocked = true;
       const modal = document.getElementById('adminPanelModal');
       modal.classList.remove('hidden');
@@ -2061,74 +2281,208 @@
       }
     }
 
-    function handleLoginSubmit(e) {
+    async function handleLoginSubmit(e) {
       e.preventDefault();
+      const submitBtn = document.getElementById('loginSubmitBtn');
+      setButtonLoading(submitBtn, true, 'Signing in...');
       const phoneInput = document.getElementById('loginPhone').value.trim();
       const passwordInput = document.getElementById('loginPassword').value.trim();
+      const authStatus = document.getElementById('authStatusMessage');
+      if (authStatus) authStatus.innerText = '';
 
-      if (!phoneInput || !passwordInput) {
-        alert('Please enter both your mobile phone number and password.');
-        return;
-      }
-
-      // Find user by phone number
-      const user = usersList.find(u => u.phone === phoneInput || u.phone.replace(/\D/g, '') === phoneInput.replace(/\D/g, ''));
-
-      if (user) {
-        // Check password match (if user has no saved password, accept default password or user input)
-        const isPasswordValid = !user.password || user.password === passwordInput || passwordInput === 'user123' || passwordInput === 'Habib123';
-        if (isPasswordValid) {
-          currentUser = user;
-          saveState();
-          renderAuthNav();
-          toggleAuthModal();
-          alert(`Welcome back, ${user.name}!`);
-        } else {
-          alert('Incorrect password! Please try again or check your credentials.');
+      try {
+        if (!phoneInput || !passwordInput) {
+          alert('Please enter both your mobile phone number and password.');
+          return;
         }
-      } else {
-        alert(`No registered account found for phone number "${phoneInput}". Switching to Registration...`);
-        switchAuthTab('register');
-        document.getElementById('regPhone').value = phoneInput;
+        if (!isValidBangladeshPhone(phoneInput)) {
+          alert('Please enter a valid Bangladesh mobile number (01XXXXXXXXX).');
+          return;
+        }
+
+        const normalizedPhone = normalizePhone(phoneInput);
+        const user = usersList.find(u => normalizePhone(u.phone) === normalizedPhone);
+
+        if (user) {
+          const isPasswordValid = await verifyUserPassword(user, passwordInput);
+          if (isPasswordValid) {
+            currentUser = getSafeUser(user);
+            setCurrentSession(user);
+            saveState();
+            renderAuthNav();
+            toggleAuthModal();
+            if (authStatus) authStatus.innerText = 'Signed in successfully.';
+            alert(`Welcome back, ${user.name}!`);
+          } else {
+            alert('Incorrect password! Please try again or use account recovery.');
+          }
+        } else {
+          alert(`No registered account found for phone number "${phoneInput}". Switching to Registration...`);
+          switchAuthTab('register');
+          document.getElementById('regPhone').value = phoneInput;
+        }
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     }
 
-    function handleRegisterSubmit(e) {
+    async function handleRegisterSubmit(e) {
       e.preventDefault();
+      const submitBtn = document.getElementById('registerSubmitBtn');
+      setButtonLoading(submitBtn, true, 'Creating account...');
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value.trim();
       const address = document.getElementById('regAddress').value.trim();
 
-      if (!name || !phone || !password) {
-        alert('Name, Phone Number, and Password are required.');
-        return;
-      }
+      try {
+        if (!name || !phone || !password) {
+          alert('Name, Phone Number, and Password are required.');
+          return;
+        }
+        if (!isValidBangladeshPhone(phone)) {
+          alert('Use a valid Bangladesh mobile number format.');
+          return;
+        }
+        if (!isValidEmail(email)) {
+          alert('Please provide a valid email address.');
+          return;
+        }
+        if (!isStrongPassword(password)) {
+          alert('Password must be at least 6 characters.');
+          return;
+        }
 
-      const existing = usersList.find(u => u.phone === phone);
-      if (existing) {
-        alert('An account with this mobile phone number already exists! Switching to Sign In...');
-        switchAuthTab('login');
-        document.getElementById('loginPhone').value = phone;
-        return;
-      }
+        const normalizedPhone = normalizePhone(phone);
+        const normalizedEmail = normalizeEmail(email);
+        const existing = usersList.find(u => normalizePhone(u.phone) === normalizedPhone);
+        if (existing) {
+          alert('An account with this mobile phone number already exists! Switching to Sign In...');
+          switchAuthTab('login');
+          document.getElementById('loginPhone').value = phone;
+          return;
+        }
+        if (normalizedEmail && usersList.some(u => normalizeEmail(u.email || '') === normalizedEmail)) {
+          alert('An account with this email already exists. Use another email or recover your account.');
+          return;
+        }
 
-      const newUser = { name, phone, email, password, address, role: 'USER' };
-      usersList.push(newUser);
-      currentUser = newUser;
-      saveState();
-      renderAuthNav();
-      toggleAuthModal();
-      alert(`Registration successful! Welcome to M/S Rong Bahar, ${name}.`);
+        const passwordSalt = createSessionToken();
+        const passwordHash = await createPasswordHash(password, passwordSalt);
+        const newUser = ensureUserModel({ id: `usr-${Date.now()}`, name, phone, email: normalizedEmail, passwordHash, passwordSalt, address, role: 'USER' });
+        usersList.push(newUser);
+        currentUser = getSafeUser(newUser);
+        setCurrentSession(newUser);
+        saveState();
+        renderAuthNav();
+        toggleAuthModal();
+        alert(`Registration successful! Welcome to M/S Rong Bahar, ${name}.`);
+      } finally {
+        setButtonLoading(submitBtn, false);
+      }
     }
 
     function handleLogout() {
       currentUser = null;
       isAdminUnlocked = false;
+      clearCurrentSession();
       localStorage.removeItem('mrb_currentUser');
       renderAuthNav();
       alert('You have logged out successfully.');
+    }
+
+    async function handleAccountRecovery() {
+      const phone = prompt('Enter your registered mobile number (01XXXXXXXXX):', '');
+      if (!phone) return;
+      const normalizedPhone = normalizePhone(phone);
+      const matchedUser = usersList.find(u => normalizePhone(u.phone) === normalizedPhone);
+      if (!matchedUser) {
+        alert('No account found for this mobile number.');
+        return;
+      }
+
+      const emailCheck = prompt('Enter your registered email (leave blank if not set):', '');
+      const storedEmail = normalizeEmail(matchedUser.email || '');
+      if (storedEmail && normalizeEmail(emailCheck || '') !== storedEmail) {
+        alert('Email verification failed for this account.');
+        return;
+      }
+
+      const newPassword = prompt('Enter your new password (minimum 6 characters):', '');
+      if (!isStrongPassword(newPassword || '')) {
+        alert('Password update cancelled. The new password is too short.');
+        return;
+      }
+
+      const newSalt = createSessionToken();
+      matchedUser.passwordSalt = newSalt;
+      matchedUser.passwordHash = await createPasswordHash(newPassword, newSalt);
+      saveState();
+      alert('Password reset successful. Please sign in with your new password.');
+      switchAuthTab('login');
+      document.getElementById('loginPhone').value = matchedUser.phone;
+    }
+
+    async function handleProfileUpdate() {
+      if (!currentUser) {
+        alert('Please sign in first.');
+        return;
+      }
+      const userIndex = usersList.findIndex(u => u.id === currentUser.id || normalizePhone(u.phone) === normalizePhone(currentUser.phone));
+      if (userIndex === -1) {
+        alert('User profile not found. Please sign in again.');
+        handleLogout();
+        return;
+      }
+      const user = usersList[userIndex];
+      const name = prompt('Update full name:', user.name);
+      if (!name || !name.trim()) return;
+      const phone = prompt('Update mobile number:', user.phone);
+      if (!phone || !isValidBangladeshPhone(phone)) {
+        alert('Valid Bangladesh mobile number required.');
+        return;
+      }
+      const email = prompt('Update email address (optional):', user.email || '');
+      if (!isValidEmail(email || '')) {
+        alert('Please provide a valid email address.');
+        return;
+      }
+      const address = prompt('Update delivery address:', user.address || '') || '';
+      const normalizedPhone = normalizePhone(phone);
+      const normalizedEmail = normalizeEmail(email || '');
+      const phoneConflict = usersList.some((u, idx) => idx !== userIndex && normalizePhone(u.phone) === normalizedPhone);
+      if (phoneConflict) {
+        alert('Another account already uses this phone number.');
+        return;
+      }
+      const emailConflict = normalizedEmail && usersList.some((u, idx) => idx !== userIndex && normalizeEmail(u.email || '') === normalizedEmail);
+      if (emailConflict) {
+        alert('Another account already uses this email.');
+        return;
+      }
+
+      user.name = name.trim();
+      user.phone = phone.trim();
+      user.email = normalizedEmail;
+      user.address = address.trim();
+
+      const newPassword = prompt('Set a new password (leave blank to keep current):', '');
+      if (newPassword && !isStrongPassword(newPassword)) {
+        alert('New password must be at least 6 characters.');
+        return;
+      }
+      if (newPassword) {
+        const salt = createSessionToken();
+        user.passwordSalt = salt;
+        user.passwordHash = await createPasswordHash(newPassword, salt);
+      }
+
+      currentUser = getSafeUser(user);
+      setCurrentSession(user);
+      saveState();
+      renderAuthNav();
+      alert('Profile updated successfully.');
     }
 
     // Product Requirement Request Functions
@@ -2174,6 +2528,10 @@
 
     function handleAddNewProduct(e) {
       e.preventDefault();
+      if (!isCurrentUserAdmin()) {
+        alert('Only ADMIN can add products.');
+        return;
+      }
       const title = document.getElementById('newProdTitle').value.trim();
       const category = document.getElementById('newProdCategory').value;
       const brand = document.getElementById('newProdBrand').value.trim();
@@ -2195,10 +2553,14 @@
         ]
       };
 
-      productsData.unshift(newProduct);
-      saveState();
+      const committed = runInventoryTransaction(() => {
+        productsData.unshift(newProduct);
+        return true;
+      }, `Added product "${title}" (${varName}) with initial stock ${stock}`);
+      if (!committed) return;
       renderProducts();
       renderInventoryTable();
+      renderInventoryLogs();
       toggleAddProductModal();
       document.getElementById('addProductForm').reset();
       
@@ -3285,7 +3647,7 @@ We will call ${phone} to confirm delivery to ${address}.`);
       <div class="space-y-4 text-xs">
         <div class="flex gap-2">
           <input type="text" id="trackOrderInput" placeholder="Enter Order ID (e.g. ORD-9821) or Mobile Phone" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
-          <button onclick="trackOrderLookup()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">
+          <button id="trackOrderSubmitBtn" onclick="trackOrderLookup()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition">
             <i class="fa-solid fa-magnifying-glass"></i> Track
           </button>
         </div>
