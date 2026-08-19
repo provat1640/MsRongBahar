@@ -1,0 +1,225 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { User, X, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+
+export function AuthModal() {
+  const { isAuthModalOpen, authModalMode, closeAuthModal, openAuthModal, login } = useAuth();
+  const [phoneOrEmail, setPhoneOrEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [district, setDistrict] = useState('Kishoreganj');
+  const [thana, setThana] = useState('Pakundia');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  if (!isAuthModalOpen) return null;
+
+  const isLogin = authModalMode === 'login';
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+      const endpoint = isLogin ? `${API_URL}/auth/login` : `${API_URL}/auth/register`;
+      const payload = isLogin
+        ? { phoneOrEmail, password }
+        : { name, phone, password, address, district, thana };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error?.message || json.message || 'Authentication failed');
+      }
+
+      const data = json.data || json;
+      login(data.token, data.user);
+      closeAuthModal();
+    } catch (err: any) {
+      // Fallback for demo login if backend is not started yet
+      if (isLogin && (phoneOrEmail === '01722452836' || phoneOrEmail === 'Habib01722452836') && password === 'Habib123') {
+        login('demo-admin-token', {
+          id: 'admin-1',
+          name: 'Manager Habib',
+          phone: '01722452836',
+          role: 'ADMIN',
+          district: 'Kishoreganj',
+          thana: 'Pakundia',
+        });
+        closeAuthModal();
+      } else if (isLogin && phoneOrEmail === '01812345678' && password === 'user123') {
+        login('demo-user-token', {
+          id: 'user-1',
+          name: 'Rahim Chowdhury',
+          phone: '01812345678',
+          role: 'USER',
+          district: 'Kishoreganj',
+          thana: 'Pakundia',
+        });
+        closeAuthModal();
+      } else {
+        setError(err.message || 'Invalid credentials.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={closeAuthModal} />
+      <div className="relative w-full max-w-md glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-800 z-10 space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+              <User className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white">
+                {isLogin ? 'Welcome Back' : 'Create Customer Account'}
+              </h3>
+              <p className="text-xs text-amber-400">
+                {isLogin ? 'Login to view orders & speedy checkout' : 'Register for order tracking in Pakundia'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={closeAuthModal}
+            className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+          {isLogin ? (
+            <>
+              <div>
+                <label className="block text-slate-400 mb-1">Mobile Phone or Email</label>
+                <input
+                  type="text"
+                  required
+                  value={phoneOrEmail}
+                  onChange={(e) => setPhoneOrEmail(e.target.value)}
+                  placeholder="01722452836 (Manager) or 01812345678"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Habib123 or user123"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-slate-400 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Rahim Chowdhury"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-slate-400 mb-1">Phone Number *</label>
+                  <input
+                    type="text"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="018XXXXXXXX"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 mb-1">Password (6+ chars) *</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-slate-400 mb-1">Street Address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Hospital Road, Mothkhola Bazar"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-4"
+          >
+            {isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            {loading ? 'Authenticating...' : isLogin ? 'Login Securely' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 border-t border-slate-800 text-xs text-slate-400">
+          {isLogin ? (
+            <p>
+              Don&apos;t have an account?{' '}
+              <button
+                onClick={() => openAuthModal('register')}
+                className="text-amber-400 font-bold hover:underline"
+              >
+                Register Here
+              </button>
+            </p>
+          ) : (
+            <p>
+              Already registered?{' '}
+              <button
+                onClick={() => openAuthModal('login')}
+                className="text-amber-400 font-bold hover:underline"
+              >
+                Login Now
+              </button>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,198 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PaymentMethod {
+  COD
+  BKASH
+  NAGAD
+}
+
+enum PaymentStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String   @unique
+  email     String?  @unique
+  password  String
+  role      Role     @default(USER)
+  address   String?
+  district  String?
+  thana     String?
+  orders    Order[]
+  reviews   Review[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([phone])
+  @@index([email])
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  image       String?
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Unit {
+  id        String   @id @default(uuid())
+  name      String   @unique // Dimension (mm), Weight (kg/gm), Volume (Litre), etc.
+  category  String   @default("General")
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id           String                 @id @default(uuid())
+  title        String
+  slug         String                 @unique
+  description  String
+  categoryId   String
+  category     Category               @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  basePrice    Float
+  stock        Int                    @default(0)
+  sku          String                 @unique
+  images       String                 // JSON array string of image paths
+  isActive     Boolean                @default(true)
+  unit         String                 @default("pcs")
+  variants     ProductVariant[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+  reservations InventoryReservation[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([sku])
+}
+
+model ProductVariant {
+  id           String                 @id @default(uuid())
+  productId    String
+  product      Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name         String                 // e.g. "0.91 Litre Tin", "50mm Lock", "500g"
+  price        Float
+  stock        Int                    @default(0)
+  sku          String                 @unique
+  orderItems   OrderItem[]
+  reservations InventoryReservation[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName    String
+  phone           String
+  deliveryAddress String
+  district        String
+  thana           String
+  totalAmount     Float
+  deliveryFee     Float         @default(60)
+  paymentMethod   PaymentMethod @default(COD)
+  paymentStatus   PaymentStatus @default(PENDING)
+  orderStatus     OrderStatus   @default(PENDING)
+  bkashTrxId      String?
+  paymentSenderNo String?
+  items           OrderItem[]
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([orderNumber])
+  @@index([phone])
+  @@index([orderStatus])
+}
+
+model OrderItem {
+  id        String          @id @default(uuid())
+  orderId   String
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  quantity  Int
+  unitPrice Float
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model InventoryReservation {
+  id          String          @id @default(uuid())
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity    Int
+  orderNumber String
+  expiresAt   DateTime
+  createdAt   DateTime        @default(now())
+
+  @@index([productId])
+  @@index([variantId])
+  @@index([expiresAt])
+}
+
+model ProductRequest {
+  id           String   @id @default(uuid())
+  customerName String
+  phone        String
+  productName  String
+  brand        String?
+  notes        String?
+  status       String   @default("PENDING") // PENDING, SOURCED, CLOSED
+  createdAt    DateTime @default(now())
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName String
+  rating       Int      @default(5)
+  comment      String
+  createdAt    DateTime @default(now())
+
+  @@index([productId])
+}

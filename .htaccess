@@ -1,0 +1,8 @@
+# Force index.html as the primary landing page
+DirectoryIndex index.html index.php index2.html
+
+# Enable RewriteEngine for clean URL fallback if needed
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+</IfModule>
