@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, X, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { User, X, LogIn, UserPlus, AlertCircle, Eye, EyeOff, Lock, Phone } from 'lucide-react';
 
 export function AuthModal() {
   const { isAuthModalOpen, authModalMode, closeAuthModal, openAuthModal, login } = useAuth();
   const [phoneOrEmail, setPhoneOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -29,8 +30,8 @@ export function AuthModal() {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
       const endpoint = isLogin ? `${API_URL}/auth/login` : `${API_URL}/auth/register`;
       const payload = isLogin
-        ? { phoneOrEmail, password }
-        : { name, phone, password, address, district, thana };
+        ? { phoneOrEmail: phoneOrEmail.trim(), password }
+        : { name: name.trim(), phone: phone.trim(), password, address: address.trim(), district, thana };
 
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -40,37 +41,18 @@ export function AuthModal() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error?.message || json.message || 'Authentication failed');
+        throw new Error(json.error?.message || json.message || (isLogin ? 'Invalid credentials. Please check your phone/email and password.' : 'Registration failed. Please verify your details.'));
       }
 
       const data = json.data || json;
-      login(data.token, data.user);
-      closeAuthModal();
-    } catch (err: any) {
-      // Fallback for demo login if backend is not started yet
-      if (isLogin && (phoneOrEmail === '01722452836' || phoneOrEmail === 'Habib01722452836') && password === 'Habib123') {
-        login('demo-admin-token', {
-          id: 'admin-1',
-          name: 'Manager Habib',
-          phone: '01722452836',
-          role: 'ADMIN',
-          district: 'Kishoreganj',
-          thana: 'Pakundia',
-        });
-        closeAuthModal();
-      } else if (isLogin && phoneOrEmail === '01812345678' && password === 'user123') {
-        login('demo-user-token', {
-          id: 'user-1',
-          name: 'Rahim Chowdhury',
-          phone: '01812345678',
-          role: 'USER',
-          district: 'Kishoreganj',
-          thana: 'Pakundia',
-        });
+      if (data.token && data.user) {
+        login(data.token, data.user);
         closeAuthModal();
       } else {
-        setError(err.message || 'Invalid credentials.');
+        throw new Error('Unexpected response from authentication server.');
       }
+    } catch (err: any) {
+      setError(err.message || 'Authentication service error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -113,74 +95,103 @@ export function AuthModal() {
           {isLogin ? (
             <>
               <div>
-                <label className="block text-slate-400 mb-1">Mobile Phone or Email</label>
-                <input
-                  type="text"
-                  required
-                  value={phoneOrEmail}
-                  onChange={(e) => setPhoneOrEmail(e.target.value)}
-                  placeholder="01722452836 (Manager) or 01812345678"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
-                />
+                <label className="block text-slate-300 font-medium mb-1.5">Mobile Phone or Email</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    autoComplete="username"
+                    value={phoneOrEmail}
+                    onChange={(e) => setPhoneOrEmail(e.target.value)}
+                    placeholder="e.g. 017xxxxxxxx or name@email.com"
+                    className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                  />
+                  <Phone className="w-4 h-4 text-slate-600 absolute right-3 top-3 pointer-events-none" />
+                </div>
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">Password</label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Habib123 or user123"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
-                />
+                <label className="block text-slate-300 font-medium mb-1.5">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 pr-10 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 transition"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </>
           ) : (
             <>
               <div>
-                <label className="block text-slate-400 mb-1">Full Name *</label>
+                <label className="block text-slate-300 font-medium mb-1.5">Full Name *</label>
                 <input
                   type="text"
                   required
+                  autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Rahim Chowdhury"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                  className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 mb-1">Phone Number *</label>
+                  <label className="block text-slate-300 font-medium mb-1.5">Phone Number *</label>
                   <input
-                    type="text"
+                    type="tel"
                     required
+                    autoComplete="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="018XXXXXXXX"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                    placeholder="017XXXXXXXX"
+                    className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 mb-1">Password (6+ chars) *</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
-                  />
+                  <label className="block text-slate-300 font-medium mb-1.5">Password (6+ chars) *</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 pr-10 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 transition"
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">Street Address</label>
+                <label className="block text-slate-300 font-medium mb-1.5">Delivery Street Address</label>
                 <input
                   type="text"
+                  autoComplete="street-address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Hospital Road, Mothkhola Bazar"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-amber-500"
+                  placeholder="e.g. Hospital Road, Mothkhola Bazar"
+                  className="w-full bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
                 />
               </div>
             </>
@@ -189,7 +200,7 @@ export function AuthModal() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-4"
+            className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
           >
             {isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
             {loading ? 'Authenticating...' : isLogin ? 'Login Securely' : 'Create Account'}
