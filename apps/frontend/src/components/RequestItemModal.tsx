@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ClipboardList, X, CheckCircle, Send } from 'lucide-react';
+import { createProductRequestAPI } from '../lib/api';
 
 interface Props {
   isOpen: boolean;
@@ -43,17 +44,12 @@ export function RequestItemModal({ isOpen, onClose }: Props) {
     }
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-      await fetch(`${API_URL}/products/request-item`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: name,
-          phone,
-          productName: item,
-          brand,
-          notes,
-        }),
+      await createProductRequestAPI({
+        customerName: name,
+        phone,
+        productName: item,
+        brand,
+        notes,
       });
     } catch {
       // ignore network failure in demo mode

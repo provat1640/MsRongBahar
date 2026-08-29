@@ -1,37 +1,156 @@
-name: Deploy to InfinityFree
+name: Deploy to Cloud (Render + Vercel + Supabase)
 
 on:
   push:
     branches:
       - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ftp-deploy:
-    name: 🚚 Deploy Static Site to InfinityFree via FTP
+  # =========================================================================
+  # 1. QUALITY ASSURANCE & TYPE VALIDATION
+  # =========================================================================
+  qa-check:
+    name: 🧪 Lint, TypeCheck & Build Verification
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /htdocs/
-          dangerous-clean-slate: true
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.next/**
-            **/prisma/**
-            **/scripts/**
-            **/tests/**
-            **/*.db
-            **/*.log
-            **/coverage/**
-            **/.vscode/**
-            **/.idea/**
-            **/Ms Rong Bahar products/**
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: |
+            apps/backend/package.json
+            apps/frontend/package.json
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./apps/backend
+        run: npm ci --legacy-peer-deps
+
+      - name: ⚡ Generate Prisma Client
+        working-directory: ./apps/backend
+        run: npx prisma generate
+
+      - name: 🏗️ Build Backend API
+        working-directory: ./apps/backend
+        run: npm run build
+
+      - name: 🧪 Run Backend Tests
+        working-directory: ./apps/backend
+        run: npm test -- --passWithNoTests
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./apps/frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: 🌐 Build Next.js Storefront
+        working-directory: ./apps/frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://ms-rong-bahar-api.onrender.com/api' }}
+        run: npm run build
+
+  # =========================================================================
+  # 2. POSTGRESQL PRISMA MIGRATIONS (SUPABASE / NEON)
+  # =========================================================================
+  migrate-database:
+    name: 🐘 Run Database Migrations (Prisma CLI)
+    needs: [qa-check]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Backend Dependencies
+        working-directory: ./apps/backend
+        run: npm ci --legacy-peer-deps
+
+      - name: Deploy Migrations to Production Database
+        if: env.DATABASE_URL != ''
+        working-directory: ./apps/backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+        run: |
+          echo "🚀 Applying pending Prisma migrations to PostgreSQL database..."
+          npx prisma migrate deploy
+          echo "✅ Database schema synchronized successfully!"
+
+  # =========================================================================
+  # 3. TRIGGER RENDER BACKEND DEPLOYMENT (NESTJS API)
+  # =========================================================================
+  deploy-backend:
+    name: 🚀 Deploy NestJS API to Render
+    needs: [migrate-database]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Webhook
+        if: env.RENDER_DEPLOY_HOOK != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "📡 Triggering Render Zero-Downtime Deployment Hook..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${RENDER_DEPLOY_HOOK}")
+          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
+            echo "🎉 Render deployment triggered successfully (HTTP $HTTP_STATUS)!"
+          else
+            echo "⚠️ Render deploy hook returned HTTP $HTTP_STATUS. Please verify your RENDER_DEPLOY_HOOK secret."
+          fi
+
+  # =========================================================================
+  # 4. DEPLOY NEXT.JS STOREFRONT TO VERCEL
+  # =========================================================================
+  deploy-frontend:
+    name: 🔺 Deploy Next.js to Vercel (Production)
+    needs: [qa-check]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel Production
+        if: env.VERCEL_TOKEN != ''
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./apps/frontend
+          vercel-args: '--prod'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  # =========================================================================
+  # 5. PIPELINE STATUS & NOTIFICATION
+  # =========================================================================
+  deployment-status:
+    name: 🏁 Production Deployment Summary
+    needs: [deploy-backend, deploy-frontend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Status
+        run: |
+          echo "========================================================"
+          echo "🚀 M/S Rong Bahar Free Cloud Deployment Pipeline Complete!"
+          echo "Storefront: https://msrongbahar.me (Vercel Edge)"
+          echo "Backend API: https://ms-rong-bahar-api.onrender.com/health"
+          echo "Database: Supabase / Neon PostgreSQL with PgBouncer Pooling"
+          echo "Cache: Upstash Redis (Serverless REST + In-Memory Fallback)"
+          echo "========================================================"

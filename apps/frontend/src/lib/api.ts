@@ -311,12 +311,78 @@ export function getCombinedProductsList(): Product[] {
   return initialFallbackProducts;
 }
 
+/**
+ * Structured fetch helper with timeout and exponential backoff retry logic
+ * Specifically designed to handle Render free-tier cold starts (502, 503, 504, network timeouts).
+ */
+export async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  retries: number = 2,
+  timeoutMs: number = 12000,
+): Promise<Response> {
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+
+      // If backend is returning gateway cold start errors, retry
+      if ([502, 503, 504].includes(response.status) && attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 1500));
+        continue;
+      }
+
+      return response;
+    } catch (err: any) {
+      clearTimeout(timer);
+      lastError = err;
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 1500));
+      }
+    }
+  }
+
+  throw lastError || new Error(`Failed to fetch ${url} after ${retries} retries`);
+}
+
+export async function pingBackendHealthAPI(): Promise<{ status: string; healthy: boolean }> {
+  try {
+    const healthUrl = API_URL.endsWith('/api')
+      ? `${API_URL.slice(0, -4)}/health`
+      : `${API_URL}/health`;
+
+    const res = await fetchWithRetry(healthUrl, { method: 'GET', cache: 'no-store' }, 1, 6000);
+    if (res.ok) {
+      const data = await res.json();
+      return { status: data.status || 'ok', healthy: true };
+    }
+    return { status: 'degraded', healthy: false };
+  } catch {
+    return { status: 'cold-starting', healthy: false };
+  }
+}
+
 export async function fetchCategories(): Promise<Category[]> {
   try {
-    const res = await fetch(`${API_URL}/categories`, { next: { revalidate: 60 } });
-    if (!res.ok) throw new Error('Failed to fetch categories');
-    const data = await res.json();
-    return data.data || data;
+    // Try products/categories first then categories
+    let res = await fetchWithRetry(`${API_URL}/products/categories`, { next: { revalidate: 60 } }, 1, 8000).catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetchWithRetry(`${API_URL}/categories`, { next: { revalidate: 60 } }, 1, 8000).catch(() => null);
+    }
+    if (res && res.ok) {
+      const data = await res.json();
+      const list = data.data || data;
+      if (Array.isArray(list) && list.length > 0) return list;
+    }
+    return initialFallbackCategories;
   } catch {
     return initialFallbackCategories;
   }
@@ -331,8 +397,10 @@ export async function fetchProductsAPI(params?: {
     const url = new URL(`${API_URL}/products`);
     if (params?.category) url.searchParams.set('category', params.category);
     if (params?.search) url.searchParams.set('search', params.search);
-    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
+
+    const res = await fetchWithRetry(url.toString(), { next: { revalidate: 60 } }, 2, 10000);
     if (!res.ok) throw new Error('Failed to fetch products');
+
     const data = await res.json();
     let list = data.data || data;
     if (!Array.isArray(list) || list.length === 0) list = getCombinedProductsList();
@@ -353,7 +421,7 @@ export async function fetchProductsAPI(params?: {
           p.title.toLowerCase().includes(q) ||
           p.description.toLowerCase().includes(q) ||
           p.vendor?.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q)
+          p.sku.toLowerCase().includes(q),
       );
     }
     if (params?.newArrivalsOnly) {
@@ -365,7 +433,7 @@ export async function fetchProductsAPI(params?: {
 
 export async function fetchProductBySlugAPI(slug: string): Promise<Product | null> {
   try {
-    const res = await fetch(`${API_URL}/products/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetchWithRetry(`${API_URL}/products/${slug}`, { next: { revalidate: 60 } }, 2, 10000);
     if (!res.ok) throw new Error('Not found');
     const data = await res.json();
     return data.data || data;
@@ -376,12 +444,105 @@ export async function fetchProductBySlugAPI(slug: string): Promise<Product | nul
   }
 }
 
-export async function trackOrderAPI(query: string) {
+export async function placeOrderAPI(orderPayload: any, token?: string): Promise<any> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetchWithRetry(
+    `${API_URL}/checkout/place-order`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(orderPayload),
+    },
+    2,
+    15000,
+  );
+
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.error?.message || json.message || 'Failed to place order');
+  }
+
+  return json.data || json;
+}
+
+export async function createProductRequestAPI(payload: {
+  customerName: string;
+  phone: string;
+  productName: string;
+  brand?: string;
+  notes?: string;
+}): Promise<any> {
+  const res = await fetchWithRetry(
+    `${API_URL}/products/request-item`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    },
+    1,
+    10000,
+  );
+
+  const json = await res.json();
+  return json.data || json;
+}
+
+export async function submitReviewAPI(
+  productId: string,
+  payload: { customerName: string; rating: number; comment: string },
+  token?: string,
+): Promise<any> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetchWithRetry(
+    `${API_URL}/products/${productId}/reviews`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+    },
+    1,
+    10000,
+  );
+
+  const json = await res.json();
+  return json.data || json;
+}
+
+export async function trackOrderAPI(query: string): Promise<any> {
   try {
-    const res = await fetch(`${API_URL}/orders/track?query=${encodeURIComponent(query)}`);
-    if (!res.ok) throw new Error('Not found');
-    const data = await res.json();
-    return data.data || data;
+    let res = await fetchWithRetry(
+      `${API_URL}/orders/track?query=${encodeURIComponent(query)}`,
+      { cache: 'no-store' },
+      1,
+      8000,
+    ).catch(() => null);
+
+    if (!res || !res.ok) {
+      res = await fetchWithRetry(
+        `${API_URL}/orders/track/${encodeURIComponent(query)}`,
+        { cache: 'no-store' },
+        1,
+        8000,
+      ).catch(() => null);
+    }
+
+    if (res && res.ok) {
+      const data = await res.json();
+      return data.data || data;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -391,3 +552,4 @@ export async function trackOrderAPI(query: string) {
 export const fetchProducts = fetchProductsAPI;
 export const fetchProductBySlug = fetchProductBySlugAPI;
 export const trackOrder = trackOrderAPI;
+

@@ -10,6 +10,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { CheckoutModule } from './modules/checkout/checkout.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdminModule } from './modules/admin/admin.module';
         limit: 120, // 120 requests per min for general, tighter per route
       },
     ]),
+    HealthModule,
     PrismaModule,
     RedisModule,
     AuthModule,

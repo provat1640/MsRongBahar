@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Put, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { UpdateOrderStatusDto } from './orders.dto';
@@ -10,6 +10,12 @@ import { Roles } from '../auth/roles.decorator';
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+
+  @Get('track')
+  @ApiOperation({ summary: 'Track order timeline and invoice receipt via query param' })
+  async trackOrderQuery(@Query('query') query?: string) {
+    return this.ordersService.trackOrder(query || '');
+  }
 
   @Get('track/:query')
   @ApiOperation({ summary: 'Track order timeline and invoice receipt by Order Number or Phone Number' })

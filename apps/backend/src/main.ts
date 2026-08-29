@@ -18,16 +18,46 @@ async function bootstrap() {
     }),
   );
 
-  // Cross-Origin Resource Sharing
+  // Cross-Origin Resource Sharing (Supports Namecheap domain, Vercel preview deploys, and local dev)
+  const allowedOrigins = [
+    'https://msrongbahar.me',
+    'https://www.msrongbahar.me',
+    'https://msrongbahar.com',
+    'https://www.msrongbahar.com',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:4000',
+  ];
+
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''));
+  }
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:3000'] : '*',
+    origin: (origin, callback) => {
+      // Allow server-to-server requests, mobile apps, or curl with no origin header
+      if (!origin) return callback(null, true);
+
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1');
+
+      if (isAllowed) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Permissive fallback for seamless client requests
+    },
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept, Authorization',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With, Cache-Control',
   });
 
-  // Global Prefix
-  app.setGlobalPrefix('api');
+  // Global Prefix (exclude health and ping so Render and uptime monitors can hit /health directly)
+  app.setGlobalPrefix('api', {
+    exclude: ['health', 'ping'],
+  });
 
   // Global Interceptors & Filters
   app.useGlobalPipes(

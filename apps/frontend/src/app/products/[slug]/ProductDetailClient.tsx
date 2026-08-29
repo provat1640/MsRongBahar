@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Product, ProductVariant } from '../../../lib/api';
+import { Product, ProductVariant, submitReviewAPI } from '../../../lib/api';
 import { useCart } from '../../../context/CartContext';
 import { formatCurrency } from '../../../lib/utils';
 import { ProductCard } from '../../../components/ProductCard';
@@ -101,18 +101,13 @@ export function ProductDetailClient({ product }: Props) {
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-      await fetch(`${API_URL}/products/${product.id}/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: reviewName,
-          rating: reviewRating,
-          comment: reviewComment,
-        }),
+      await submitReviewAPI(product.id, {
+        customerName: reviewName,
+        rating: reviewRating,
+        comment: reviewComment,
       });
     } catch {
-      // ignore
+      // ignore network errors in fallback mode
     }
     setReviewsList([
       {

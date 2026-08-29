@@ -4,6 +4,7 @@ import { AuthProvider } from '../context/AuthContext';
 import { CartProvider } from '../context/CartContext';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
+import { BackendWakeup } from '../components/BackendWakeup';
 
 export const metadata: Metadata = {
   title: 'M/S Rong Bahar | Paint, Hardware & Sanitary Superstore in Pakundia',
@@ -93,6 +94,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#030712] text-slate-100 flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-slate-950">
         <AuthProvider>
           <CartProvider>
+            <BackendWakeup />
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />

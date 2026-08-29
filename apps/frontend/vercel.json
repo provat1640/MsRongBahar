@@ -1,0 +1,12 @@
+{
+  "framework": "nextjs",
+  "cleanUrls": true,
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci --legacy-peer-deps",
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "0 */12 * * *"
+    }
+  ]
+}

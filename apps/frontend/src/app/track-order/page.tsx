@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { trackOrderAPI } from '../../lib/api';
 import { formatCurrency } from '../../lib/utils';
@@ -17,7 +17,7 @@ import {
   Phone,
 } from 'lucide-react';
 
-export default function TrackOrderPage() {
+function TrackOrderContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('query') || '';
 
@@ -297,3 +297,19 @@ export default function TrackOrderPage() {
     </div>
   );
 }
+
+export default function TrackOrderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center text-slate-400">
+          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-xs">Loading Order Tracking...</p>
+        </div>
+      }
+    >
+      <TrackOrderContent />
+    </Suspense>
+  );
+}
+
