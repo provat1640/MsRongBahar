@@ -431,6 +431,28 @@ export async function fetchProductsAPI(params?: {
   }
 }
 
+export async function createProductAPI(payload: any): Promise<Product> {
+  try {
+    const res = await fetchWithRetry(
+      `${API_URL}/products`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      },
+      2,
+      10000,
+    );
+    if (res.ok) {
+      const data = await res.json();
+      return data.data || data;
+    }
+  } catch (err) {
+    console.warn('Backend API create product error, saving locally in browser storage:', err);
+  }
+  return payload;
+}
+
 export async function fetchProductBySlugAPI(slug: string): Promise<Product | null> {
   try {
     const res = await fetchWithRetry(`${API_URL}/products/${slug}`, { next: { revalidate: 60 } }, 2, 10000);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { fetchProducts, fetchCategories } from '../../lib/api';
 import { ProductCard } from '../../components/ProductCard';
+import { CatalogGrid } from '../../components/CatalogGrid';
 import Link from 'next/link';
 import { Filter, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 
@@ -81,28 +82,12 @@ export default async function ProductsCatalogPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {/* Main Grid */}
-      {products.length === 0 ? (
-        <div className="glass-panel rounded-3xl p-16 text-center space-y-4">
-          <Filter className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto" />
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">No products found</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-            We couldn&apos;t find any items matching your filter criteria. Try resetting your search or request the unlisted product.
-          </p>
-          <Link
-            href="/products"
-            className="inline-block px-5 py-2.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl"
-          >
-            Clear Filters
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      {/* Main Grid with Dynamic Client Synchronization */}
+      <CatalogGrid
+        initialProducts={products}
+        categoryFilter={selectedCategory}
+        searchFilter={searchQuery}
+      />
     </div>
   );
 }

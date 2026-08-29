@@ -7,6 +7,7 @@ import {
   initialFallbackProducts,
   initialFallbackCategories,
   getCombinedProductsList,
+  createProductAPI,
   Product,
   ProductVariant,
 } from '../../lib/api';
@@ -731,6 +732,11 @@ export default function AdminControlPanel() {
     try {
       localStorage.setItem('rong_bahar_products_list', JSON.stringify(updatedList));
     } catch {}
+
+    // Asynchronously send to backend PostgreSQL database
+    createProductAPI(newProduct).catch((err) => {
+      console.warn('Backend sync warning:', err);
+    });
 
     setAddSuccessMessage(`🎉 Product "${prodTitle}" is 100% successfully listed across your storefront, catalog, and admin inventory!`);
     setAddedProductSlug(newProduct.slug);

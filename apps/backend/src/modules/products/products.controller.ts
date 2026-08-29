@@ -33,6 +33,12 @@ export class ProductsController {
     return this.productsService.findBySlug(slug);
   }
 
+  @Post()
+  @ApiOperation({ summary: 'Create a new catalog product with variants and category link' })
+  async createProduct(@Body() dto: any) {
+    return this.productsService.createProduct(dto);
+  }
+
   @Post(':id/reviews')
   @ApiOperation({ summary: 'Submit a customer review for a product' })
   async addReview(@Param('id') productId: string, @Body() dto: AddReviewDto, @Request() req: any) {

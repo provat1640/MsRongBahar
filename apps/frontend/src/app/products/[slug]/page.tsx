@@ -59,16 +59,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductDetailPage({ params }: Props) {
   const product = await fetchProductBySlug(params.slug);
 
-  if (!product) {
-    notFound();
-  }
-
-  // Generate JSON-LD Schema for Google Rich Snippets
-  const jsonLdProduct = {
+  // Generate JSON-LD Schema for Google Rich Snippets if product found on server
+  const jsonLdProduct = product ? {
     '@context': 'https://schema.org/',
     '@type': 'Product',
     name: product.title,
-    image: product.images.map((img) => (img.startsWith('http') ? img : `https://msrongbahar.com${img}`)),
+    image: product.images?.map((img) => (img.startsWith('http') ? img : `https://msrongbahar.com${img}`)) || [],
     description: product.description,
     sku: product.sku,
     mpn: product.sku,
@@ -91,20 +87,17 @@ export default async function ProductDetailPage({ params }: Props) {
         name: 'M/S Rong Bahar',
       },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: (product.reviews?.length || 0) + 12,
-    },
-  };
+  } : null;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
-      />
-      <ProductDetailClient product={product} />
+      {jsonLdProduct && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
+        />
+      )}
+      <ProductDetailClient initialProduct={product} slug={params.slug} />
     </>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { fetchProducts, fetchCategories } from '../lib/api';
 import { ProductCard } from '../components/ProductCard';
+import { HomeFeaturedGrid } from '../components/HomeFeaturedGrid';
 import {
   Sparkles,
   ArrowRight,
@@ -161,20 +162,11 @@ export default async function HomePage() {
             href="/products"
             className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
           >
-            Browse All ({newArrivals.length}) <ArrowRight className="w-3.5 h-3.5" />
+            Browse All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {(newArrivals.length > 0 ? newArrivals : products.slice(0, 4)).map((product) => (
-            <div key={product.id} className="relative">
-              <div className="absolute -top-2 left-4 z-20 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-[9px] uppercase tracking-wider shadow-md">
-                ★ New Arrival
-              </div>
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
+        <HomeFeaturedGrid initialProducts={products} type="new-arrivals" />
       </section>
 
       {/* 3. CATEGORIES GRID */}
@@ -229,15 +221,11 @@ export default async function HomePage() {
             href="/products"
             className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
           >
-            View All ({products.length}) <ArrowRight className="w-3.5 h-3.5" />
+            View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.slice(0, 6).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <HomeFeaturedGrid initialProducts={products} type="featured" />
       </section>
 
       {/* 5. VALUE-ADD PROMO BANNER (Express Delivery & Visualizer) */}

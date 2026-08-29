@@ -154,6 +154,81 @@ export class ProductsService {
     return review;
   }
 
+  async createProduct(dto: any) {
+    const slug = dto.slug || dto.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    // Find or create category
+    let category = await this.prisma.category.findFirst({
+      where: {
+        OR: [
+          { id: dto.categoryId || 'unknown' },
+          { slug: dto.categoryId || 'unknown' },
+          { name: { equals: dto.categoryId || 'General', mode: 'insensitive' } },
+        ],
+      },
+    });
+
+    if (!category) {
+      category = await this.prisma.category.create({
+        data: {
+          name: dto.category?.name || dto.categoryId || 'General Hardware',
+          slug: dto.category?.slug || dto.categoryId || `cat-${Date.now()}`,
+          description: 'Catalog Category',
+        },
+      });
+    }
+
+    const imagesStr = typeof dto.images === 'string' ? dto.images : JSON.stringify(dto.images || ['/products/2412.jpg']);
+    const sku = dto.sku || `SKU-${Date.now()}`;
+
+    const product = await this.prisma.product.create({
+      data: {
+        title: dto.title,
+        slug,
+        description: dto.description || `${dto.title} available at M/S Rong Bahar.`,
+        categoryId: category.id,
+        basePrice: Number(dto.basePrice) || 0,
+        stock: Number(dto.stock) || 0,
+        sku,
+        images: imagesStr,
+        isActive: dto.isActive !== undefined ? dto.isActive : true,
+        unit: dto.unit || 'pcs',
+        variants:
+          dto.variants && Array.isArray(dto.variants) && dto.variants.length > 0
+            ? {
+                create: dto.variants.map((v: any) => ({
+                  name: v.name,
+                  price: Number(v.price) || 0,
+                  stock: Number(v.stock) || 0,
+                  sku: v.sku || `${sku}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`,
+                })),
+              }
+            : undefined,
+      },
+      include: {
+        category: true,
+        variants: true,
+      },
+    });
+
+    // Invalidate Redis cache
+    await this.redis.del('cache:products:featured');
+    await this.redis.del('cache:categories:all');
+
+    return {
+      ...product,
+      images: typeof product.images === 'string' ? JSON.parse(product.images) : product.images,
+    };
+  }
+
+  async deleteProduct(id: string) {
+    const deleted = await this.prisma.product.delete({
+      where: { id },
+    });
+    await this.redis.del('cache:products:featured');
+    return deleted;
+  }
+
   async requestUnlistedProduct(dto: ProductRequestDto) {
     return this.prisma.productRequest.create({
       data: {

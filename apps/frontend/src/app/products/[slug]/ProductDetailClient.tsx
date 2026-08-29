@@ -21,24 +21,50 @@ import {
 } from 'lucide-react';
 
 interface Props {
-  product: Product;
+  initialProduct?: Product | null;
+  product?: Product;
+  slug?: string;
 }
 
-export function ProductDetailClient({ product }: Props) {
+export function ProductDetailClient({ initialProduct, product: propProduct, slug }: Props) {
   const { addItem } = useCart();
 
-  const [activeImage, setActiveImage] = useState(product.images[0] || '/products/2412.jpg');
+  const [currentProduct, setCurrentProduct] = useState<Product | null>(propProduct || initialProduct || null);
+  const [loading, setLoading] = useState(!propProduct && !initialProduct);
+
+  // Client-side fallback resolution for products added from gallery/admin
+  useEffect(() => {
+    if (!currentProduct && slug) {
+      try {
+        const stored = localStorage.getItem('rong_bahar_products_list');
+        if (stored) {
+          const list: Product[] = JSON.parse(stored);
+          const found = list.find((p) => p.slug === slug || p.id === slug);
+          if (found) {
+            setCurrentProduct(found);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+      setLoading(false);
+    }
+  }, [currentProduct, slug]);
+
+  const product = currentProduct;
+
+  const [activeImage, setActiveImage] = useState(product?.images?.[0] || '/products/2412.jpg');
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants && product.variants.length > 0 ? product.variants[0] : null,
+    product?.variants && product.variants.length > 0 ? product.variants[0] : null,
   );
 
   // Selected Color and Size state for universal multi-attribute selection
   const [selectedColor, setSelectedColor] = useState<string>(
-    product.variants?.[0]?.colorName || (product.colors && product.colors.length > 0 ? product.colors[0].name : '')
+    product?.variants?.[0]?.colorName || (product?.colors && product.colors.length > 0 ? product.colors[0].name : '')
   );
 
   const [selectedSize, setSelectedSize] = useState<string>(
-    product.variants?.[0]?.sizeOrWeight || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : '')
+    product?.variants?.[0]?.sizeOrWeight || (product?.sizes && product.sizes.length > 0 ? product.sizes[0] : '')
   );
 
   const [quantity, setQuantity] = useState(1);
@@ -48,21 +74,32 @@ export function ProductDetailClient({ product }: Props) {
   const [reviewName, setReviewName] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
-  const [reviewsList, setReviewsList] = useState(product.reviews || []);
+  const [reviewsList, setReviewsList] = useState(product?.reviews || []);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  // Synchronize when product changes
+  useEffect(() => {
+    if (product) {
+      setActiveImage(product.images?.[0] || '/products/2412.jpg');
+      if (product.variants && product.variants.length > 0) {
+        setSelectedVariant(product.variants[0]);
+        setSelectedColor(product.variants[0].colorName || '');
+        setSelectedSize(product.variants[0].sizeOrWeight || '');
+      }
+      setReviewsList(product.reviews || []);
+    }
+  }, [product]);
 
   // Dynamically match variant when Color or Size changes
   useEffect(() => {
-    if (!product.variants || product.variants.length === 0) return;
+    if (!product?.variants || product.variants.length === 0) return;
 
-    // 1. Try matching both color and size
     let match = product.variants.find(
       (v) =>
         (!selectedColor || v.colorName === selectedColor) &&
         (!selectedSize || v.sizeOrWeight === selectedSize)
     );
 
-    // 2. Fallback matching either
     if (!match && selectedSize) {
       match = product.variants.find((v) => v.sizeOrWeight === selectedSize);
     }
@@ -73,7 +110,36 @@ export function ProductDetailClient({ product }: Props) {
     if (match) {
       setSelectedVariant(match);
     }
-  }, [selectedColor, selectedSize, product.variants]);
+  }, [selectedColor, selectedSize, product?.variants]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
+        <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-xs text-slate-400">Loading authentic paint specifications...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
+          <AlertCircle className="w-8 h-8 text-amber-400" />
+        </div>
+        <h1 className="text-2xl font-black text-white">Product Not Found</h1>
+        <p className="text-xs text-slate-400 max-w-md mx-auto">
+          The requested product may have been modified or is undergoing stock synchronization.
+        </p>
+        <Link
+          href="/products"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-lg"
+        >
+          Browse All Products &rarr;
+        </Link>
+      </div>
+    );
+  }
 
   const activePrice = selectedVariant ? selectedVariant.price : product.basePrice;
   const activeStock = selectedVariant ? selectedVariant.stock : product.stock;
