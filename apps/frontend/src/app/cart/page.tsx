@@ -172,7 +172,7 @@ export default function CartPage() {
 
           <Link
             href="/checkout"
-            className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2"
           >
             Proceed to Checkout <ArrowRight className="w-4 h-4" />
           </Link>
@@ -180,13 +180,28 @@ export default function CartPage() {
           <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2 text-[11px] text-slate-400">
             <div className="flex items-center gap-2 text-white font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Safe & Guaranteed Dispatch</span>
+              <span>Safe &amp; Guaranteed Dispatch</span>
             </div>
             <p>
               Your order is processed directly at M/S Rong Bahar (Pakundia Bazar). Pay easily with bKash, Nagad, or Cash on Delivery upon arrival.
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Sticky Mobile Checkout Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-slate-950/98 backdrop-blur-xl border-t border-slate-800 flex items-center justify-between gap-3 lg:hidden shadow-2xl">
+        <div>
+          <span className="text-[10px] text-slate-400 block font-medium">Payable Bill</span>
+          <span className="text-base font-black text-amber-400 font-mono">{formatCurrency(total)}</span>
+        </div>
+        <Link
+          href="/checkout"
+          className="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg shrink-0"
+        >
+          <span>Proceed to Checkout</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </div>
   );

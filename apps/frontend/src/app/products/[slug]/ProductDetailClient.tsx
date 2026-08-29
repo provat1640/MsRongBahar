@@ -361,27 +361,26 @@ export function ProductDetailClient({ product }: Props) {
               </button>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              disabled={!inStock}
-              className={`flex-1 py-3.5 rounded-2xl font-black text-sm transition flex items-center justify-center gap-2 shadow-xl ${
-                !inStock
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                  : added
-                  ? 'bg-emerald-500 text-slate-950'
-                  : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950'
-              }`}
-            >
-              {added ? (
-                <>
-                  <Check className="w-5 h-5" /> Reserved in Cart!
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-5 h-5" /> Add {quantity} to Cart ({formatCurrency(activePrice * quantity)})
-                </>
-              )}
-            </button>
+            {added ? (
+              <Link
+                href="/cart"
+                className="flex-1 py-3.5 rounded-2xl font-black text-sm transition flex items-center justify-center gap-2 shadow-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950"
+              >
+                <Check className="w-5 h-5" /> Added! Go to Cart &amp; Checkout &rarr;
+              </Link>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                disabled={!inStock}
+                className={`flex-1 py-3.5 rounded-2xl font-black text-sm transition flex items-center justify-center gap-2 shadow-xl ${
+                  !inStock
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                }`}
+              >
+                <ShoppingCart className="w-5 h-5" /> Add {quantity} to Cart ({formatCurrency(activePrice * quantity)})
+              </button>
+            )}
           </div>
 
           {/* Trust Guarantees */}
@@ -528,27 +527,26 @@ export function ProductDetailClient({ product }: Props) {
             </button>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={!inStock}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-lg shrink-0 ${
-              !inStock
-                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                : added
-                ? 'bg-emerald-500 text-slate-950'
-                : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="w-4 h-4" /> Added
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-4 h-4" /> Buy Now
-              </>
-            )}
-          </button>
+          {added ? (
+            <Link
+              href="/cart"
+              className="px-4 py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-lg shrink-0 bg-emerald-500 text-slate-950"
+            >
+              <Check className="w-4 h-4" /> Go to Cart &rarr;
+            </Link>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={!inStock}
+              className={`px-4 py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-lg shrink-0 ${
+                !inStock
+                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                  : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+              }`}
+            >
+              <ShoppingCart className="w-4 h-4" /> Buy Now
+            </button>
+          )}
         </div>
       </div>
     </div>

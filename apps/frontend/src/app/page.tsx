@@ -27,24 +27,20 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-20 pb-16">
-      {/* 1. HERO SECTION */}
-      <section className="relative pt-8 pb-12 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24 overflow-hidden border-b border-slate-200 dark:border-slate-800/80 w-full max-w-full">
-        {/* Glow ambient backgrounds */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[500px] lg:w-[650px] h-[300px] sm:h-[380px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 right-4 sm:right-10 w-[250px] sm:w-[450px] h-[250px] sm:h-[320px] bg-emerald-500/10 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* 1. HERO SECTION (Clean & Glare-Free) */}
+      <section className="relative pt-6 pb-12 sm:pt-14 sm:pb-18 lg:pt-18 lg:pb-22 border-b border-slate-200 dark:border-slate-800/80 w-full max-w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Hero Content */}
-            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-black tracking-wide shadow-sm max-w-full">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-black tracking-wide shadow-xs max-w-full">
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">Authorized Berger Paints &amp; Hardware Dealer</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15] sm:leading-[1.1] drop-shadow-xs">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15] sm:leading-[1.1]">
                 Authentic Paints, <br className="hidden sm:inline" />
-                <span className="gradient-text font-black">Industrial Hardware</span> &amp; Glues.
+                <span className="text-amber-500 dark:text-amber-400 font-black">Industrial Hardware</span> &amp; Glues.
               </h1>
 
               <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
@@ -55,15 +51,15 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-2">
                 <Link
                   href="/products"
-                  className="px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm transition shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2"
+                  className="px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2"
                 >
                   Browse Full Catalog <ArrowRight className="w-4 h-4" />
                 </Link>
 
-                <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <Link
                     href="/products?category=synthetic-enamel-paints"
-                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 border border-slate-700 dark:border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md"
+                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 border border-slate-700 dark:border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs"
                   >
                     <Paintbrush className="w-4 h-4 text-amber-400" />
                     <span>Shop Berger</span>
@@ -72,7 +68,7 @@ export default async function HomePage() {
                   {/* Shop Aqua Paints Button */}
                   <Link
                     href="/products?search=Aqua"
-                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 border border-emerald-400/40"
+                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs border border-emerald-400/40"
                   >
                     <Sparkles className="w-4 h-4 text-emerald-200" />
                     <span>Shop Aqua</span>
@@ -80,30 +76,32 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Quick stats (No broken wrapping on any mobile screens) */}
-              <div className="pt-5 sm:pt-6 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto lg:mx-0 text-center sm:text-left">
-                <div className="p-1 sm:p-0">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap">
+              {/* Quick stats (Compact & non-breaking on all phones) */}
+              <div className="pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-around sm:justify-start sm:gap-8 max-w-md mx-auto lg:mx-0">
+                <div className="text-center sm:text-left">
+                  <div className="text-xl sm:text-2xl font-black text-amber-500 dark:text-amber-400 font-mono">
                     100%
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400">
                     Original Stock
                   </div>
                 </div>
-                <div className="p-1 sm:p-0 border-x border-slate-200/80 dark:border-slate-800/80 sm:border-x-0">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white font-mono whitespace-nowrap">
-                    2 Hours
+                <div className="h-7 w-px bg-slate-200 dark:bg-slate-800" />
+                <div className="text-center sm:text-left">
+                  <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono">
+                    2-Hour
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400">
                     Local Delivery
                   </div>
                 </div>
-                <div className="p-1 sm:p-0">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-500 dark:text-emerald-400 font-mono whitespace-nowrap">
-                    12+ Types
+                <div className="h-7 w-px bg-slate-200 dark:bg-slate-800" />
+                <div className="text-center sm:text-left">
+                  <div className="text-xl sm:text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">
+                    12+
                   </div>
-                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                    Paints &amp; Tools
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400">
+                    Categories
                   </div>
                 </div>
               </div>

@@ -116,27 +116,26 @@ export function ProductCard({ product }: Props) {
             </span>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={!inStock}
-            className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-md shrink-0 ${
-              !inStock
-                ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
-                : added
-                ? 'bg-emerald-500 text-slate-950'
-                : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="w-3.5 h-3.5" /> Added
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-3.5 h-3.5" /> Buy
-              </>
-            )}
-          </button>
+          {added ? (
+            <Link
+              href="/cart"
+              className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-md shrink-0 bg-emerald-500 text-slate-950"
+            >
+              <Check className="w-3.5 h-3.5" /> Cart &rarr;
+            </Link>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={!inStock}
+              className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-md shrink-0 ${
+                !inStock
+                  ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
+                  : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+              }`}
+            >
+              <ShoppingCart className="w-3.5 h-3.5" /> Buy
+            </button>
+          )}
         </div>
       </div>
     </div>
