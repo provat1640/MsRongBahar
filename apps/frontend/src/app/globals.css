@@ -28,11 +28,25 @@ html.light {
   --input-border: #cbd5e1;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   color: var(--foreground);
   background-color: var(--background);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  position: relative;
   selection-background-color: #f59e0b;
   selection-color: #030712;
   transition: background-color 0.25s ease, color 0.25s ease;
@@ -46,7 +60,8 @@ body::before {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100vw;
+  width: 100%;
+  max-width: 100vw;
   height: 600px;
   background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(245, 158, 11, 0.12), transparent 70%);
   pointer-events: none;

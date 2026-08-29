@@ -1313,7 +1313,7 @@ export default function AdminControlPanel() {
                     key={v.id}
                     className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs"
                   >
-                    <div className="flex items-center gap-2.5 min-w-[220px]">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       {v.colorHex && (
                         <span
                           className="w-4 h-4 rounded-full border border-slate-300 dark:border-white/20 shrink-0 shadow-xs"

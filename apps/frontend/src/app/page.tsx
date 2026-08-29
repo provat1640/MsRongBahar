@@ -28,104 +28,118 @@ export default async function HomePage() {
   return (
     <div className="space-y-20 pb-16">
       {/* 1. HERO SECTION */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 overflow-hidden border-b border-slate-200 dark:border-slate-800/80">
+      <section className="relative pt-8 pb-12 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24 overflow-hidden border-b border-slate-200 dark:border-slate-800/80 w-full max-w-full">
         {/* Glow ambient backgrounds */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 right-10 w-[450px] h-[320px] bg-emerald-500/10 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[500px] lg:w-[650px] h-[300px] sm:h-[380px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-4 sm:right-10 w-[250px] sm:w-[450px] h-[250px] sm:h-[320px] bg-emerald-500/10 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Hero Content */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black tracking-wide shadow-sm">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Authorized Berger Paints &amp; Industrial Hardware Dealer</span>
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-black tracking-wide shadow-sm max-w-full">
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Authorized Berger Paints &amp; Hardware Dealer</span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.1] drop-shadow-xs">
-                Authentic Paints, <br />
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15] sm:leading-[1.1] drop-shadow-xs">
+                Authentic Paints, <br className="hidden sm:inline" />
                 <span className="gradient-text font-black">Industrial Hardware</span> &amp; Glues.
               </h1>
 
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+              <p className="text-xs sm:text-base text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
                 Direct authorized distributor in Pakundia Bazar for Berger Robbialac synthetic enamels, Aqua Paints CNG Green, Fevicol 1K PUR waterproof adhesives, JM lacquer spray cans, and HMBR security padlocks.
               </p>
 
               {/* Action Buttons with Shop Berger & Shop Aqua */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-3 pt-2">
                 <Link
                   href="/products"
-                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-sm transition shadow-xl shadow-amber-500/25 flex items-center gap-2"
+                  className="px-5 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm transition shadow-xl shadow-amber-500/25 flex items-center justify-center gap-2"
                 >
                   Browse Full Catalog <ArrowRight className="w-4 h-4" />
                 </Link>
 
-                <Link
-                  href="/products?category=synthetic-enamel-paints"
-                  className="px-5 py-3.5 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 border border-slate-700 dark:border-slate-800 font-bold text-sm transition flex items-center gap-2 shadow-md"
-                >
-                  <Paintbrush className="w-4 h-4 text-amber-400" />
-                  Shop Berger Paints
-                </Link>
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <Link
+                    href="/products?category=synthetic-enamel-paints"
+                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 border border-slate-700 dark:border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md"
+                  >
+                    <Paintbrush className="w-4 h-4 text-amber-400" />
+                    <span>Shop Berger</span>
+                  </Link>
 
-                {/* Shop Aqua Paints Button */}
-                <Link
-                  href="/products?search=Aqua"
-                  className="px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/25 border border-emerald-400/40"
-                >
-                  <Sparkles className="w-4 h-4 text-emerald-200" />
-                  Shop Aqua Paints
-                </Link>
+                  {/* Shop Aqua Paints Button */}
+                  <Link
+                    href="/products?search=Aqua"
+                    className="flex-1 sm:flex-initial px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 border border-emerald-400/40"
+                  >
+                    <Sparkles className="w-4 h-4 text-emerald-200" />
+                    <span>Shop Aqua</span>
+                  </Link>
+                </div>
               </div>
 
-              {/* Quick stats */}
-              <div className="pt-6 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-left">
-                <div>
-                  <div className="text-2xl font-black text-amber-500 dark:text-amber-400 font-mono">100%</div>
-                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Original Stock</div>
+              {/* Quick stats (No broken wrapping on any mobile screens) */}
+              <div className="pt-5 sm:pt-6 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-3 gap-2 sm:gap-4 max-w-md mx-auto lg:mx-0 text-center sm:text-left">
+                <div className="p-1 sm:p-0">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-500 dark:text-amber-400 font-mono whitespace-nowrap">
+                    100%
+                  </div>
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    Original Stock
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">2 Hours</div>
-                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Local Delivery</div>
+                <div className="p-1 sm:p-0 border-x border-slate-200/80 dark:border-slate-800/80 sm:border-x-0">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 dark:text-white font-mono whitespace-nowrap">
+                    2 Hours
+                  </div>
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    Local Delivery
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">12+ Cats</div>
-                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400">Paints &amp; Tools</div>
+                <div className="p-1 sm:p-0">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-500 dark:text-emerald-400 font-mono whitespace-nowrap">
+                    12+ Types
+                  </div>
+                  <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    Paints &amp; Tools
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Right Hero Image Card */}
-            <div className="lg:col-span-5 relative">
-              <div className="glass-panel rounded-3xl p-6 relative border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+            <div className="lg:col-span-5 relative mt-4 lg:mt-0">
+              <div className="glass-panel rounded-3xl p-4 sm:p-6 relative border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
                 <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950 relative border border-slate-200 dark:border-slate-800">
                   <img
                     src="/products/2412.jpg"
                     alt="Berger Robbialac Paints"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 flex items-center justify-between text-white">
-                    <div>
-                      <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Featured Item</div>
-                      <div className="text-xs font-black text-white">Berger Robbialac Synthetic Enamel</div>
+                  <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 p-2.5 sm:p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 flex items-center justify-between text-white">
+                    <div className="min-w-0 pr-2">
+                      <div className="text-[9px] sm:text-[10px] text-amber-400 font-bold uppercase tracking-wider">Featured Item</div>
+                      <div className="text-[11px] sm:text-xs font-black text-white truncate">Berger Robbialac Synthetic Enamel</div>
                     </div>
-                    <span className="text-xs font-black text-amber-400 font-mono">From ৳240</span>
+                    <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono shrink-0">From ৳240</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2.5 shadow-xs">
-                    <Truck className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0" />
-                    <div>
-                      <div className="text-[11px] font-bold text-slate-900 dark:text-white">Pakundia Local</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">৳40 Express Van</div>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
+                    <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">Pakundia Local</div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">৳40 Express Van</div>
                     </div>
                   </div>
-                  <div className="p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2.5 shadow-xs">
-                    <ShieldCheck className="w-5 h-5 text-amber-500 dark:text-amber-400 shrink-0" />
-                    <div>
-                      <div className="text-[11px] font-bold text-slate-900 dark:text-white">Verified Shop</div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">Pakundia Bazar</div>
+                  <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
+                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">Verified Shop</div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">Pakundia Bazar</div>
                     </div>
                   </div>
                 </div>

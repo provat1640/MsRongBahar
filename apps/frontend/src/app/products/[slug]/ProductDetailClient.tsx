@@ -491,7 +491,7 @@ export function ProductDetailClient({ product }: Props) {
 
       {/* Related Products */}
       {product.related && product.related.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-20 sm:pb-0">
           <h2 className="text-xl font-black text-white">Recommended Hardware &amp; Paints</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {product.related.map((rel) => (
@@ -500,6 +500,57 @@ export function ProductDetailClient({ product }: Props) {
           </div>
         </div>
       )}
+
+      {/* Sticky Mobile Add to Cart Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 flex items-center justify-between gap-3 sm:hidden shadow-2xl">
+        <div className="min-w-0">
+          <span className="text-[10px] text-slate-400 block font-semibold">Total Price</span>
+          <div className="text-base font-black text-amber-400 font-mono truncate">
+            {formatCurrency(activePrice * quantity)}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Mobile Quantity +/- */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5">
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              className="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 font-black text-xs"
+            >
+              -
+            </button>
+            <span className="w-6 text-center text-xs font-black text-white font-mono">{quantity}</span>
+            <button
+              onClick={() => setQuantity(Math.min(quantity + 1, activeStock))}
+              className="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 font-black text-xs"
+            >
+              +
+            </button>
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={!inStock}
+            className={`px-4 py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-lg shrink-0 ${
+              !inStock
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                : added
+                ? 'bg-emerald-500 text-slate-950'
+                : 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950'
+            }`}
+          >
+            {added ? (
+              <>
+                <Check className="w-4 h-4" /> Added
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4" /> Buy Now
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

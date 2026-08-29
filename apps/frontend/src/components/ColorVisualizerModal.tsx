@@ -69,30 +69,32 @@ export function ColorVisualizerModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto">
       <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md" onClick={onClose} />
-      <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto glass-panel rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-800 z-10 space-y-6">
+      <div className="relative w-full max-w-4xl max-h-[94vh] overflow-y-auto glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl border border-slate-800 z-10 space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold shadow-inner">
-              <Palette className="w-6 h-6" />
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3 sm:pb-4 gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold shadow-inner shrink-0">
+              <Palette className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg sm:text-xl font-black text-white">Live Room &amp; Surface Color Visualizer</h3>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase">
-                  Berger &amp; Aqua Paints
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h3 className="text-base sm:text-lg lg:text-xl font-black text-white truncate">
+                  3D Surface Color Visualizer
+                </h3>
+                <span className="hidden xs:inline px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase shrink-0">
+                  Berger &amp; Aqua
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Select a paint color to instantly see how real rooms, furniture, and vehicles look with authentic paint finishes
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+                Preview real wall shades &amp; auto rickshaw paint finishes
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition shrink-0"
           >
             <X className="w-4 h-4" />
           </button>

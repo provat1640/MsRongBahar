@@ -1,10 +1,21 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { CartProvider } from '../context/CartContext';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { BackendWakeup } from '../components/BackendWakeup';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#030712' },
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+  ],
+};
 
 export const metadata: Metadata = {
   title: 'M/S Rong Bahar | Paint, Hardware & Sanitary Superstore in Pakundia',
@@ -86,17 +97,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
         />
       </head>
-      <body className="min-h-screen bg-[#030712] text-slate-100 flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-slate-950">
+      <body className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#030712] text-slate-100 flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-slate-950">
         <AuthProvider>
           <CartProvider>
             <BackendWakeup />
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>

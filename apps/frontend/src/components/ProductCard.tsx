@@ -39,21 +39,21 @@ export function ProductCard({ product }: Props) {
   };
 
   return (
-    <div className="glass-panel glass-panel-hover rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative group transition">
+    <div className="glass-panel glass-panel-hover rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 flex flex-col justify-between relative group transition">
       {/* Top Category & Vendor Badge */}
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-500 dark:text-amber-400 text-[10px] font-black tracking-wide uppercase truncate">
+      <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
+        <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-500 dark:text-amber-400 text-[9px] sm:text-[10px] font-black tracking-wide uppercase truncate max-w-[140px]">
           {product.category?.name || 'Hardware'}
         </span>
         {product.vendor && (
-          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
+          <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[100px]">
             {product.vendor}
           </span>
         )}
       </div>
 
       {/* Image container */}
-      <Link href={`/products/${product.slug}`} className="block relative aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950/60 mb-4 border border-slate-200 dark:border-slate-800/80 group-hover:border-amber-500/40 transition">
+      <Link href={`/products/${product.slug}`} className="block relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950/60 mb-3 sm:mb-4 border border-slate-200 dark:border-slate-800/80 group-hover:border-amber-500/40 transition">
         <img
           src={product.images[0] || '/products/2412.jpg'}
           alt={product.title}
@@ -61,7 +61,9 @@ export function ProductCard({ product }: Props) {
         />
         {!inStock && (
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center">
-            <span className="px-3 py-1 bg-rose-500 text-white font-black text-xs rounded-full">Out of Stock</span>
+            <span className="px-2.5 py-1 bg-rose-500 text-white font-black text-[11px] sm:text-xs rounded-full shadow-md">
+              Out of Stock
+            </span>
           </div>
         )}
       </Link>
@@ -70,25 +72,27 @@ export function ProductCard({ product }: Props) {
       <div className="space-y-2 flex-1 flex flex-col justify-between">
         <div>
           <Link href={`/products/${product.slug}`} className="block">
-            <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition line-clamp-2">
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-400 transition line-clamp-2 leading-snug">
               {product.title}
             </h3>
           </Link>
-          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">{product.description}</p>
+          <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mt-1 leading-relaxed">
+            {product.description}
+          </p>
         </div>
 
         {/* Variants Selector */}
         {product.variants && product.variants.length > 1 && (
-          <div className="pt-2">
-            <label className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider block mb-1">
+          <div className="pt-1.5 sm:pt-2">
+            <label className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider block mb-1">
               Select {product.unit}:
             </label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {product.variants.map((v) => (
                 <button
                   key={v.id}
                   onClick={() => setSelectedVariant(v)}
-                  className={`px-2 py-1 rounded-lg text-[11px] font-bold border transition ${
+                  className={`px-2 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-bold border transition ${
                     selectedVariant?.id === v.id
                       ? 'border-amber-500 bg-amber-500/15 text-amber-600 dark:text-amber-300 ring-1 ring-amber-500'
                       : 'border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
@@ -102,10 +106,12 @@ export function ProductCard({ product }: Props) {
         )}
 
         {/* Price & Add to Cart button */}
-        <div className="pt-3 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-2 mt-3">
-          <div>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-semibold">Retail Price</span>
-            <span className="text-base font-black text-amber-500 dark:text-amber-400 font-mono">
+        <div className="pt-2.5 sm:pt-3 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-2 mt-2 sm:mt-3">
+          <div className="min-w-0">
+            <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 block font-semibold truncate">
+              Retail Price
+            </span>
+            <span className="text-sm sm:text-base font-black text-amber-500 dark:text-amber-400 font-mono truncate block">
               {formatCurrency(activePrice)}
             </span>
           </div>
@@ -113,7 +119,7 @@ export function ProductCard({ product }: Props) {
           <button
             onClick={handleAddToCart}
             disabled={!inStock}
-            className={`px-4 py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-md ${
+            className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-black text-xs transition flex items-center gap-1.5 shadow-md shrink-0 ${
               !inStock
                 ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
                 : added
