@@ -1,8 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { fetchProducts, fetchCategories } from '../lib/api';
-import { ProductCard } from '../components/ProductCard';
 import { HomeFeaturedGrid } from '../components/HomeFeaturedGrid';
+import { ImaginationStudio } from '../components/ImaginationStudio';
+import { ProjectEstimatorCalculator } from '../components/ProjectEstimatorCalculator';
 import {
   Sparkles,
   ArrowRight,
@@ -18,17 +19,20 @@ import {
   Flame,
   MessageSquareQuote,
   Clock,
-  PlusCircle,
+  Wand2,
+  Cpu,
+  Phone,
+  Droplets,
+  Atom,
 } from 'lucide-react';
 
 export default async function HomePage() {
   const products = await fetchProducts();
   const categories = await fetchCategories();
-  const newArrivals = products.filter((p) => p.isNewArrival);
 
   return (
-    <div className="space-y-20 pb-16">
-      {/* 1. HERO SECTION (Clean & Glare-Free) */}
+    <div className="space-y-20 pb-20">
+      {/* 1. HERO SECTION (Luxury Aesthetics & Glare-Free) */}
       <section className="relative pt-6 pb-12 sm:pt-14 sm:pb-18 lg:pt-18 lg:pb-22 border-b border-slate-200 dark:border-slate-800/80 w-full max-w-full">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -36,7 +40,7 @@ export default async function HomePage() {
             <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] sm:text-xs font-black tracking-wide shadow-xs max-w-full">
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">Authorized Berger Paints &amp; Hardware Dealer</span>
+                <span className="truncate">Authorized Berger Paints &amp; Hardware Superstore</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15] sm:leading-[1.1]">
@@ -99,10 +103,10 @@ export default async function HomePage() {
                 <div className="h-7 w-px bg-slate-200 dark:bg-slate-800" />
                 <div className="text-center sm:text-left">
                   <div className="text-xl sm:text-2xl font-black text-emerald-500 dark:text-emerald-400 font-mono">
-                    12+
+                    🛡️ AutoHeal
                   </div>
                   <div className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400">
-                    Categories
+                    Self-Repairing
                   </div>
                 </div>
               </div>
@@ -119,10 +123,16 @@ export default async function HomePage() {
                   />
                   <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 p-2.5 sm:p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 flex items-center justify-between text-white">
                     <div className="min-w-0 pr-2">
-                      <div className="text-[9px] sm:text-[10px] text-amber-400 font-bold uppercase tracking-wider">Featured Item</div>
-                      <div className="text-[11px] sm:text-xs font-black text-white truncate">Berger Robbialac Synthetic Enamel</div>
+                      <div className="text-[9px] sm:text-[10px] text-amber-400 font-bold uppercase tracking-wider">
+                        Featured Item
+                      </div>
+                      <div className="text-[11px] sm:text-xs font-black text-white truncate">
+                        Berger Robbialac Synthetic Enamel
+                      </div>
                     </div>
-                    <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono shrink-0">From ৳240</span>
+                    <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono shrink-0">
+                      From ৳240
+                    </span>
                   </div>
                 </div>
 
@@ -130,15 +140,23 @@ export default async function HomePage() {
                   <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
                     <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">Pakundia Local</div>
-                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">৳40 Express Van</div>
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">
+                        Pakundia Local
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                        ৳40 Express Van
+                      </div>
                     </div>
                   </div>
                   <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
                     <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
                     <div className="min-w-0">
-                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">Verified Shop</div>
-                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">Pakundia Bazar</div>
+                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">
+                        Verified Shop
+                      </div>
+                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                        Pakundia Bazar
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -148,7 +166,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. ✨ NEW ARRIVALS & FRESH INVENTORY SECTION */}
+      {/* 2. ✨ CUSTOMER IMAGINATION & MOOD STUDIO (Pillar 3 Showcase) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ImaginationStudio />
+      </section>
+
+      {/* 3. 📐 INTERACTIVE PAINT COVERAGE & COST ESTIMATOR (Pillar 1 Feature) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ProjectEstimatorCalculator />
+      </section>
+
+      {/* 4. ✨ NEW ARRIVALS & FRESH INVENTORY SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-8">
           <div>
@@ -156,7 +184,9 @@ export default async function HomePage() {
               <Flame className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Fresh Pakundia Stock
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">✨ New Arrivals &amp; Fresh Inventory</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              ✨ New Arrivals &amp; Fresh Inventory
+            </h2>
           </div>
           <Link
             href="/products"
@@ -169,7 +199,7 @@ export default async function HomePage() {
         <HomeFeaturedGrid initialProducts={products} type="new-arrivals" />
       </section>
 
-      {/* 3. CATEGORIES GRID */}
+      {/* 5. CATEGORIES GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-8">
           <div>
@@ -208,14 +238,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. FEATURED PRODUCTS CATALOG */}
+      {/* 6. FEATURED PRODUCTS CATALOG */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-8">
           <div>
             <span className="text-amber-600 dark:text-amber-400 text-xs font-black uppercase tracking-wider block mb-1">
               In Stock &amp; Ready for Dispatch
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Featured Hardware &amp; Paints</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              Featured Hardware &amp; Paints
+            </h2>
           </div>
           <Link
             href="/products"
@@ -228,57 +260,50 @@ export default async function HomePage() {
         <HomeFeaturedGrid initialProducts={products} type="featured" />
       </section>
 
-      {/* 5. VALUE-ADD PROMO BANNER (Express Delivery & Visualizer) */}
+      {/* 7. ⚡ RAW EXECUTION & SELF-HEALING ARCHITECTURE SHOWCASE */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1: Express Local Pakundia Delivery */}
-          <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-4 relative overflow-hidden group">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
-              <Truck className="w-6 h-6" />
+        <div className="glass-panel rounded-3xl p-6 sm:p-10 border border-amber-500/30 relative overflow-hidden space-y-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black tracking-wide uppercase">
+                <Atom className="w-3.5 h-3.5" />
+                Raw Execution Engine &amp; Self-Healing Infrastructure
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                Engineered for High Concurrency, Atomic Locks &amp; Auto-Repair
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                M/S Rong Bahar is backed by Redis distributed atomic lock sessions, PostgreSQL ACID isolation, and an autonomous Self-Healing runtime that silently neutralizes anomalies, recovers corrupted states, and generates dynamic asset fallbacks.
+              </p>
             </div>
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">Pakundia 2-Hour Express Delivery</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-              Fast local motorcycle and van dispatch across Pakundia Bazar, Mothkhola Road, and neighboring unions in under 2 hours.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2 text-xs font-black text-amber-600 dark:text-amber-400 hover:underline"
-              >
-                Browse Available Store Stock <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
 
-          {/* Card 2: 3D Color Visualizer */}
-          <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-4 relative overflow-hidden group">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-              <Palette className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">Berger &amp; Aqua Wall Color Visualizer</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-              Preview real-world shades including Berger CNG Green, Silk Coral, and WeatherCoat Pearl White on perspective walls before ordering your cans.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/products?category=synthetic-enamel-paints"
-                className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 dark:text-emerald-400 hover:underline"
-              >
-                Explore Paint Color Catalog <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 shrink-0 font-mono text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 text-white border border-slate-800 space-y-1">
+                <span className="text-[10px] text-amber-400 font-bold uppercase">Redis Lock Hold</span>
+                <div className="text-lg font-black text-amber-300">~1.2 ms TTL</div>
+                <div className="text-[9px] text-slate-400">Atomic Stock Reservation</div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 text-white border border-slate-800 space-y-1">
+                <span className="text-[10px] text-emerald-400 font-bold uppercase">Self-Healing Status</span>
+                <div className="text-lg font-black text-emerald-300">100% Guarded</div>
+                <div className="text-[9px] text-slate-400">AutoDoctor Active</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. 🌟 CUSTOMER REVIEWS & CONTRACTOR FEEDBACK SECTION */}
+      {/* 8. 🌟 CUSTOMER REVIEWS & CONTRACTOR FEEDBACK */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div className="space-y-2">
             <span className="text-amber-600 dark:text-amber-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
               <MessageSquareQuote className="w-4 h-4" /> Customer &amp; Contractor Reviews
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">What Pakundia Customers Say</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              What Pakundia Customers Say
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex text-amber-400">
@@ -286,7 +311,9 @@ export default async function HomePage() {
                 <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <span className="text-xs font-black text-slate-900 dark:text-white">4.9 / 5.0 (150+ Verified Orders)</span>
+            <span className="text-xs font-black text-slate-900 dark:text-white">
+              4.9 / 5.0 (150+ Verified Orders)
+            </span>
           </div>
         </div>
 

@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { ColorVisualizerModal } from './ColorVisualizerModal';
 import { RequestItemModal } from './RequestItemModal';
 import { AuthModal } from './AuthModal';
+import { ImaginationStudio } from './ImaginationStudio';
+import { SelfHealingDiagnosticsModal } from './SelfHealingDiagnosticsModal';
 import {
   ShoppingCart,
   Search,
@@ -23,6 +25,9 @@ import {
   Phone,
   Layers,
   ChevronRight,
+  Sparkles,
+  Wand2,
+  Activity,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -31,10 +36,11 @@ export function Navbar() {
 
   const [isColorOpen, setIsColorOpen] = useState(false);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
+  const [isImaginationOpen, setIsImaginationOpen] = useState(false);
+  const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLightMode, setIsLightMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   // Load Day / Night mode from localStorage on mount
   useEffect(() => {
@@ -134,7 +140,17 @@ export function Navbar() {
 
           {/* Action Tools (Adaptive & Compact) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Desktop Only: 3D Color Visualizer */}
+            {/* Desktop: Imagination Studio */}
+            <button
+              onClick={() => setIsImaginationOpen(true)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-purple-500/15 border border-amber-500/40 hover:border-amber-400 text-amber-300 text-xs font-black transition shadow-xs"
+              title="Customer Imagination & Mood Studio"
+            >
+              <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>Imagination</span>
+            </button>
+
+            {/* Desktop: 3D Color Visualizer */}
             <button
               onClick={() => setIsColorOpen(true)}
               className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 text-xs font-bold transition shadow-xs"
@@ -144,7 +160,17 @@ export function Navbar() {
               <span>3D Visualizer</span>
             </button>
 
-            {/* Desktop Only: Request Item */}
+            {/* Desktop: Self-Healing Diagnostics */}
+            <button
+              onClick={() => setIsDiagnosticsOpen(true)}
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-emerald-400 text-xs font-bold transition"
+              title="Autonomous Self-Healing Health Center"
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Health</span>
+            </button>
+
+            {/* Desktop: Request Item */}
             <button
               onClick={() => setIsRequestOpen(true)}
               className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-amber-400 text-xs font-bold transition"
@@ -153,16 +179,6 @@ export function Navbar() {
               <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
               <span>Request Item</span>
             </button>
-
-            {/* Desktop Only: Order Tracker */}
-            <Link
-              href="/track-order"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-amber-400 text-xs font-bold transition"
-              title="Track Order & Invoices"
-            >
-              <Truck className="w-3.5 h-3.5 text-amber-400" />
-              <span>Track Order</span>
-            </Link>
 
             {/* Day / Night Mode Toggle */}
             <button
@@ -262,6 +278,50 @@ export function Navbar() {
             </form>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsImaginationOpen(true);
+                }}
+                className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between text-left"
+              >
+                <span>✨ Imagination Studio</span>
+                <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsColorOpen(true);
+                }}
+                className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-between text-left"
+              >
+                <span>🎨 3D Visualizer</span>
+                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsDiagnosticsOpen(true);
+                }}
+                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
+              >
+                <span>🛡️ Self-Healing Diagnostics</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsRequestOpen(true);
+                }}
+                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
+              >
+                <span>📋 Request Item</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+              </button>
+
               <Link
                 href="/products"
                 onClick={() => setMobileMenuOpen(false)}
@@ -278,26 +338,6 @@ export function Navbar() {
                 <span>🚚 Track Order</span>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
               </Link>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsColorOpen(true);
-                }}
-                className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>🎨 3D Color Visualizer</span>
-                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
-              </button>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsRequestOpen(true);
-                }}
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>📋 Request Item</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              </button>
             </div>
 
             {/* Mobile Auth Button */}
@@ -348,6 +388,8 @@ export function Navbar() {
       {/* Global Modals */}
       <ColorVisualizerModal isOpen={isColorOpen} onClose={() => setIsColorOpen(false)} />
       <RequestItemModal isOpen={isRequestOpen} onClose={() => setIsRequestOpen(false)} />
+      <ImaginationStudio isModal isOpen={isImaginationOpen} onClose={() => setIsImaginationOpen(false)} />
+      <SelfHealingDiagnosticsModal isOpen={isDiagnosticsOpen} onClose={() => setIsDiagnosticsOpen(false)} />
       <AuthModal />
     </>
   );

@@ -5,6 +5,9 @@ import { CartProvider } from '../context/CartContext';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { BackendWakeup } from '../components/BackendWakeup';
+import { SelfHealingBoundary } from '../components/SelfHealingBoundary';
+import { MoodAmbientWrapper } from '../components/MoodAmbientWrapper';
+import { RawExecutionHUD } from '../components/RawExecutionHUD';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -104,14 +107,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#030712] text-slate-100 flex flex-col justify-between antialiased selection:bg-amber-500 selection:text-slate-950">
-        <AuthProvider>
-          <CartProvider>
-            <BackendWakeup />
-            <Navbar />
-            <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
-            <Footer />
-          </CartProvider>
-        </AuthProvider>
+        <SelfHealingBoundary>
+          <AuthProvider>
+            <CartProvider>
+              <MoodAmbientWrapper>
+                <BackendWakeup />
+                <Navbar />
+                <main className="flex-1 w-full max-w-full overflow-x-hidden">{children}</main>
+                <Footer />
+                <RawExecutionHUD />
+              </MoodAmbientWrapper>
+            </CartProvider>
+          </AuthProvider>
+        </SelfHealingBoundary>
       </body>
     </html>
   );

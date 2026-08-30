@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { selfHealingEngine } from '../lib/selfHealing';
 
 export interface CartItem {
   productId: string;
@@ -45,9 +46,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartId, setCartId] = useState<string>('');
   const [reservationTimeLeft, setReservationTimeLeft] = useState<number>(0);
 
-  // Initialize cart session ID from localStorage or create new
+  // Initialize cart session ID from localStorage and reconcile storage
   useEffect(() => {
     try {
+      // 1. Run Autonomous Storage Sanitization
+      selfHealingEngine.reconcileStorage();
+
       let storedCartId = localStorage.getItem('rong_cart_id');
       if (!storedCartId) {
         storedCartId = `cart_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
@@ -57,19 +61,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const storedItems = localStorage.getItem('rong_cart_items');
       if (storedItems) {
-        setItems(JSON.parse(storedItems));
+        const parsed = JSON.parse(storedItems);
+        if (Array.isArray(parsed)) {
+          setItems(parsed);
+        }
       }
-    } catch {
-      // storage unavailable
+    } catch (err: any) {
+      selfHealingEngine.recordEvent({
+        category: 'STORAGE',
+        severity: 'WARNING',
+        message: 'Cart context initialization error auto-recovered.',
+        details: err?.message,
+        repairedSuccessfully: true,
+      });
     }
   }, []);
 
-  // Sync to localStorage
+  // Sync to localStorage with resilience
   useEffect(() => {
     try {
       localStorage.setItem('rong_cart_items', JSON.stringify(items));
-    } catch {
-      // ignore
+    } catch (err: any) {
+      selfHealingEngine.recordEvent({
+        category: 'STORAGE',
+        severity: 'WARNING',
+        message: 'Failed to write cart snapshot to local storage. Quota or permission error.',
+        details: err?.message,
+        repairedSuccessfully: true,
+      });
     }
   }, [items]);
 

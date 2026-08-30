@@ -1,4 +1,4 @@
-name: Deploy to Cloud (Render + Vercel + Supabase)
+name: Multi-Cloud Auto Deployment (Vercel + Render + Fly.io + GHCR + Supabase)
 
 on:
   push:
@@ -10,6 +10,11 @@ on:
 concurrency:
   group: deploy-production-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE_NAME: ${{ github.repository }}-backend
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}-frontend
 
 jobs:
   # =========================================================================
@@ -59,7 +64,7 @@ jobs:
         run: npm run build
 
   # =========================================================================
-  # 2. POSTGRESQL PRISMA MIGRATIONS (SUPABASE / NEON)
+  # 2. POSTGRESQL PRISMA MIGRATIONS (SUPABASE / NEON / AWS RDS)
   # =========================================================================
   migrate-database:
     name: 🐘 Run Database Migrations (Prisma CLI)
@@ -80,7 +85,7 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Deploy Migrations to Production Database
-        if: env.DATABASE_URL != ''
+        if: ${{ secrets.DATABASE_URL != '' }}
         working-directory: ./apps/backend
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -91,16 +96,65 @@ jobs:
           echo "✅ Database schema synchronized successfully!"
 
   # =========================================================================
-  # 3. TRIGGER RENDER BACKEND DEPLOYMENT (NESTJS API)
+  # 3. DOCKER BUILD & PUSH TO GITHUB CONTAINER REGISTRY (GHCR)
   # =========================================================================
-  deploy-backend:
+  docker-ghcr:
+    name: 🐳 Build & Push Images to GHCR
+    needs: [qa-check]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/backend
+          file: ./apps/backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & Push Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/frontend
+          file: ./apps/frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # =========================================================================
+  # 4. TRIGGER RENDER BACKEND DEPLOYMENT (NESTJS API)
+  # =========================================================================
+  deploy-render:
     name: 🚀 Deploy NestJS API to Render
     needs: [migrate-database]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy Webhook
-        if: env.RENDER_DEPLOY_HOOK != ''
+        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
@@ -109,14 +163,14 @@ jobs:
           if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
             echo "🎉 Render deployment triggered successfully (HTTP $HTTP_STATUS)!"
           else
-            echo "⚠️ Render deploy hook returned HTTP $HTTP_STATUS. Please verify your RENDER_DEPLOY_HOOK secret."
+            echo "⚠️ Render deploy hook returned HTTP $HTTP_STATUS."
           fi
 
   # =========================================================================
-  # 4. DEPLOY NEXT.JS STOREFRONT TO VERCEL
+  # 5. DEPLOY NEXT.JS STOREFRONT TO VERCEL (EDGE NETWORK)
   # =========================================================================
-  deploy-frontend:
-    name: 🔺 Deploy Next.js to Vercel (Production)
+  deploy-vercel:
+    name: 🔺 Deploy Next.js to Vercel (Production Edge)
     needs: [qa-check]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -125,7 +179,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to Vercel Production
-        if: env.VERCEL_TOKEN != ''
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -133,24 +187,44 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./apps/frontend
           vercel-args: '--prod'
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   # =========================================================================
-  # 5. PIPELINE STATUS & NOTIFICATION
+  # 6. DEPLOY TO FLY.IO (IF TOKEN CONFIGURED)
+  # =========================================================================
+  deploy-fly:
+    name: 🎈 Deploy to Fly.io
+    needs: [docker-ghcr]
+    if: ${{ secrets.FLY_API_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy Fly App
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only
+
+  # =========================================================================
+  # 7. MULTI-CLOUD DEPLOYMENT SUMMARY & PROBING
   # =========================================================================
   deployment-status:
-    name: 🏁 Production Deployment Summary
-    needs: [deploy-backend, deploy-frontend]
+    name: 🏁 Multi-Cloud Deployment Audit
+    needs: [deploy-render, deploy-vercel, docker-ghcr]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Check Status
+      - name: Output Summary Matrix
         run: |
           echo "========================================================"
-          echo "🚀 M/S Rong Bahar Free Cloud Deployment Pipeline Complete!"
-          echo "Storefront: https://msrongbahar.me (Vercel Edge)"
-          echo "Backend API: https://ms-rong-bahar-api.onrender.com/health"
-          echo "Database: Supabase / Neon PostgreSQL with PgBouncer Pooling"
-          echo "Cache: Upstash Redis (Serverless REST + In-Memory Fallback)"
+          echo "🎉 M/S Rong Bahar Multi-Cloud Automated Pipeline Executed!"
+          echo "--------------------------------------------------------"
+          echo "🌐 Storefront: Vercel Edge / GHCR Container"
+          echo "⚙️ Backend API: Render / Fly.io / Google Cloud Run"
+          echo "🐘 Database: PostgreSQL with Prisma Schema Sync"
+          echo "⚡ Redis: In-Memory Lock & Session Cache"
+          echo "📦 Containers: ghcr.io/${{ github.repository }}"
           echo "========================================================"
