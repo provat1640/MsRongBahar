@@ -948,6 +948,35 @@ export default function AdminControlPanel() {
     setTimeout(() => setSettingsSavedToast(''), 3000);
   };
 
+  const handleClearCompletedOrders = () => {
+    const toRemove = orders.filter((o) => o.orderStatus === 'DELIVERED' || o.orderStatus === 'CANCELLED');
+    if (toRemove.length === 0) {
+      alert('No delivered or cancelled orders to clean up right now.');
+      return;
+    }
+    if (!window.confirm(`Clean up and delete ${toRemove.length} delivered / cancelled order(s) to keep history neat and clean?`)) return;
+    setOrders((prev) => {
+      const updated = prev.filter((o) => o.orderStatus !== 'DELIVERED' && o.orderStatus !== 'CANCELLED');
+      try {
+        localStorage.setItem('rong_bahar_all_orders', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setSettingsSavedToast(`🧹 Cleaned up ${toRemove.length} delivered/cancelled order(s).`);
+    setTimeout(() => setSettingsSavedToast(''), 3000);
+  };
+
+  const handleClearAllProductRequests = () => {
+    if (productRequests.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete all ${productRequests.length} customer product request(s) to clean history?`)) return;
+    setProductRequests([]);
+    try {
+      localStorage.setItem('rong_bahar_customer_requests', JSON.stringify([]));
+    } catch {}
+    setSettingsSavedToast('🧹 All customer product requests cleared.');
+    setTimeout(() => setSettingsSavedToast(''), 3000);
+  };
+
   const handleConvertRequestToProduct = (req: ProductRequest) => {
     setProdTitle(req.productName);
     setProdVendor(req.brand && req.brand !== 'Any Brand' ? req.brand : 'Berger Paints BD');
@@ -2622,7 +2651,7 @@ export default function AdminControlPanel() {
               </p>
             </div>
 
-            {/* Filter & Search */}
+            {/* Filter, Search & History Clean Up Toolbar */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs">
                 <Search className="w-3.5 h-3.5 text-slate-400" />
@@ -2647,6 +2676,17 @@ export default function AdminControlPanel() {
                 <option value="DELIVERED">DELIVERED</option>
                 <option value="CANCELLED">CANCELLED</option>
               </select>
+
+              {/* 1-Click History Cleaner for Delivered & Out of Stock Orders */}
+              <button
+                type="button"
+                onClick={handleClearCompletedOrders}
+                className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 hover:bg-rose-500/10 text-slate-700 dark:text-slate-300 hover:text-rose-500 border border-slate-200 dark:border-slate-800 hover:border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                title="Clean up all delivered and out-of-stock cancelled orders to keep history neat"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                <span>Clean Completed</span>
+              </button>
             </div>
           </div>
 
@@ -2660,65 +2700,84 @@ export default function AdminControlPanel() {
                   <th className="pb-3 font-bold">Items Ordered</th>
                   <th className="pb-3 font-bold">Total Bill</th>
                   <th className="pb-3 font-bold">Status</th>
-                  <th className="pb-3 font-bold text-right">Actions</th>
+                  <th className="pb-3 font-bold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
-                {filteredOrders.map((o) => (
-                  <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition">
-                    <td className="py-3.5 font-mono font-black text-amber-600 dark:text-amber-400">{o.orderNumber}</td>
-                    <td className="py-3.5 font-bold text-slate-900 dark:text-white">{o.customerName}</td>
-                    <td className="py-3.5 font-mono text-slate-600 dark:text-slate-300">{o.phone}</td>
-                    <td className="py-3.5 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">
-                      {o.items?.map((it: any) => `${it.productTitle || it.product?.title || 'Item'} (${it.quantity})`).join(', ') || 'Ordered Items'}
-                    </td>
-                    <td className="py-3.5 font-mono font-black text-slate-900 dark:text-white">{formatCurrency(o.totalAmount)}</td>
-                    <td className="py-3.5">
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-slate-500">
                       <div className="space-y-1">
-                        <select
-                          value={o.orderStatus}
-                          onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
-                          className={`border rounded-xl px-2.5 py-1 text-xs font-bold focus:outline-none focus:border-amber-500 ${
-                            o.orderStatus === 'CANCELLED'
-                              ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
-                              : o.orderStatus === 'DELIVERED'
-                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
-                              : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-amber-600 dark:text-amber-300'
-                          }`}
-                        >
-                          <option value="PENDING">PENDING</option>
-                          <option value="CONFIRMED">CONFIRMED</option>
-                          <option value="SHIPPED">SHIPPED</option>
-                          <option value="DELIVERED">DELIVERED</option>
-                          <option value="CANCELLED">CANCELLED</option>
-                        </select>
-                        {o.orderStatus === 'CANCELLED' && (
-                          <div className="text-[10px] text-rose-500 font-bold block max-w-[150px] truncate" title={o.cancelReason || 'Product not in stock / not delivered'}>
-                            ⚠ {o.cancelReason || 'Out of Stock / Cancelled'}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => setSelectedOrder(o)}
-                          className="px-2.5 py-1.5 bg-amber-500/15 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-xl font-bold text-xs inline-flex items-center gap-1 transition"
-                          title="View order details and invoices"
-                        >
-                          <Eye className="w-3.5 h-3.5" /> Details
-                        </button>
-                        <button
-                          onClick={() => handleDeleteOrder(o.id)}
-                          className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-500/15 border border-rose-500/20 transition"
-                          title="Delete order request (when product not delivered or out of stock)"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <p className="font-bold">No orders found in pipeline.</p>
+                        <p className="text-[11px]">Your order history is clean and ready for new customer checkouts.</p>
                       </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredOrders.map((o) => (
+                    <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition">
+                      <td className="py-3.5 font-mono font-black text-amber-600 dark:text-amber-400">{o.orderNumber}</td>
+                      <td className="py-3.5 font-bold text-slate-900 dark:text-white">{o.customerName}</td>
+                      <td className="py-3.5 font-mono text-slate-600 dark:text-slate-300">{o.phone}</td>
+                      <td className="py-3.5 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">
+                        {o.items?.map((it: any) => `${it.productTitle || it.product?.title || 'Item'} (${it.quantity})`).join(', ') || 'Ordered Items'}
+                      </td>
+                      <td className="py-3.5 font-mono font-black text-slate-900 dark:text-white">{formatCurrency(o.totalAmount)}</td>
+                      <td className="py-3.5">
+                        <div className="space-y-1">
+                          <select
+                            value={o.orderStatus}
+                            onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
+                            className={`border rounded-xl px-2.5 py-1 text-xs font-bold focus:outline-none focus:border-amber-500 ${
+                              o.orderStatus === 'CANCELLED'
+                                ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+                                : o.orderStatus === 'DELIVERED'
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-amber-600 dark:text-amber-300'
+                            }`}
+                          >
+                            <option value="PENDING">PENDING</option>
+                            <option value="CONFIRMED">CONFIRMED</option>
+                            <option value="SHIPPED">SHIPPED</option>
+                            <option value="DELIVERED">DELIVERED</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                          </select>
+                          {o.orderStatus === 'CANCELLED' && (
+                            <div className="text-[10px] text-rose-500 font-bold block max-w-[150px] truncate" title={o.cancelReason || 'Product not in stock / not delivered'}>
+                              ⚠ {o.cancelReason || 'Out of Stock / Cancelled'}
+                            </div>
+                          )}
+                          {o.orderStatus === 'DELIVERED' && (
+                            <div className="text-[10px] text-emerald-500 font-bold block">
+                              ✓ Delivered
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* 100% Details Button */}
+                          <button
+                            onClick={() => setSelectedOrder(o)}
+                            className="px-2.5 py-1.5 bg-amber-500/15 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-xl font-bold text-xs inline-flex items-center gap-1 transition"
+                            title="View full order details and printable invoice"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> 100% Details
+                          </button>
+
+                          {/* Delete Order Button */}
+                          <button
+                            onClick={() => handleDeleteOrder(o.id)}
+                            className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 rounded-xl font-bold text-xs inline-flex items-center gap-1 transition shadow-xs"
+                            title="Delete order when delivered or out of stock to keep history clean"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -2728,80 +2787,100 @@ export default function AdminControlPanel() {
       {/* TAB 4: CUSTOMER PRODUCT REQUESTS */}
       {activeTab === 'requests' && (
         <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <ClipboardList className="w-5 h-5 text-cyan-500 dark:text-cyan-400" />
                 Customer Product Requests
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Manage requests submitted by customers; add to catalog or dismiss out-of-stock items
+                Manage customer product requests; add to shop or delete out-of-stock items
               </p>
             </div>
-            <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-bold rounded-lg">
-              {productRequests.length} Requests
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-bold rounded-lg">
+                {productRequests.length} Requests
+              </span>
+              {productRequests.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearAllProductRequests}
+                  className="px-3 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 text-xs font-bold rounded-lg transition flex items-center gap-1"
+                  title="Clear all customer requests to keep history clean"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Clear All
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="space-y-4">
-            {productRequests.map((req) => (
-              <div
-                key={req.id}
-                className="p-5 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition space-y-3"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-black text-slate-900 dark:text-white">{req.productName}</h3>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                        {req.brand || 'Any Brand'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                      Requested by: <strong className="text-slate-900 dark:text-white">{req.customerName}</strong> • Phone:{' '}
-                      <a href={`tel:${req.phone}`} className="text-cyan-600 dark:text-cyan-400 hover:underline font-mono">
-                        {req.phone}
-                      </a>
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleConvertRequestToProduct(req)}
-                      className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow"
-                      title="Add this product to store catalog"
-                    >
-                      <PlusCircle className="w-3.5 h-3.5" /> + Add to Shop
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProductRequest(req.id)}
-                      className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1"
-                      title="Delete / Dismiss request (e.g. not in stock or cannot procure)"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Dismiss
-                    </button>
-                  </div>
-                </div>
-
-                {req.notes && (
-                  <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 italic">
-                    &quot;{req.notes}&quot;
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200 dark:border-slate-800/60">
-                  <span>Requested on: {new Date(req.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                  <a
-                    href={`https://wa.me/88${req.phone.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-bold"
-                  >
-                    <Smartphone className="w-3 h-3" /> WhatsApp Customer
-                  </a>
-                </div>
+            {productRequests.length === 0 ? (
+              <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 space-y-1">
+                <ClipboardList className="w-7 h-7 text-slate-400 mx-auto mb-1" />
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">No customer product requests.</p>
+                <p className="text-[11px] text-slate-500">History is completely neat and clean.</p>
               </div>
-            ))}
+            ) : (
+              productRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="p-5 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition space-y-3"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white">{req.productName}</h3>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                          {req.brand || 'Any Brand'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                        Requested by: <strong className="text-slate-900 dark:text-white">{req.customerName}</strong> • Phone:{' '}
+                        <a href={`tel:${req.phone}`} className="text-cyan-600 dark:text-cyan-400 hover:underline font-mono">
+                          {req.phone}
+                        </a>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleConvertRequestToProduct(req)}
+                        className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow"
+                        title="Add this product to store catalog"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" /> + Add to Shop
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProductRequest(req.id)}
+                        className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-xs"
+                        title="Delete this request (when product is out of stock or procured)"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Delete Request
+                      </button>
+                    </div>
+                  </div>
+
+                  {req.notes && (
+                    <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 italic">
+                      &quot;{req.notes}&quot;
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200 dark:border-slate-800/60">
+                    <span>Requested on: {new Date(req.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                    <a
+                      href={`https://wa.me/88${req.phone.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-bold"
+                    >
+                      <Smartphone className="w-3 h-3" /> WhatsApp Customer
+                    </a>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
