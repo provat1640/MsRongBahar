@@ -2,8 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import { fetchProducts, fetchCategories } from '../lib/api';
 import { HomeFeaturedGrid } from '../components/HomeFeaturedGrid';
-import { ImaginationStudio } from '../components/ImaginationStudio';
-import { ProjectEstimatorCalculator } from '../components/ProjectEstimatorCalculator';
 import {
   Sparkles,
   ArrowRight,
@@ -166,12 +164,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. ✨ CUSTOMER IMAGINATION & MOOD STUDIO */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ImaginationStudio />
-      </section>
-
-      {/* 4. ✨ NEW ARRIVALS & FRESH INVENTORY SECTION */}
+      {/* 2. ✨ NEW ARRIVALS & FRESH INVENTORY SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-8">
           <div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -30,7 +30,8 @@ import {
   Wand2,
   Activity,
   Calculator,
-  MoreVertical,
+  Package,
+  ArrowRight,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -42,23 +43,9 @@ export function Navbar() {
   const [isImaginationOpen, setIsImaginationOpen] = useState(false);
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
   const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLightMode, setIsLightMode] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const moreMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close 3-dot dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
-        setIsMoreMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // Load Day / Night mode from localStorage on mount
   useEffect(() => {
@@ -95,6 +82,7 @@ export function Navbar() {
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
+      setMenuOpen(false);
       window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
     }
   };
@@ -144,7 +132,7 @@ export function Navbar() {
           {/* Desktop Search Bar (Hidden on Mobile) */}
           <form
             onSubmit={handleSearchSubmit}
-            className="hidden md:flex flex-1 max-w-xs lg:max-w-md items-center relative mx-2"
+            className="hidden md:flex flex-1 max-w-xs lg:max-w-md items-center relative mx-4"
           >
             <input
               type="text"
@@ -158,136 +146,6 @@ export function Navbar() {
 
           {/* Action Tools */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Desktop: Imagination Studio */}
-            <button
-              onClick={() => setIsImaginationOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-purple-500/15 border border-amber-500/40 hover:border-amber-400 text-amber-300 text-xs font-black transition shadow-xs"
-              title="Customer Imagination & Mood Studio"
-            >
-              <Wand2 className="w-3.5 h-3.5 text-amber-400" />
-              <span>Imagination</span>
-            </button>
-
-            {/* Desktop: 3D Color Visualizer */}
-            <button
-              onClick={() => setIsColorOpen(true)}
-              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 text-xs font-bold transition shadow-xs"
-              title="3D Room & Surface Color Visualizer"
-            >
-              <Palette className="w-3.5 h-3.5 text-emerald-400" />
-              <span>3D Visualizer</span>
-            </button>
-
-            {/* 3-Dot More Tools Dropdown Menu (Accessible on Desktop & Mobile) */}
-            <div className="relative" ref={moreMenuRef}>
-              <button
-                onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-                className={`p-2 sm:p-2.5 rounded-xl border transition flex items-center justify-center ${
-                  isMoreMenuOpen
-                    ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                    : 'bg-slate-900 border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-amber-400'
-                }`}
-                title="More Superstore Tools & Estimator"
-                aria-label="More Options"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-
-              {/* 3-Dot Dropdown Panel */}
-              {isMoreMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-slate-950/98 backdrop-blur-2xl border border-slate-800 shadow-2xl p-2 z-50 space-y-1 animate-in fade-in-50 zoom-in-95 duration-150">
-                  <div className="px-3 py-1.5 text-[10px] font-black uppercase text-amber-400 border-b border-slate-800/80 tracking-wider">
-                    Superstore Tools
-                  </div>
-
-                  {/* 1. Berger Paint Coverage & Cost Estimator */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsEstimatorOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-amber-500/15 text-left text-xs font-bold text-slate-200 hover:text-amber-300 transition flex items-center gap-2.5"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                      <Calculator className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-black">Paint Coverage Estimator</div>
-                      <div className="text-[10px] text-slate-400 truncate">Calculate litres, coats &amp; price</div>
-                    </div>
-                  </button>
-
-                  {/* 2. 3D Surface Color Visualizer */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsColorOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-emerald-500/15 text-left text-xs font-bold text-slate-200 hover:text-emerald-300 transition flex items-center gap-2.5"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                      <Palette className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-black">3D Color Visualizer</div>
-                      <div className="text-[10px] text-slate-400 truncate">Rooms, exteriors &amp; autos</div>
-                    </div>
-                  </button>
-
-                  {/* 3. Customer Imagination Studio */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsImaginationOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-purple-500/15 text-left text-xs font-bold text-slate-200 hover:text-purple-300 transition flex items-center gap-2.5"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-                      <Wand2 className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-black">Imagination &amp; Moods</div>
-                      <div className="text-[10px] text-slate-400 truncate">6 customer mood profiles</div>
-                    </div>
-                  </button>
-
-                  {/* 4. Self-Healing Diagnostics */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsDiagnosticsOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-teal-500/15 text-left text-xs font-bold text-slate-200 hover:text-teal-300 transition flex items-center gap-2.5"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
-                      <Activity className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-black">Self-Healing Diagnostics</div>
-                      <div className="text-[10px] text-slate-400 truncate">System health &amp; auto-repair</div>
-                    </div>
-                  </button>
-
-                  {/* 5. Request Custom Hardware */}
-                  <button
-                    onClick={() => {
-                      setIsMoreMenuOpen(false);
-                      setIsRequestOpen(true);
-                    }}
-                    className="w-full p-2.5 rounded-xl hover:bg-amber-500/15 text-left text-xs font-bold text-slate-200 hover:text-amber-300 transition flex items-center gap-2.5 border-t border-slate-800/80 pt-2"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center shrink-0">
-                      <ClipboardList className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="truncate font-black">Request Unlisted Item</div>
-                      <div className="text-[10px] text-slate-400 truncate">Special paints &amp; hardware</div>
-                    </div>
-                  </button>
-                </div>
-              )}
-            </div>
-
             {/* Day / Night Mode Toggle */}
             <button
               onClick={toggleThemeMode}
@@ -297,7 +155,7 @@ export function Navbar() {
               {isLightMode ? <Moon className="w-4 h-4 text-slate-300" /> : <Sun className="w-4 h-4 text-amber-400" />}
             </button>
 
-            {/* Live Cart Button (Always visible, prominent & tap-friendly) */}
+            {/* Live Cart Button */}
             <Link
               href="/cart"
               className="relative flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black text-xs transition shadow-md shrink-0"
@@ -308,13 +166,13 @@ export function Navbar() {
                 {itemCount}
               </span>
               {reservationTimeLeft > 0 && (
-                <span className="hidden xl:inline bg-slate-950/20 text-slate-950 font-mono text-[10px] px-1.5 py-0.5 rounded">
+                <span className="hidden lg:inline bg-slate-950/20 text-slate-950 font-mono text-[10px] px-1.5 py-0.5 rounded">
                   ⏱ {formatTimer(reservationTimeLeft)}
                 </span>
               )}
             </Link>
 
-            {/* Desktop Auth / User */}
+            {/* Desktop Auth / User Button */}
             {user ? (
               <div className="hidden md:flex items-center gap-1.5">
                 {isAdmin ? (
@@ -351,147 +209,246 @@ export function Navbar() {
               </button>
             )}
 
-            {/* Mobile Menu Button (Hamburger) */}
+            {/* ☰ MAIN MENU BUTTON (The marked box containing all essential tools) */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 transition"
-              aria-label="Open menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`p-2 sm:p-2.5 rounded-xl border transition flex items-center justify-center ${
+                menuOpen
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-black'
+                  : 'bg-slate-900 border-slate-800 text-slate-200 hover:text-amber-400 hover:border-amber-500/40'
+              }`}
+              title="Open Navigation & Superstore Tools Menu"
+              aria-label="Navigation Menu"
             >
-              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Slide-Down Drawer Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-slate-950/98 border-t border-slate-800 px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
-            {/* Mobile Search Box inside menu */}
-            <form onSubmit={handleSearchSubmit} className="flex gap-2">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search paints, glues, tools..."
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
-                />
-                <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-2.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md"
-              >
-                Search
-              </button>
-            </form>
-
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              {/* Berger Estimator */}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsEstimatorOpen(true);
-                }}
-                className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-black flex items-center justify-between text-left"
-              >
-                <span>📐 Paint Estimator</span>
-                <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsColorOpen(true);
-                }}
-                className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>🎨 3D Visualizer</span>
-                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsImaginationOpen(true);
-                }}
-                className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>✨ Imagination Studio</span>
-                <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsDiagnosticsOpen(true);
-                }}
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>🛡️ Self-Healing Health</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setIsRequestOpen(true);
-                }}
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
-              >
-                <span>📋 Request Item</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              </button>
-
-              <Link
-                href="/products"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between"
-              >
-                <span>📦 All Products</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              </Link>
-            </div>
-
-            {/* Mobile Auth Button */}
-            <div className="pt-2 border-t border-slate-800/80">
-              {user ? (
-                <div className="flex items-center justify-between">
-                  <div className="text-xs">
-                    <span className="text-slate-400 block text-[10px]">Logged in as</span>
-                    <span className="font-bold text-white">{user.name || user.phone}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-400 rounded-xl text-xs font-bold"
-                      >
-                        Admin
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => {
-                        logout();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold"
-                    >
-                      Logout
-                    </button>
-                  </div>
+        {/* ☰ FULL-FEATURED MENU DRAWER PANEL */}
+        {menuOpen && (
+          <div className="bg-slate-950/98 backdrop-blur-2xl border-t border-slate-800/90 px-4 sm:px-6 lg:px-8 py-5 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+            <div className="max-w-7xl mx-auto space-y-4">
+              {/* Search Bar inside Menu (for Mobile / Quick Search) */}
+              <form onSubmit={handleSearchSubmit} className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search Berger paints, PUR glue, spray, padlocks..."
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                  />
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 </div>
-              ) : (
                 <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    openAuthModal('login');
-                  }}
-                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg"
+                  type="submit"
+                  className="px-4 py-2.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md"
                 >
-                  <User className="w-4 h-4" /> Login or Register Account
+                  Search
                 </button>
-              )}
+              </form>
+
+              {/* 🛠️ THE 6 CORE REQUIRED TOOLS IN THIS BOX */}
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-black uppercase text-amber-400 tracking-wider">
+                  Superstore Tools &amp; Features
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {/* 1. Paint Coverage & Cost Estimator */}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsEstimatorOpen(true);
+                    }}
+                    className="p-3.5 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <Calculator className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-amber-300 transition truncate">
+                          1. Paint Coverage Estimator
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          Exact litres, gallons, coats &amp; price
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition shrink-0" />
+                  </button>
+
+                  {/* 2. 3D Architectural Visualizer */}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsColorOpen(true);
+                    }}
+                    className="p-3.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <Palette className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-emerald-300 transition truncate">
+                          2. 3D Color Visualizer
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          Photorealistic rooms, exteriors &amp; autos
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition shrink-0" />
+                  </button>
+
+                  {/* 3. Customer Imagination & Mood Studio */}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsImaginationOpen(true);
+                    }}
+                    className="p-3.5 rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-500 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <Wand2 className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-purple-300 transition truncate">
+                          3. Imagination &amp; Moods
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          6 emotional profiles &amp; AI project kits
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-purple-400 group-hover:translate-x-0.5 transition shrink-0" />
+                  </button>
+
+                  {/* 4. Self-Healing Health Center */}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsDiagnosticsOpen(true);
+                    }}
+                    className="p-3.5 rounded-2xl bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 hover:border-teal-500 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <Activity className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-teal-300 transition truncate">
+                          4. Self-Healing Diagnostics
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          100% Health score &amp; live repair stream
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-teal-400 group-hover:translate-x-0.5 transition shrink-0" />
+                  </button>
+
+                  {/* 5. Request Custom Hardware / Unlisted Item */}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsRequestOpen(true);
+                    }}
+                    className="p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-slate-800 text-amber-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <ClipboardList className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-amber-300 transition truncate">
+                          5. Request Unlisted Item
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          Special order paints, pur glues &amp; tools
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+                  </button>
+
+                  {/* 6. All Products Catalog */}
+                  <Link
+                    href="/products"
+                    onClick={() => setMenuOpen(false)}
+                    className="p-3.5 rounded-2xl bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 text-left transition flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-slate-800 text-amber-400 flex items-center justify-center font-bold shrink-0 group-hover:scale-110 transition">
+                        <Package className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-black text-white group-hover:text-amber-300 transition truncate">
+                          6. All Products Catalog
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          Browse complete Pakundia inventory
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-0.5 transition shrink-0" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Order Tracking & Auth */}
+              <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <Link
+                  href="/track-order"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white text-xs font-bold flex items-center justify-center gap-2"
+                >
+                  <Truck className="w-4 h-4 text-amber-400" />
+                  <span>🚚 Track Order &amp; Invoice Status</span>
+                </Link>
+
+                {user ? (
+                  <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3 text-xs">
+                    <span className="text-slate-400">
+                      Logged in: <strong className="text-white">{user.name || user.phone}</strong>
+                    </span>
+                    <div className="flex gap-2">
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 text-amber-400 rounded-xl font-bold"
+                        >
+                          Admin
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout();
+                          setMenuOpen(false);
+                        }}
+                        className="px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 text-rose-400 rounded-xl font-bold"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      openAuthModal('login');
+                    }}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <User className="w-4 h-4" /> Login or Register Account
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
