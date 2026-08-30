@@ -166,14 +166,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. ✨ CUSTOMER IMAGINATION & MOOD STUDIO (Pillar 3 Showcase) */}
+      {/* 2. ✨ CUSTOMER IMAGINATION & MOOD STUDIO */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ImaginationStudio />
-      </section>
-
-      {/* 3. 📐 INTERACTIVE PAINT COVERAGE & COST ESTIMATOR (Pillar 1 Feature) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ProjectEstimatorCalculator />
       </section>
 
       {/* 4. ✨ NEW ARRIVALS & FRESH INVENTORY SECTION */}

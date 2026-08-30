@@ -12,9 +12,16 @@ import {
   ShoppingCart,
   Sparkles,
   ArrowRight,
+  X,
 } from 'lucide-react';
 
-export function ProjectEstimatorCalculator() {
+interface Props {
+  isModal?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export function ProjectEstimatorCalculator({ isModal = false, isOpen = true, onClose }: Props) {
   const { addItem } = useCart();
 
   const [lengthFeet, setLengthFeet] = useState<number>(14);
@@ -23,6 +30,8 @@ export function ProjectEstimatorCalculator() {
   const [coats, setCoats] = useState<number>(2);
   const [surfaceType, setSurfaceType] = useState<'interior' | 'exterior' | 'wood_metal'>('interior');
   const [added, setAdded] = useState<boolean>(false);
+
+  if (isModal && !isOpen) return null;
 
   // Calculations
   const grossArea = lengthFeet * heightFeet * 4; // 4 walls of standard room
@@ -66,16 +75,16 @@ export function ProjectEstimatorCalculator() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  return (
-    <div className="glass-panel rounded-3xl p-5 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6 shadow-2xl">
+  const calculatorCard = (
+    <div className="glass-panel rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-800 space-y-5 shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold">
-            <Calculator className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center font-bold">
+            <Calculator className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+            <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
               Berger Paint Coverage &amp; Cost Estimator
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -83,15 +92,25 @@ export function ProjectEstimatorCalculator() {
             </p>
           </div>
         </div>
-        <span className="hidden sm:inline-flex items-center gap-1 text-xs font-black text-amber-500 dark:text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-          <Sparkles className="w-3.5 h-3.5" /> Instant Accuracy
-        </span>
+
+        {isModal ? (
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        ) : (
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs font-black text-amber-500 dark:text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+            <Sparkles className="w-3.5 h-3.5" /> Instant Accuracy
+          </span>
+        )}
       </div>
 
       {/* Input Form Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-bold">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs font-bold">
         {/* Room Dimensions */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label className="text-slate-700 dark:text-slate-300">Room Wall Length (Feet):</label>
           <input
             type="number"
@@ -103,7 +122,7 @@ export function ProjectEstimatorCalculator() {
           />
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label className="text-slate-700 dark:text-slate-300">Wall Height (Feet):</label>
           <input
             type="number"
@@ -115,7 +134,7 @@ export function ProjectEstimatorCalculator() {
           />
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <label className="text-slate-700 dark:text-slate-300">Coats Needed:</label>
           <select
             value={coats}
@@ -176,7 +195,7 @@ export function ProjectEstimatorCalculator() {
 
         <button
           onClick={handleAddEstimateToCart}
-          className="w-full sm:w-auto px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-md shrink-0"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-md shrink-0"
         >
           {added ? (
             <>
@@ -191,4 +210,17 @@ export function ProjectEstimatorCalculator() {
       </div>
     </div>
   );
+
+  if (isModal) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md" onClick={onClose} />
+        <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto z-10">
+          {calculatorCard}
+        </div>
+      </div>
+    );
+  }
+
+  return calculatorCard;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,7 @@ import { RequestItemModal } from './RequestItemModal';
 import { AuthModal } from './AuthModal';
 import { ImaginationStudio } from './ImaginationStudio';
 import { SelfHealingDiagnosticsModal } from './SelfHealingDiagnosticsModal';
+import { ProjectEstimatorCalculator } from './ProjectEstimatorCalculator';
 import {
   ShoppingCart,
   Search,
@@ -28,6 +29,8 @@ import {
   Sparkles,
   Wand2,
   Activity,
+  Calculator,
+  MoreVertical,
 } from 'lucide-react';
 
 export function Navbar() {
@@ -38,9 +41,24 @@ export function Navbar() {
   const [isRequestOpen, setIsRequestOpen] = useState(false);
   const [isImaginationOpen, setIsImaginationOpen] = useState(false);
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
+  const [isEstimatorOpen, setIsEstimatorOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLightMode, setIsLightMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close 3-dot dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setIsMoreMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load Day / Night mode from localStorage on mount
   useEffect(() => {
@@ -138,7 +156,7 @@ export function Navbar() {
             <Search className="w-4 h-4 text-slate-500 absolute left-3.5 pointer-events-none" />
           </form>
 
-          {/* Action Tools (Adaptive & Compact) */}
+          {/* Action Tools */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop: Imagination Studio */}
             <button
@@ -160,25 +178,115 @@ export function Navbar() {
               <span>3D Visualizer</span>
             </button>
 
-            {/* Desktop: Self-Healing Diagnostics */}
-            <button
-              onClick={() => setIsDiagnosticsOpen(true)}
-              className="hidden xl:flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-emerald-400 text-xs font-bold transition"
-              title="Autonomous Self-Healing Health Center"
-            >
-              <Activity className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Health</span>
-            </button>
+            {/* 3-Dot More Tools Dropdown Menu (Accessible on Desktop & Mobile) */}
+            <div className="relative" ref={moreMenuRef}>
+              <button
+                onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                className={`p-2 sm:p-2.5 rounded-xl border transition flex items-center justify-center ${
+                  isMoreMenuOpen
+                    ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                    : 'bg-slate-900 border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-amber-400'
+                }`}
+                title="More Superstore Tools & Estimator"
+                aria-label="More Options"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
 
-            {/* Desktop: Request Item */}
-            <button
-              onClick={() => setIsRequestOpen(true)}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-amber-400 text-xs font-bold transition"
-              title="Request unlisted paint/hardware"
-            >
-              <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
-              <span>Request Item</span>
-            </button>
+              {/* 3-Dot Dropdown Panel */}
+              {isMoreMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-slate-950/98 backdrop-blur-2xl border border-slate-800 shadow-2xl p-2 z-50 space-y-1 animate-in fade-in-50 zoom-in-95 duration-150">
+                  <div className="px-3 py-1.5 text-[10px] font-black uppercase text-amber-400 border-b border-slate-800/80 tracking-wider">
+                    Superstore Tools
+                  </div>
+
+                  {/* 1. Berger Paint Coverage & Cost Estimator */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      setIsEstimatorOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-amber-500/15 text-left text-xs font-bold text-slate-200 hover:text-amber-300 transition flex items-center gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <Calculator className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-black">Paint Coverage Estimator</div>
+                      <div className="text-[10px] text-slate-400 truncate">Calculate litres, coats &amp; price</div>
+                    </div>
+                  </button>
+
+                  {/* 2. 3D Surface Color Visualizer */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      setIsColorOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-emerald-500/15 text-left text-xs font-bold text-slate-200 hover:text-emerald-300 transition flex items-center gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                      <Palette className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-black">3D Color Visualizer</div>
+                      <div className="text-[10px] text-slate-400 truncate">Rooms, exteriors &amp; autos</div>
+                    </div>
+                  </button>
+
+                  {/* 3. Customer Imagination Studio */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      setIsImaginationOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-purple-500/15 text-left text-xs font-bold text-slate-200 hover:text-purple-300 transition flex items-center gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                      <Wand2 className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-black">Imagination &amp; Moods</div>
+                      <div className="text-[10px] text-slate-400 truncate">6 customer mood profiles</div>
+                    </div>
+                  </button>
+
+                  {/* 4. Self-Healing Diagnostics */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      setIsDiagnosticsOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-teal-500/15 text-left text-xs font-bold text-slate-200 hover:text-teal-300 transition flex items-center gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center shrink-0">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-black">Self-Healing Diagnostics</div>
+                      <div className="text-[10px] text-slate-400 truncate">System health &amp; auto-repair</div>
+                    </div>
+                  </button>
+
+                  {/* 5. Request Custom Hardware */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      setIsRequestOpen(true);
+                    }}
+                    className="w-full p-2.5 rounded-xl hover:bg-amber-500/15 text-left text-xs font-bold text-slate-200 hover:text-amber-300 transition flex items-center gap-2.5 border-t border-slate-800/80 pt-2"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center shrink-0">
+                      <ClipboardList className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-black">Request Unlisted Item</div>
+                      <div className="text-[10px] text-slate-400 truncate">Special paints &amp; hardware</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Day / Night Mode Toggle */}
             <button
@@ -278,14 +386,15 @@ export function Navbar() {
             </form>
 
             <div className="grid grid-cols-2 gap-2 pt-1">
+              {/* Berger Estimator */}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  setIsImaginationOpen(true);
+                  setIsEstimatorOpen(true);
                 }}
-                className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center justify-between text-left"
+                className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-black flex items-center justify-between text-left"
               >
-                <span>✨ Imagination Studio</span>
+                <span>📐 Paint Estimator</span>
                 <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
               </button>
 
@@ -303,11 +412,22 @@ export function Navbar() {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
+                  setIsImaginationOpen(true);
+                }}
+                className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold flex items-center justify-between text-left"
+              >
+                <span>✨ Imagination Studio</span>
+                <ChevronRight className="w-3.5 h-3.5 text-purple-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
                   setIsDiagnosticsOpen(true);
                 }}
                 className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between text-left"
               >
-                <span>🛡️ Self-Healing Diagnostics</span>
+                <span>🛡️ Self-Healing Health</span>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
               </button>
 
@@ -328,14 +448,6 @@ export function Navbar() {
                 className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between"
               >
                 <span>📦 All Products</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              </Link>
-              <Link
-                href="/track-order"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-bold flex items-center justify-between"
-              >
-                <span>🚚 Track Order</span>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
               </Link>
             </div>
@@ -390,6 +502,7 @@ export function Navbar() {
       <RequestItemModal isOpen={isRequestOpen} onClose={() => setIsRequestOpen(false)} />
       <ImaginationStudio isModal isOpen={isImaginationOpen} onClose={() => setIsImaginationOpen(false)} />
       <SelfHealingDiagnosticsModal isOpen={isDiagnosticsOpen} onClose={() => setIsDiagnosticsOpen(false)} />
+      <ProjectEstimatorCalculator isModal isOpen={isEstimatorOpen} onClose={() => setIsEstimatorOpen(false)} />
       <AuthModal />
     </>
   );

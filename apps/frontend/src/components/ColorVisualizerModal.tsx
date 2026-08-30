@@ -14,6 +14,9 @@ import {
   Calculator,
   Brush,
   ShoppingBag,
+  Sliders,
+  Layers,
+  Eye,
 } from 'lucide-react';
 import { formatCurrency } from '../lib/utils';
 
@@ -23,6 +26,7 @@ interface Props {
 }
 
 type SceneType = 'living' | 'bedroom' | 'exterior' | 'cng_rickshaw';
+type FinishType = 'gloss' | 'satin' | 'matte';
 
 interface PaintColor {
   name: string;
@@ -53,15 +57,16 @@ export function ColorVisualizerModal({ isOpen, onClose }: Props) {
   const [activeScene, setActiveScene] = useState<SceneType>('living');
   const [selectedColor, setSelectedColor] = useState<PaintColor>(colorPalettes[0]);
   const [lighting, setLighting] = useState<'daylight' | 'warm' | 'cool'>('daylight');
+  const [finish, setFinish] = useState<FinishType>('gloss');
 
   if (!isOpen) return null;
 
   const getLightingFilter = () => {
     switch (lighting) {
       case 'warm':
-        return 'sepia(30%) saturate(130%) brightness(95%)';
+        return 'sepia(25%) saturate(125%) brightness(98%)';
       case 'cool':
-        return 'saturate(95%) brightness(105%) hue-rotate(5deg)';
+        return 'saturate(95%) brightness(105%) hue-rotate(6deg)';
       case 'daylight':
       default:
         return 'none';
@@ -81,14 +86,14 @@ export function ColorVisualizerModal({ isOpen, onClose }: Props) {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <h3 className="text-base sm:text-lg lg:text-xl font-black text-white truncate">
-                  3D Surface Color Visualizer
+                  3D Architectural Surface Visualizer
                 </h3>
                 <span className="hidden xs:inline px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase shrink-0">
-                  Berger &amp; Aqua
+                  Berger &amp; Aqua Pro
                 </span>
               </div>
               <p className="text-[11px] sm:text-xs text-slate-400 truncate">
-                Preview real wall shades &amp; auto rickshaw paint finishes
+                Photorealistic lighting, specular gloss reflections &amp; real shade mapping
               </p>
             </div>
           </div>
@@ -100,324 +105,402 @@ export function ColorVisualizerModal({ isOpen, onClose }: Props) {
           </button>
         </div>
 
-        {/* Scene Selector & Lighting Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-3 rounded-2xl border border-slate-800 text-xs">
-          {/* Scenes */}
-          <div className="flex items-center gap-1.5 overflow-x-auto">
-            <span className="text-slate-400 font-bold text-[11px] mr-1">Choose Room / Object:</span>
-            {[
-              { id: 'living', label: '🛋️ Modern Living Room' },
-              { id: 'bedroom', label: '🛏️ Master Bedroom' },
-              { id: 'exterior', label: '🏡 Building Exterior' },
-              { id: 'cng_rickshaw', label: '🛺 Auto Rickshaw & Gate' },
-            ].map((sc) => (
+        {/* Controls: Scene Selector, Lighting & Specular Finish */}
+        <div className="space-y-3 bg-slate-950/90 p-3 sm:p-4 rounded-2xl border border-slate-800 text-xs">
+          {/* Scenes Row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+              <span className="text-slate-400 font-bold text-[11px] mr-1 shrink-0">Room / Surface:</span>
+              {[
+                { id: 'living', label: '🛋️ Modern Living Room' },
+                { id: 'bedroom', label: '🛏️ Master Bedroom Suite' },
+                { id: 'exterior', label: '🏡 Villa Building Facade' },
+                { id: 'cng_rickshaw', label: '🛺 Auto Rickshaw & Steel' },
+              ].map((sc) => (
+                <button
+                  key={sc.id}
+                  onClick={() => setActiveScene(sc.id as SceneType)}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap text-xs ${
+                    activeScene === sc.id
+                      ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                      : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                  }`}
+                >
+                  {sc.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Lighting & Finish Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
+            {/* Lighting */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-400 font-bold text-[11px] mr-1">Lighting:</span>
               <button
-                key={sc.id}
-                onClick={() => setActiveScene(sc.id as SceneType)}
-                className={`px-3 py-2 rounded-xl font-bold transition whitespace-nowrap ${
-                  activeScene === sc.id
-                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                    : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                onClick={() => setLighting('daylight')}
+                className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1 ${
+                  lighting === 'daylight'
+                    ? 'bg-sky-500/20 border-sky-400 text-sky-300'
+                    : 'bg-slate-900 border-slate-800 text-slate-400'
                 }`}
               >
-                {sc.label}
+                <Sun className="w-3.5 h-3.5 text-amber-400" /> 6500K True Daylight
               </button>
-            ))}
-          </div>
+              <button
+                onClick={() => setLighting('warm')}
+                className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition flex items-center gap-1 ${
+                  lighting === 'warm'
+                    ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                    : 'bg-slate-900 border-slate-800 text-slate-400'
+                }`}
+              >
+                <Lamp className="w-3.5 h-3.5 text-amber-400" /> 3000K Warm Evening
+              </button>
+            </div>
 
-          {/* Lighting Mode */}
-          <div className="flex items-center gap-1.5 border-t sm:border-t-0 sm:border-l border-slate-800 pt-2 sm:pt-0 sm:pl-3">
-            <span className="text-slate-400 font-bold text-[11px] mr-1">Lighting:</span>
-            <button
-              onClick={() => setLighting('daylight')}
-              title="Daylight (6500K True Solar)"
-              className={`px-2.5 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1 ${
-                lighting === 'daylight'
-                  ? 'bg-sky-500/20 border-sky-400 text-sky-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
-              }`}
-            >
-              <Sun className="w-3.5 h-3.5 text-amber-400" /> Daylight
-            </button>
-            <button
-              onClick={() => setLighting('warm')}
-              title="Warm Evening Lamp"
-              className={`px-2.5 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1 ${
-                lighting === 'warm'
-                  ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
-              }`}
-            >
-              <Lamp className="w-3.5 h-3.5 text-amber-400" /> Warm
-            </button>
+            {/* Specular Paint Finish */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-400 font-bold text-[11px] mr-1">Paint Finish:</span>
+              {[
+                { id: 'gloss', label: '✨ Super High Gloss (88+ GU)' },
+                { id: 'satin', label: '🌟 Silk Satin Sheen' },
+                { id: 'matte', label: '🛡️ Velvet Matte' },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setFinish(f.id as FinishType)}
+                  className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold transition ${
+                    finish === f.id
+                      ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                      : 'bg-slate-900 border-slate-800 text-slate-400'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* 🎨 REALISTIC VISUAL CANVAS WITH OBJECTS & FURNITURE */}
+        {/* 🎨 PHOTOREALISTIC ARCHITECTURAL CANVAS */}
         <div
-          className="relative h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-slate-800 shadow-2xl transition-all duration-500 select-none flex flex-col justify-between"
+          className="relative h-80 sm:h-[420px] rounded-3xl overflow-hidden border-2 border-slate-800 shadow-2xl transition-all duration-700 select-none"
           style={{ filter: getLightingFilter() }}
         >
-          {/* 1. SCENE: MODERN LIVING ROOM */}
+          {/* ========================================================
+              1. SCENE: PHOTOREALISTIC MODERN LIVING ROOM
+             ======================================================== */}
           {activeScene === 'living' && (
-            <div className="absolute inset-0 transition-colors duration-700" style={{ backgroundColor: selectedColor.hex }}>
-              {/* Ceiling */}
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/95 to-slate-200 border-b border-slate-400/30 flex items-center justify-center">
-                <div className="w-32 h-1.5 bg-amber-400/80 rounded-full blur-xs" />
-              </div>
-
-              {/* Wooden Flooring */}
-              <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-amber-950 via-amber-900 to-amber-800/90 border-t-4 border-amber-950/80 shadow-2xl flex items-center justify-center">
-                <div className="w-64 h-12 bg-slate-900/60 rounded-full blur-md" />
-              </div>
-
-              {/* Wall Art Frame on the Painted Wall */}
-              <div className="absolute top-24 left-1/2 -translate-x-1/2 w-44 h-28 rounded-xl border-4 border-slate-900 bg-slate-950/90 shadow-2xl p-2 flex flex-col items-center justify-center text-center space-y-1">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div className="text-[11px] font-black text-white">{selectedColor.name}</div>
-                <div className="text-[9px] font-mono text-amber-400 font-bold">{selectedColor.code} • {selectedColor.brand}</div>
-              </div>
-
-              {/* Real Living Room Furniture: Modern Couch & Plant */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-80 sm:w-96 flex flex-col items-center z-10 pointer-events-none">
-                {/* Couch Body */}
-                <div className="w-full h-24 bg-gradient-to-t from-slate-900 via-slate-800 to-slate-700 rounded-3xl border-2 border-slate-600/80 shadow-2xl p-3 flex justify-between items-end">
-                  <div className="w-20 h-12 bg-slate-700 rounded-2xl border border-slate-600 flex items-center justify-center text-[10px] text-slate-300 font-bold">Cushion</div>
-                  <div className="w-24 h-12 bg-amber-500/20 rounded-2xl border border-amber-500/40 flex items-center justify-center text-[10px] text-amber-300 font-bold">Silk Pillow</div>
-                  <div className="w-20 h-12 bg-slate-700 rounded-2xl border border-slate-600 flex items-center justify-center text-[10px] text-slate-300 font-bold">Cushion</div>
-                </div>
-                {/* Couch Legs */}
-                <div className="w-72 flex justify-between px-4 pt-1">
-                  <div className="w-2.5 h-4 bg-amber-500 rounded-b" />
-                  <div className="w-2.5 h-4 bg-amber-500 rounded-b" />
-                </div>
-              </div>
-
-              {/* Floor Lamp & Plant on Sides */}
-              <div className="absolute bottom-12 left-8 z-10 flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-amber-300/60 blur-md" />
-                <div className="w-8 h-8 bg-amber-200 rounded-t-full border border-amber-400" />
-                <div className="w-1 h-28 bg-slate-800" />
-                <div className="w-6 h-2 bg-slate-900 rounded-full" />
-              </div>
-
-              <div className="absolute bottom-10 right-8 z-10 flex flex-col items-center">
-                <div className="text-2xl">🌿</div>
-                <div className="w-8 h-10 bg-amber-800 rounded-b-xl border border-amber-900" />
-              </div>
-            </div>
-          )}
-
-          {/* 2. SCENE: MASTER BEDROOM */}
-          {activeScene === 'bedroom' && (
-            <div className="absolute inset-0 transition-colors duration-700" style={{ backgroundColor: selectedColor.hex }}>
-              {/* Ambient Ceiling & Wall Glow */}
-              <div className="absolute top-0 left-0 right-0 h-14 bg-slate-900/40 backdrop-blur-xs border-b border-white/10" />
-
-              {/* Wooden Headboard Wall Mount */}
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 w-72 sm:w-80 h-36 bg-gradient-to-b from-amber-950 to-amber-900 rounded-t-3xl border-4 border-amber-900 shadow-2xl p-4 text-center">
-                <div className="text-xs font-black text-amber-300">{selectedColor.name}</div>
-                <div className="text-[10px] font-mono text-white/80">Master Bedroom Feature Headboard</div>
-              </div>
-
-              {/* Bed & Pillows */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-80 sm:w-96 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-800 rounded-t-3xl border-t-4 border-slate-700 shadow-2xl p-6 flex flex-col justify-between items-center z-10">
-                <div className="flex gap-4 mb-2">
-                  <div className="w-20 h-10 bg-white rounded-xl shadow border border-slate-300 flex items-center justify-center text-[10px] text-slate-800 font-bold">Pillow</div>
-                  <div className="w-20 h-10 bg-white rounded-xl shadow border border-slate-300 flex items-center justify-center text-[10px] text-slate-800 font-bold">Pillow</div>
-                </div>
-                <div className="text-xs font-black text-amber-400">Cozy Bedroom Suite • Silk Emulsion Sheen</div>
-              </div>
-
-              {/* Nightstand Lamps */}
-              <div className="absolute bottom-16 left-6 z-10 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-amber-400/40 blur-md" />
-                <div className="w-6 h-6 bg-amber-200 rounded-t-full" />
-                <div className="w-12 h-14 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">Drawer</div>
-              </div>
-
-              <div className="absolute bottom-16 right-6 z-10 flex flex-col items-center">
-                <div className="w-8 h-8 rounded-full bg-amber-400/40 blur-md" />
-                <div className="w-6 h-6 bg-amber-200 rounded-t-full" />
-                <div className="w-12 h-14 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">Drawer</div>
-              </div>
-            </div>
-          )}
-
-          {/* 3. SCENE: EXTERIOR BUILDING / VILLA */}
-          {activeScene === 'exterior' && (
-            <div className="absolute inset-0 transition-colors duration-700" style={{ backgroundColor: selectedColor.hex }}>
-              {/* Sky */}
-              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-sky-400 to-sky-200 flex items-center justify-between px-8">
-                <span className="text-2xl">☀️</span>
-                <span className="text-2xl opacity-70">☁️</span>
-              </div>
-
-              {/* Roof Gables & Trims */}
-              <div className="absolute top-20 left-0 right-0 h-8 bg-slate-950 border-b-4 border-amber-500 flex items-center justify-center">
-                <span className="text-[10px] font-black text-amber-400 tracking-widest uppercase">WeatherCoat All-Weather Facade</span>
-              </div>
-
-              {/* Villa Windows & Entryway Door */}
-              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-80 sm:w-96 flex justify-around items-end z-10">
-                {/* Left Window */}
-                <div className="w-18 h-24 bg-sky-200/90 border-4 border-slate-950 rounded-xl shadow-2xl flex items-center justify-center">
-                  <div className="w-full h-0.5 bg-slate-950" />
+            <div className="absolute inset-0 bg-slate-950 overflow-hidden">
+              {/* Back Wall with Dynamic Paint Shade */}
+              <div
+                className="absolute inset-0 transition-colors duration-700"
+                style={{ backgroundColor: selectedColor.hex }}
+              >
+                {/* Ceiling with Recessed Ambient Cove Light */}
+                <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-slate-100 via-slate-200/90 to-transparent flex items-center justify-center">
+                  <div className="w-3/4 h-1 bg-amber-200/80 rounded-full blur-[2px]" />
                 </div>
 
-                {/* Main Entry Door */}
-                <div className="w-24 h-40 bg-gradient-to-b from-amber-950 to-amber-900 border-4 border-slate-950 rounded-t-2xl shadow-2xl flex flex-col items-center justify-between p-3">
-                  <div className="w-4 h-4 rounded-full bg-amber-400 border border-amber-600" />
-                  <div className="text-[9px] font-bold text-amber-200">Main Door</div>
-                  <div className="w-12 h-1 bg-amber-400 rounded-full" />
-                </div>
+                {/* Left Floor-To-Ceiling Perspective Window Casting Real Light Rays */}
+                <div className="absolute top-0 left-0 bottom-24 w-32 bg-gradient-to-r from-white/30 via-white/10 to-transparent pointer-events-none transform -skew-x-6 origin-top" />
 
-                {/* Right Window */}
-                <div className="w-18 h-24 bg-sky-200/90 border-4 border-slate-950 rounded-xl shadow-2xl flex items-center justify-center">
-                  <div className="w-full h-0.5 bg-slate-950" />
-                </div>
-              </div>
-
-              {/* Front Lawn */}
-              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-emerald-800 to-emerald-600 border-t-2 border-emerald-900" />
-            </div>
-          )}
-
-          {/* 4. SCENE: AUTO RICKSHAW & COMMERCIAL GATE */}
-          {activeScene === 'cng_rickshaw' && (
-            <div className="absolute inset-0 bg-slate-900 flex items-center justify-center overflow-hidden">
-              {/* Background Garage / Shop Wall */}
-              <div className="absolute inset-0 bg-slate-950 opacity-90" />
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-slate-900 border border-slate-800 text-[10px] text-amber-400 font-bold z-10">
-                Commercial Metal / CNG Green Super Gloss Enamel
-              </div>
-
-              {/* Rendered Auto Rickshaw (CNG) Vehicle Body painted in selectedColor.hex */}
-              <div className="relative z-10 flex flex-col items-center">
-                {/* Canopy Roof */}
-                <div className="w-48 h-12 bg-slate-950 rounded-t-3xl border-2 border-slate-700 flex items-center justify-center text-[10px] font-black text-amber-400">
-                  Black Top Canopy
-                </div>
-
-                {/* Windshield Glass */}
-                <div className="w-44 h-16 bg-sky-200/80 border-x-4 border-slate-950 flex items-center justify-center">
-                  <span className="text-xs font-black text-slate-900">Front Windshield</span>
-                </div>
-
-                {/* Painted Metal Front Body */}
+                {/* Specular Paint Sheen Overlay based on Finish */}
                 <div
-                  className="w-56 h-28 rounded-b-3xl border-4 border-slate-950 shadow-2xl flex flex-col items-center justify-between p-3 transition-colors duration-500"
+                  className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
+                    finish === 'gloss'
+                      ? 'opacity-40 bg-gradient-to-tr from-transparent via-white/25 to-transparent'
+                      : finish === 'satin'
+                      ? 'opacity-20 bg-gradient-to-t from-transparent via-white/15 to-transparent'
+                      : 'opacity-5 bg-black/20'
+                  }`}
+                />
+
+                {/* Wall Moulding / Geometric Architectural Panels */}
+                <div className="absolute top-20 left-12 right-12 bottom-36 border border-white/20 rounded-2xl shadow-inner pointer-events-none" />
+
+                {/* Architectural Artwork Frame */}
+                <div className="absolute top-24 right-16 sm:right-28 w-36 sm:w-44 h-24 sm:h-28 rounded-xl border-4 border-slate-900 bg-slate-950 shadow-2xl p-2.5 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-amber-400 font-bold uppercase tracking-wider">Berger Original</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-black text-white truncate">{selectedColor.name}</div>
+                    <div className="text-[10px] text-slate-400 font-mono">{selectedColor.code}</div>
+                  </div>
+                </div>
+
+                {/* Parquet Hardwood Flooring */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 sm:h-36 bg-gradient-to-t from-[#2a1708] via-[#45270f] to-[#5c3514] border-t-2 border-[#1f1005] shadow-2xl">
+                  {/* Subtle Floor Plank Reflections */}
+                  <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]" />
+                  {/* Furniture Drop Shadow */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-80 sm:w-[480px] h-12 bg-black/60 rounded-full blur-xl" />
+                </div>
+
+                {/* Photorealistic Designer Sectional Sofa */}
+                <div className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 w-72 sm:w-[440px] z-10 pointer-events-none">
+                  {/* Sofa Backrest */}
+                  <div className="w-full h-16 bg-gradient-to-b from-[#334155] to-[#1e293b] rounded-t-3xl border-t border-slate-600 shadow-2xl flex justify-between px-6">
+                    <div className="w-1/3 h-full border-r border-slate-700/60" />
+                    <div className="w-1/3 h-full border-r border-slate-700/60" />
+                    <div className="w-1/3 h-full" />
+                  </div>
+                  {/* Sofa Cushion Seat */}
+                  <div className="w-full h-16 bg-gradient-to-b from-[#1e293b] to-[#0f172a] rounded-2xl border-t border-slate-500/50 shadow-2xl flex items-center justify-around px-4">
+                    {/* Plush Accent Throw Pillows */}
+                    <div className="w-16 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 shadow-lg border border-amber-500/40 transform -rotate-6" />
+                    <div className="w-16 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-400 shadow-lg border border-white/50" />
+                    <div className="w-16 h-10 rounded-xl bg-gradient-to-br from-teal-700 to-teal-900 shadow-lg border border-teal-500/40 transform rotate-6" />
+                  </div>
+                  {/* Metallic Legs */}
+                  <div className="flex justify-between px-6 pt-1">
+                    <div className="w-2.5 h-4 bg-gradient-to-b from-amber-400 to-amber-600 rounded-b shadow" />
+                    <div className="w-2.5 h-4 bg-gradient-to-b from-amber-400 to-amber-600 rounded-b shadow" />
+                  </div>
+                </div>
+
+                {/* Minimalist Floor Arc Lamp */}
+                <div className="absolute bottom-16 left-6 sm:left-12 z-10 pointer-events-none">
+                  <div className="w-10 h-10 rounded-full bg-amber-400/40 blur-lg" />
+                  <div className="w-8 h-6 bg-amber-300 rounded-t-full shadow-md border border-amber-200" />
+                  <div className="w-1 h-36 bg-gradient-to-b from-slate-700 to-slate-900 mx-auto" />
+                  <div className="w-8 h-2 bg-slate-900 rounded-full mx-auto shadow" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================
+              2. SCENE: PHOTOREALISTIC MASTER BEDROOM SUITE
+             ======================================================== */}
+          {activeScene === 'bedroom' && (
+            <div className="absolute inset-0 bg-slate-950 overflow-hidden">
+              <div
+                className="absolute inset-0 transition-colors duration-700"
+                style={{ backgroundColor: selectedColor.hex }}
+              >
+                {/* Ceiling Cove Lighting */}
+                <div className="absolute top-0 left-0 right-0 h-14 bg-gradient-to-b from-slate-100/95 to-transparent flex justify-center">
+                  <div className="w-2/3 h-1 bg-amber-300/80 rounded-full blur-[2px]" />
+                </div>
+
+                {/* Wall Niche with Acoustic Wooden Slats */}
+                <div className="absolute top-14 left-8 right-8 bottom-32 rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+                  <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(90deg,#000000,#000000_6px,transparent_6px,transparent_18px)]" />
+                </div>
+
+                {/* Headboard Upholstered Feature Wall Panel */}
+                <div className="absolute top-24 left-1/2 -translate-x-1/2 w-72 sm:w-[420px] h-36 bg-gradient-to-b from-[#1e293b] to-[#0f172a] rounded-t-3xl border-t-2 border-x-2 border-slate-600/80 shadow-2xl p-4 flex flex-col justify-between items-center text-center">
+                  <div className="text-xs font-black text-amber-400 font-mono tracking-wider">
+                    {selectedColor.brand} • {selectedColor.name}
+                  </div>
+                  <div className="text-[10px] text-slate-300 font-medium">
+                    Velvet Smooth Silk Emulsion Finish
+                  </div>
+                </div>
+
+                {/* Bed Platform & Linen */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-80 sm:w-[460px] h-32 bg-gradient-to-t from-[#020617] via-[#0f172a] to-[#1e293b] rounded-t-3xl border-t-2 border-slate-500 shadow-2xl p-4 z-10 flex flex-col justify-between items-center">
+                  <div className="flex gap-4 -mt-6">
+                    <div className="w-20 h-10 bg-gradient-to-b from-white to-slate-200 rounded-xl shadow-lg border border-slate-300 transform -rotate-3" />
+                    <div className="w-20 h-10 bg-gradient-to-b from-white to-slate-200 rounded-xl shadow-lg border border-slate-300 transform rotate-3" />
+                  </div>
+                  <div className="w-full h-1 bg-amber-500/40 rounded-full" />
+                  <div className="text-[11px] font-bold text-slate-300">
+                    Master Bedroom Accent Wall • Anti-Fungal Protective Coating
+                  </div>
+                </div>
+
+                {/* Modern Pendant Sconces on Bedside */}
+                <div className="absolute top-20 left-14 z-10 pointer-events-none">
+                  <div className="w-0.5 h-16 bg-slate-400 mx-auto" />
+                  <div className="w-5 h-5 rounded-full bg-amber-400/90 shadow-[0_0_20px_#f59e0b]" />
+                </div>
+                <div className="absolute top-20 right-14 z-10 pointer-events-none">
+                  <div className="w-0.5 h-16 bg-slate-400 mx-auto" />
+                  <div className="w-5 h-5 rounded-full bg-amber-400/90 shadow-[0_0_20px_#f59e0b]" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================
+              3. SCENE: VILLA BUILDING EXTERIOR FACADE
+             ======================================================== */}
+          {activeScene === 'exterior' && (
+            <div className="absolute inset-0 bg-slate-950 overflow-hidden">
+              {/* Sky Background */}
+              <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#0284c7] via-[#38bdf8] to-[#bae6fd] flex items-center justify-between px-8">
+                <div className="w-12 h-12 rounded-full bg-amber-300/80 blur-md shadow-[0_0_40px_#fef08a]" />
+                <div className="text-3xl opacity-80">⛅</div>
+              </div>
+
+              {/* Concrete Villa Facade with Painted Texture */}
+              <div
+                className="absolute top-24 left-0 right-0 bottom-0 transition-colors duration-700"
+                style={{ backgroundColor: selectedColor.hex }}
+              >
+                {/* Roof Border Trim */}
+                <div className="absolute top-0 left-0 right-0 h-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-md flex items-center justify-center">
+                  <span className="text-[9px] font-mono text-amber-400 font-bold uppercase tracking-widest">
+                    Berger WeatherCoat Long Life Protection
+                  </span>
+                </div>
+
+                {/* Modern Architectural Balcony Glass & Frame */}
+                <div className="absolute top-10 left-12 right-12 h-32 rounded-2xl bg-white/10 backdrop-blur-md border border-white/40 shadow-2xl p-3 flex flex-col justify-between">
+                  <div className="flex justify-between items-center text-white">
+                    <span className="text-xs font-black drop-shadow">Exterior Facade Preview</span>
+                    <span className="px-2 py-0.5 rounded bg-black/40 text-[9px] font-mono text-amber-400">
+                      UV &amp; Heavy Rain Resistant
+                    </span>
+                  </div>
+                  {/* Glass Railing Posts */}
+                  <div className="flex justify-around border-t border-white/30 pt-2">
+                    <div className="w-1 h-12 bg-slate-300" />
+                    <div className="w-1 h-12 bg-slate-300" />
+                    <div className="w-1 h-12 bg-slate-300" />
+                  </div>
+                </div>
+
+                {/* Ground Landscaping */}
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#14532d] via-[#166534] to-[#15803d] border-t-2 border-emerald-900" />
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================
+              4. SCENE: AUTHENTIC CNG AUTO RICKSHAW & STEEL
+             ======================================================== */}
+          {activeScene === 'cng_rickshaw' && (
+            <div className="absolute inset-0 bg-slate-950 overflow-hidden flex flex-col justify-between">
+              {/* Workshop Studio Background */}
+              <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-slate-900 to-slate-800 border-b border-slate-700/60 p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-black text-white">Pakundia Commercial Enamel Studio</div>
+                  <div className="text-[10px] text-amber-400 font-mono">High Gloss Mirror Sheen (Berger / Aqua)</div>
+                </div>
+                <span className="px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black">
+                  Auto Rickshaw Coating
+                </span>
+              </div>
+
+              {/* Asphalt Road Ground */}
+              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-800 border-t border-slate-700">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-64 h-8 bg-black/70 rounded-full blur-lg" />
+              </div>
+
+              {/* CNG Auto Body Shell with Selected Enamel Paint */}
+              <div className="absolute top-24 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-48 z-10">
+                {/* Auto Rickshaw Curved Hood */}
+                <div
+                  className="w-full h-32 rounded-3xl border-4 border-slate-900 shadow-2xl relative overflow-hidden transition-colors duration-700"
                   style={{ backgroundColor: selectedColor.hex }}
                 >
-                  <div className="w-full flex justify-between items-center px-3">
-                    <div className="w-6 h-6 rounded-full bg-amber-300 border-2 border-slate-950 shadow flex items-center justify-center">💡</div>
-                    <div className="px-2 py-0.5 rounded bg-black/70 text-white font-mono text-[9px] font-black">{selectedColor.code}</div>
-                    <div className="w-6 h-6 rounded-full bg-amber-300 border-2 border-slate-950 shadow flex items-center justify-center">💡</div>
+                  {/* High Gloss Specular Automotive Reflection */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/35 to-transparent pointer-events-none" />
+                  {/* Front Grille */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-8 bg-slate-950 rounded-xl border border-slate-700 flex items-center justify-around px-2">
+                    <div className="w-4 h-4 rounded-full bg-amber-300 shadow-[0_0_10px_#f59e0b]" />
+                    <div className="w-12 h-1 bg-slate-600 rounded-full" />
+                    <div className="w-4 h-4 rounded-full bg-amber-300 shadow-[0_0_10px_#f59e0b]" />
                   </div>
-
-                  <div className="text-center font-black text-white text-xs drop-shadow">
+                  {/* Badge */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-950/90 border border-slate-700 text-[9px] font-black text-amber-400 font-mono">
                     {selectedColor.name}
-                  </div>
-
-                  <div className="w-24 h-4 bg-slate-950 rounded-md border border-slate-700 flex items-center justify-center text-[8px] font-mono text-amber-400">
-                    DHAKA METRO
                   </div>
                 </div>
 
-                {/* Front Wheel */}
-                <div className="w-14 h-8 bg-slate-950 rounded-b-full border-2 border-slate-700 flex items-center justify-center text-[8px] text-slate-400 font-bold">
-                  Tyre
+                {/* Front Chrome Bumper & Wheels */}
+                <div className="flex justify-between items-center px-4 -mt-2">
+                  <div className="w-12 h-12 rounded-full bg-slate-950 border-4 border-slate-700 shadow-2xl flex items-center justify-center">
+                    <div className="w-4 h-4 rounded-full bg-slate-500" />
+                  </div>
+                  <div className="flex-1 h-3 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 rounded-full shadow mx-2 border border-slate-300" />
+                  <div className="w-12 h-12 rounded-full bg-slate-950 border-4 border-slate-700 shadow-2xl flex items-center justify-center">
+                    <div className="w-4 h-4 rounded-full bg-slate-500" />
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Overlay Info Card */}
-          <div className="relative z-20 m-4 flex justify-between items-end pointer-events-none">
-            <div className="bg-slate-950/90 backdrop-blur-md border border-slate-800 rounded-2xl p-3.5 space-y-1 shadow-2xl">
-              <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider block">
-                Active Paint Color
-              </span>
-              <div className="text-base font-black text-white">{selectedColor.name}</div>
-              <div className="text-xs text-slate-300">
-                Code: <strong className="text-amber-400 font-mono">{selectedColor.code}</strong> • {selectedColor.brand}
-              </div>
-              <div className="text-[10px] text-slate-400 italic">
-                Best For: {selectedColor.popularFor}
+          {/* Active Shade Floating Info Badge */}
+          <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-slate-800/90 flex items-center justify-between text-white z-20 shadow-2xl">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                className="w-7 h-7 rounded-xl shrink-0 shadow-md border border-white/20"
+                style={{ backgroundColor: selectedColor.hex }}
+              />
+              <div className="min-w-0">
+                <div className="text-xs font-black truncate">{selectedColor.name}</div>
+                <div className="text-[10px] text-slate-400 font-mono truncate">
+                  {selectedColor.code} • {selectedColor.brand} • Finish: {finish.toUpperCase()}
+                </div>
               </div>
             </div>
 
-            <div className="px-3.5 py-2 rounded-xl bg-amber-500 text-slate-950 font-black text-xs shadow-xl flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" /> 100% Genuine Paint
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="text-right hidden sm:block">
+                <span className="text-[9px] text-slate-400 block">Estimated Can</span>
+                <span className="text-xs font-black text-amber-400 font-mono">
+                  {formatCurrency(selectedColor.estPrice)}
+                </span>
+              </div>
+
+              <Link
+                href="/products?category=synthetic-enamel-paints"
+                onClick={onClose}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1 shadow-md"
+              >
+                <span>Order Shade</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* 12 REAL BERGER & AQUA COLOR SWATCHES */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs text-slate-300 font-bold flex items-center gap-2">
-              <Brush className="w-4 h-4 text-amber-400" />
-              Click any color to paint the room / object:
-            </label>
-            <span className="text-[11px] text-slate-500 font-mono">12 Genuine Store Shades</span>
+        {/* 12 Genuine Paint Swatches Grid */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Palette className="w-4 h-4 text-amber-400" />
+              Click any genuine Berger or Aqua shade to paint:
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">12 Genuine Store Shades</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
-            {colorPalettes.map((c) => {
-              const isSelected = selectedColor.code === c.code;
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-48 overflow-y-auto pr-1">
+            {colorPalettes.map((col) => {
+              const isSelected = selectedColor.code === col.code;
               return (
                 <button
-                  key={c.code}
-                  onClick={() => setSelectedColor(c)}
-                  className={`p-2.5 rounded-2xl border text-left flex items-center gap-3 transition ${
+                  key={col.code}
+                  onClick={() => setSelectedColor(col)}
+                  className={`p-2.5 rounded-xl border text-left transition flex items-center gap-2.5 ${
                     isSelected
-                      ? 'border-amber-500 bg-amber-500/15 shadow-lg scale-[1.02]'
-                      : 'border-slate-800 bg-slate-950/80 hover:border-slate-700'
+                      ? 'border-amber-500 bg-amber-500/15 shadow-md ring-1 ring-amber-500'
+                      : 'border-slate-800 bg-slate-900/80 hover:border-slate-700'
                   }`}
                 >
                   <div
-                    className="w-9 h-9 rounded-xl border border-white/20 shrink-0 shadow-md flex items-center justify-center"
-                    style={{ backgroundColor: c.hex }}
+                    className="w-8 h-8 rounded-lg shrink-0 shadow-md border border-black/30 flex items-center justify-center"
+                    style={{ backgroundColor: col.hex }}
                   >
-                    {isSelected && <Check className="w-5 h-5 text-white drop-shadow-md" />}
+                    {isSelected && <Check className="w-4 h-4 text-white drop-shadow-md" />}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-slate-100 truncate">{c.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">
-                      {c.code} • <span className="text-amber-400">{c.brand.split(' ')[0]}</span>
-                    </div>
+                    <div className="text-xs font-black text-white truncate">{col.name}</div>
+                    <div className="text-[10px] text-slate-400 font-mono truncate">{col.code}</div>
+                    <div className="text-[9px] text-amber-400 font-bold truncate">{col.brand}</div>
                   </div>
                 </button>
               );
             })}
           </div>
-        </div>
-
-        {/* Smart Paint Calculation & 1-Click Order Link */}
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-emerald-500/15 to-teal-500/15 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Calculator className="w-4 h-4 text-amber-400" />
-              <strong className="text-white text-xs">Estimated Paint Required for Room / Vehicle:</strong>
-            </div>
-            <p className="text-slate-300 text-[11px]">
-              2 Coats of <strong className="text-amber-300">{selectedColor.name}</strong> = Approx.{' '}
-              <strong className="text-emerald-400 font-mono">{selectedColor.litresNeeded} Litres ({formatCurrency(selectedColor.estPrice)})</strong>. Fresh stock ready in Pakundia Bazar.
-            </p>
-          </div>
-
-          <Link
-            href={`/products?search=${encodeURIComponent(selectedColor.brand.split(' ')[0])}`}
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black text-xs transition shadow-lg flex items-center gap-1.5 shrink-0 justify-center"
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Order This Paint Now</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
       </div>
     </div>
