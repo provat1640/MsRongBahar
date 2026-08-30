@@ -350,7 +350,13 @@ export default function AdminControlPanel() {
   useEffect(() => {
     try {
       const combined = getCombinedProductsList();
-      setProductsList(combined);
+      const cleanProducts = combined.filter(
+        (p: Product) => !['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'].includes(p.id)
+      );
+      setProductsList(cleanProducts);
+      if (cleanProducts.length !== combined.length) {
+        localStorage.setItem('rong_bahar_products_list', JSON.stringify(cleanProducts));
+      }
 
       const savedOrders = localStorage.getItem('rong_bahar_all_orders');
       if (savedOrders) {
@@ -1967,18 +1973,19 @@ export default function AdminControlPanel() {
                       key={product.id}
                       className="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden transition shadow-xs"
                     >
-                      {/* Product Header Row */}
-                      <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                          <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0 flex items-center justify-center relative group">
+                      {/* Product Header Card Block */}
+                      <div className="p-4 sm:p-5 flex flex-col gap-3.5">
+                        {/* Top: Photo Thumbnail + Product Info */}
+                        <div className="flex items-start gap-3.5 min-w-0">
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0 relative group flex items-center justify-center">
                             {coverImage ? (
-                              <img src={coverImage} alt="" className="w-full h-full object-cover" />
+                              <img src={coverImage} alt={product.title} className="w-full h-full object-cover" />
                             ) : (
                               <Package className="w-7 h-7 text-slate-400" />
                             )}
                             <button
                               onClick={() => handleOpenEditModal(product)}
-                              className="absolute inset-0 bg-slate-950/70 text-amber-400 font-black text-[9px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                              className="absolute inset-0 bg-slate-950/80 text-amber-400 font-bold text-[9px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
                               title="Edit product photos"
                             >
                               <Camera className="w-4 h-4 mb-0.5" />
@@ -1986,43 +1993,25 @@ export default function AdminControlPanel() {
                             </button>
                           </div>
 
-                          <div className="min-w-0 flex-1 space-y-1">
-                            {/* Inline Editable Product Title */}
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                defaultValue={product.title}
-                                onBlur={(e) => {
-                                  if (e.target.value.trim() && e.target.value !== product.title) {
-                                    handleInlineUpdateProduct(product.id, 'title', e.target.value.trim());
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    (e.target as HTMLInputElement).blur();
-                                  }
-                                }}
-                                className="bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 focus:bg-white dark:focus:bg-slate-900 border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-amber-500 rounded-lg px-2 py-0.5 text-sm sm:text-base font-black text-slate-900 dark:text-white focus:outline-none transition w-full"
-                                title="Click to edit product name inline"
-                              />
-                            </div>
+                          <div className="min-w-0 flex-1 space-y-1.5">
+                            {/* Product Title */}
+                            <h3
+                              onClick={() => handleOpenEditModal(product)}
+                              className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white leading-snug break-words cursor-pointer hover:text-amber-500 transition"
+                              title="Click to edit product"
+                            >
+                              {product.title}
+                            </h3>
 
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2 pl-2">
-                              <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
+                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                              <span className="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold">
                                 {product.vendor || 'M/S Rong Bahar'}
                               </span>
-                              <span className="text-slate-400">•</span>
-                              <span className="font-bold text-slate-700 dark:text-slate-300">
-                                {totalVariantsCount} {totalVariantsCount === 1 ? 'Variant' : 'Variants'}
-                              </span>
-                              <span className="text-slate-400">•</span>
-                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                              <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-black font-mono">
                                 ৳{product.basePrice} base price
                               </span>
-                              <span className="text-slate-400">•</span>
-                              <span className="font-mono text-[10px] text-slate-400">SKU: {product.sku}</span>
                               {product.isNewArrival && (
-                                <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[9px]">
+                                <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
                                   ★ New Arrival
                                 </span>
                               )}
@@ -2030,12 +2019,27 @@ export default function AdminControlPanel() {
                           </div>
                         </div>
 
-                        {/* Action Buttons Toolbar */}
-                        <div className="flex flex-wrap items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-900">
+                        {/* Middle: Badges Wrap */}
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] pt-1">
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-slate-800 flex items-center gap-1">
+                            <Sliders className="w-3 h-3 text-amber-500" />
+                            {totalVariantsCount} {totalVariantsCount === 1 ? 'Variant' : 'Variants'}
+                          </span>
+                          <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20 flex items-center gap-1">
+                            <Package className="w-3 h-3 text-emerald-500" />
+                            {product.stock} total stock
+                          </span>
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 font-mono text-[10px] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
+                            SKU: {product.sku}
+                          </span>
+                        </div>
+
+                        {/* Bottom: Action Buttons Bar (2x2 Grid on Mobile, Flex on Desktop - NO OVERLAP) */}
+                        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-900">
                           {/* ✏️ Full Product Edit Studio Button */}
                           <button
                             onClick={() => handleOpenEditModal(product)}
-                            className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition flex items-center gap-1.5 shadow-sm"
+                            className="col-span-1 sm:flex-1 py-2.5 px-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs"
                             title="Edit full product details, photos, and variants matrix"
                           >
                             <Edit className="w-3.5 h-3.5" />
@@ -2045,9 +2049,9 @@ export default function AdminControlPanel() {
                           {/* 📦 Manage Variants In-Place Button */}
                           <button
                             onClick={() => setExpandedInventoryProdId(isExpanded ? null : product.id)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                            className={`col-span-1 sm:flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                               isExpanded
-                                ? 'bg-amber-500 text-slate-950 font-black shadow'
+                                ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
                                 : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
                             }`}
                             title="Toggle in-place variant editor"
@@ -2061,20 +2065,21 @@ export default function AdminControlPanel() {
                           <Link
                             href={`/products/${product.slug}`}
                             target="_blank"
-                            className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-amber-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-1"
+                            className="col-span-1 sm:w-auto py-2.5 px-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-amber-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center gap-1.5 transition"
                             title="View Live Product Page"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            <span>PDP</span>
+                            <span>View PDP</span>
                           </Link>
 
                           {/* 🗑️ Delete Entire Product Button */}
                           <button
                             onClick={() => handleDeleteProduct(product.id)}
-                            className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition"
+                            className="col-span-1 sm:w-auto py-2.5 px-3 rounded-xl text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 font-bold text-xs flex items-center justify-center gap-1.5 transition"
                             title="Delete entire product from store"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </div>
@@ -2086,10 +2091,10 @@ export default function AdminControlPanel() {
                             <div>
                               <span className="font-bold text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                                 <Sliders className="w-3.5 h-3.5" />
-                                In-Place Multi-Variant Matrix for &quot;{product.title}&quot;
+                                Multi-Variant Stock Matrix
                               </span>
-                              <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                                Edit prices, stock counts, or remove variants on the fly. Changes save instantly.
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                                Edit prices, stock counts, or remove variants. Changes save instantly.
                               </span>
                             </div>
                             <button
@@ -2100,13 +2105,13 @@ export default function AdminControlPanel() {
                             </button>
                           </div>
 
-                          <div className="space-y-2.5">
+                          <div className="space-y-3">
                             {product.variants?.map((v) => (
                               <div
                                 key={v.id}
-                                className="p-3.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shadow-xs"
+                                className="p-3.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2.5 text-xs shadow-xs"
                               >
-                                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                <div className="flex items-center gap-2.5 min-w-0">
                                   {v.colorHex && (
                                     <span
                                       className="w-4 h-4 rounded-full border border-slate-300 dark:border-white/20 shrink-0 shadow-xs"
@@ -2114,15 +2119,15 @@ export default function AdminControlPanel() {
                                       title={v.colorName}
                                     />
                                   )}
-                                  <div className="flex-1 space-y-1">
+                                  <div className="flex-1 space-y-1 min-w-0">
                                     <input
                                       type="text"
                                       value={v.name}
                                       onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'name', e.target.value)}
                                       placeholder="Variant Name / Dimension"
-                                      className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-slate-900 dark:text-white text-xs font-bold w-full focus:outline-none focus:border-amber-500"
+                                      className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white text-xs font-bold w-full focus:outline-none focus:border-amber-500"
                                     />
-                                    <div className="text-[10px] text-slate-400 font-mono flex items-center gap-2">
+                                    <div className="text-[10px] text-slate-400 font-mono flex flex-wrap items-center gap-2">
                                       <span>Size: {v.sizeOrWeight}</span>
                                       {v.colorName && <span>• Color: {v.colorName}</span>}
                                       <span>• SKU: {v.sku}</span>
@@ -2130,38 +2135,40 @@ export default function AdminControlPanel() {
                                   </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                                  {/* Selling Price */}
-                                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                                    <span className="text-amber-500 font-bold">Price: ৳</span>
-                                    <input
-                                      type="number"
-                                      value={v.price}
-                                      onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'price', Number(e.target.value))}
-                                      className="w-16 bg-transparent text-slate-900 dark:text-white font-bold font-mono focus:outline-none text-right"
-                                      title="Retail Selling Price"
-                                    />
-                                  </div>
+                                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-slate-900">
+                                  <div className="flex items-center gap-2">
+                                    {/* Selling Price */}
+                                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800">
+                                      <span className="text-amber-500 font-bold text-xs">৳</span>
+                                      <input
+                                        type="number"
+                                        value={v.price}
+                                        onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'price', Number(e.target.value))}
+                                        className="w-16 sm:w-20 bg-transparent text-slate-900 dark:text-white font-bold font-mono focus:outline-none text-right text-xs"
+                                        title="Retail Selling Price"
+                                      />
+                                    </div>
 
-                                  {/* Stock Count */}
-                                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                                    <span className="text-slate-500 dark:text-slate-400 text-[10px]">Stock:</span>
-                                    <input
-                                      type="number"
-                                      value={v.stock}
-                                      onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'stock', Number(e.target.value))}
-                                      className="w-12 bg-transparent text-emerald-600 dark:text-emerald-400 font-bold font-mono focus:outline-none text-right"
-                                      title="Inventory Stock Count"
-                                    />
+                                    {/* Stock Count */}
+                                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800">
+                                      <span className="text-slate-500 dark:text-slate-400 text-[10px]">Stock:</span>
+                                      <input
+                                        type="number"
+                                        value={v.stock}
+                                        onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'stock', Number(e.target.value))}
+                                        className="w-12 sm:w-16 bg-transparent text-emerald-600 dark:text-emerald-400 font-bold font-mono focus:outline-none text-right text-xs"
+                                        title="Inventory Stock Count"
+                                      />
+                                    </div>
                                   </div>
 
                                   {/* Delete Variant */}
                                   <button
                                     onClick={() => handleDeleteProductVariant(product.id, v.id)}
-                                    className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition"
+                                    className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition"
                                     title="Delete this variant"
                                   >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="w-4 h-4" />
                                   </button>
                                 </div>
                               </div>

@@ -85,7 +85,11 @@ export function getCombinedProductsList(): Product[] {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          return parsed;
+          // Filter out legacy dummy seeds if present from previous test runs
+          const clean = parsed.filter(
+            (p: Product) => !['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'].includes(p.id)
+          );
+          return clean;
         }
       }
     } catch {
