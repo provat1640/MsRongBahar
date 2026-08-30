@@ -7,6 +7,7 @@ import {
   initialFallbackProducts,
   initialFallbackCategories,
   getCombinedProductsList,
+  notifyProductsUpdated,
   createProductAPI,
   updateProductAPI,
   deleteProductAPI,
@@ -498,6 +499,7 @@ export default function AdminControlPanel() {
       try {
         localStorage.removeItem('rong_bahar_products_list');
       } catch {}
+      notifyProductsUpdated();
       setSettingsSavedToast('🧹 Store Catalog wiped! Product list is now 100% blank (0 products).');
       setTimeout(() => setSettingsSavedToast(''), 4000);
     }
@@ -510,6 +512,7 @@ export default function AdminControlPanel() {
     try {
       localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
     } catch {}
+    notifyProductsUpdated();
     deleteProductAPI(productId).catch(() => {});
     setSettingsSavedToast('🗑️ Product deleted from store catalog.');
     setTimeout(() => setSettingsSavedToast(''), 3000);
@@ -706,6 +709,7 @@ export default function AdminControlPanel() {
     try {
       localStorage.setItem('rong_bahar_products_list', JSON.stringify(updatedList));
     } catch {}
+    notifyProductsUpdated();
 
     updateProductAPI(editingProduct.id, updatedProduct).catch((err) => {
       console.warn('Backend update sync:', err);
@@ -729,6 +733,7 @@ export default function AdminControlPanel() {
       try {
         localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
       } catch {}
+      notifyProductsUpdated();
       return updated;
     });
     setSettingsSavedToast('💾 In-place product updates saved.');
@@ -844,6 +849,7 @@ export default function AdminControlPanel() {
       try {
         localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
       } catch {}
+      notifyProductsUpdated();
       return updated;
     });
   };
@@ -859,6 +865,7 @@ export default function AdminControlPanel() {
       try {
         localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
       } catch {}
+      notifyProductsUpdated();
       return updated;
     });
   };
@@ -883,6 +890,7 @@ export default function AdminControlPanel() {
       try {
         localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
       } catch {}
+      notifyProductsUpdated();
       return updated;
     });
   };
@@ -1088,6 +1096,7 @@ export default function AdminControlPanel() {
     try {
       localStorage.setItem('rong_bahar_products_list', JSON.stringify(updatedList));
     } catch {}
+    notifyProductsUpdated();
 
     // Asynchronously send to backend PostgreSQL database
     createProductAPI(newProduct).catch((err) => {

@@ -37,24 +37,56 @@ export function ProductDetailClient({ initialProduct, product: propProduct, slug
   const [loading, setLoading] = useState(!propProduct && !initialProduct);
   const [isPhysicsOpen, setIsPhysicsOpen] = useState(false);
 
-  // Client-side fallback resolution for products added from gallery/admin
+  // Client-side fallback resolution for products added from camera/gallery in admin
   useEffect(() => {
-    if (!currentProduct && slug) {
-      try {
-        const stored = localStorage.getItem('rong_bahar_products_list');
-        if (stored) {
-          const list: Product[] = JSON.parse(stored);
-          const found = list.find((p) => p.slug === slug || p.id === slug);
-          if (found) {
-            setCurrentProduct(found);
-            setLoading(false);
-            return;
+    const resolveProduct = () => {
+      if (slug) {
+        const decoded = decodeURIComponent(slug).trim().toLowerCase();
+        try {
+          const stored = localStorage.getItem('rong_bahar_products_list');
+          if (stored) {
+            const list: Product[] = JSON.parse(stored);
+            const clean = Array.isArray(list)
+              ? list.filter((p: Product) => !['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'].includes(p.id))
+              : [];
+
+            if (clean.length > 0) {
+              const found = clean.find(
+                (p) =>
+                  p.slug === slug ||
+                  p.slug.toLowerCase() === decoded ||
+                  p.id === slug ||
+                  p.id.toLowerCase() === decoded ||
+                  p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') === decoded
+              );
+
+              if (found) {
+                setCurrentProduct(found);
+                setLoading(false);
+                return;
+              }
+
+              // Fallback to latest added product if exact match wasn't found
+              if (clean.length === 1 || !currentProduct) {
+                setCurrentProduct(clean[0]);
+                setLoading(false);
+                return;
+              }
+            }
           }
-        }
-      } catch {}
+        } catch {}
+      }
       setLoading(false);
-    }
-  }, [currentProduct, slug]);
+    };
+
+    resolveProduct();
+    window.addEventListener('rong_bahar_products_changed', resolveProduct);
+    window.addEventListener('storage', resolveProduct);
+    return () => {
+      window.removeEventListener('rong_bahar_products_changed', resolveProduct);
+      window.removeEventListener('storage', resolveProduct);
+    };
+  }, [slug]);
 
   const product = currentProduct;
 

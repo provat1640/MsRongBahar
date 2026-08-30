@@ -15,29 +15,39 @@ export function HomeFeaturedGrid({ initialProducts, type = 'featured' }: Props) 
   const [products, setProducts] = useState<Product[]>(initialProducts);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('rong_bahar_products_list');
-      if (stored) {
-        const customList: Product[] = JSON.parse(stored);
-        if (Array.isArray(customList) && customList.length > 0) {
-          const serverIds = new Set(initialProducts.map((p) => p.id));
-          const uniqueCustom = customList.filter((p) => !serverIds.has(p.id));
-
-          const combined = [...uniqueCustom, ...initialProducts];
-          if (type === 'new-arrivals') {
-            const arrivals = combined.filter((p) => p.isNewArrival);
-            setProducts(arrivals.length > 0 ? arrivals.slice(0, 4) : combined.slice(0, 4));
-          } else {
-            setProducts(combined.slice(0, 8));
-          }
-          return;
-        } else {
-          setProducts([]);
-          return;
+    const loadProducts = () => {
+      try {
+        const stored = localStorage.getItem('rong_bahar_products_list');
+        let customList: Product[] = [];
+        if (stored) {
+          customList = JSON.parse(stored);
         }
+        const cleanCustom = Array.isArray(customList)
+          ? customList.filter((p: Product) => !['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'].includes(p.id))
+          : [];
+
+        const serverIds = new Set(initialProducts.map((p) => p.id));
+        const uniqueCustom = cleanCustom.filter((p) => !serverIds.has(p.id));
+        const combined = [...uniqueCustom, ...initialProducts];
+
+        if (type === 'new-arrivals') {
+          const arrivals = combined.filter((p) => p.isNewArrival);
+          setProducts(arrivals.length > 0 ? arrivals.slice(0, 4) : combined.slice(0, 4));
+        } else {
+          setProducts(combined.slice(0, 8));
+        }
+      } catch {
+        setProducts(initialProducts);
       }
-    } catch {}
-    setProducts(initialProducts);
+    };
+
+    loadProducts();
+    window.addEventListener('rong_bahar_products_changed', loadProducts);
+    window.addEventListener('storage', loadProducts);
+    return () => {
+      window.removeEventListener('rong_bahar_products_changed', loadProducts);
+      window.removeEventListener('storage', loadProducts);
+    };
   }, [initialProducts, type]);
 
   if (products.length === 0) {

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { fetchProducts, fetchCategories } from '../lib/api';
 import { HomeFeaturedGrid } from '../components/HomeFeaturedGrid';
+import { HomeHeroPreview } from '../components/HomeHeroPreview';
 import {
   Sparkles,
   ArrowRight,
@@ -110,68 +111,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right Hero Image Card */}
+            {/* Right Hero Image Card (Client Synchronized with Added Camera/Gallery Products) */}
             <div className="lg:col-span-5 relative mt-4 lg:mt-0">
-              <div className="glass-panel rounded-3xl p-4 sm:p-6 relative border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-                <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950 relative border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                  {products.length > 0 && products[0].images?.[0] ? (
-                    <img
-                      src={products[0].images[0]}
-                      alt={products[0].title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-amber-500/10 via-slate-900 to-slate-950 text-white relative">
-                      <div className="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-xl mb-3">
-                        RB
-                      </div>
-                      <div className="text-base font-black text-white">M/S Rong Bahar</div>
-                      <p className="text-xs text-amber-400 font-bold mt-1">Pakundia Bazar • Authorized Dealer</p>
-                      <span className="mt-3 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
-                        ⚡ Live Store Ready
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 p-2.5 sm:p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 flex items-center justify-between text-white">
-                    <div className="min-w-0 pr-2">
-                      <div className="text-[9px] sm:text-[10px] text-amber-400 font-bold uppercase tracking-wider">
-                        {products.length > 0 ? 'Featured Item' : 'Store Catalog'}
-                      </div>
-                      <div className="text-[11px] sm:text-xs font-black text-white truncate">
-                        {products.length > 0 ? products[0].title : 'M/S Rong Bahar Paints & Hardware'}
-                      </div>
-                    </div>
-                    <span className="text-[11px] sm:text-xs font-black text-amber-400 font-mono shrink-0">
-                      {products.length > 0 ? `From ৳${products[0].basePrice}` : 'Pakundia'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
-                    <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
-                    <div className="min-w-0">
-                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">
-                        Pakundia Local
-                      </div>
-                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                        ৳40 Express Van
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-2.5 sm:p-3 bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 flex items-center gap-2 sm:gap-2.5 shadow-xs">
-                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 dark:text-amber-400 shrink-0" />
-                    <div className="min-w-0">
-                      <div className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-white truncate">
-                        Verified Shop
-                      </div>
-                      <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                        Pakundia Bazar
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <HomeHeroPreview initialProduct={products[0] || null} />
             </div>
           </div>
         </div>

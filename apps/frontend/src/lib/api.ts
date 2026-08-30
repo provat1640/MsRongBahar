@@ -99,6 +99,14 @@ export function getCombinedProductsList(): Product[] {
   return [];
 }
 
+export function notifyProductsUpdated() {
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('rong_bahar_products_changed'));
+    } catch {}
+  }
+}
+
 /**
  * Structured fetch helper with timeout and exponential backoff retry logic
  * Specifically designed to handle Render free-tier cold starts (502, 503, 504, network timeouts).
@@ -281,16 +289,26 @@ export async function deleteProductAPI(id: string): Promise<boolean> {
 }
 
 export async function fetchProductBySlugAPI(slug: string): Promise<Product | null> {
+  const decoded = decodeURIComponent(slug).trim().toLowerCase();
   try {
     const res = await fetchWithRetry(`${API_URL}/products/${slug}`, { next: { revalidate: 60 } }, 2, 10000);
-    if (!res.ok) throw new Error('Not found');
-    const data = await res.json();
-    return data.data || data;
-  } catch {
-    const list = getCombinedProductsList();
-    const matched = list.find((p) => p.slug === slug);
-    return matched || null;
-  }
+    if (res.ok) {
+      const data = await res.json();
+      const item = data.data || data;
+      if (item && (item.id || item.slug || item.title)) return item;
+    }
+  } catch {}
+
+  const list = getCombinedProductsList();
+  const matched = list.find(
+    (p) =>
+      p.slug === slug ||
+      p.slug.toLowerCase() === decoded ||
+      p.id === slug ||
+      p.id.toLowerCase() === decoded ||
+      p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') === decoded
+  );
+  return matched || (list.length > 0 ? list[0] : null);
 }
 
 export async function placeOrderAPI(orderPayload: any, token?: string): Promise<any> {
