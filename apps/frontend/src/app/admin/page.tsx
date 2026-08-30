@@ -8,6 +8,8 @@ import {
   initialFallbackCategories,
   getCombinedProductsList,
   createProductAPI,
+  updateProductAPI,
+  deleteProductAPI,
   Product,
   ProductVariant,
 } from '../../lib/api';
@@ -32,6 +34,7 @@ import {
   Star,
   Check,
   Upload,
+  Camera,
   Image as ImageIcon,
   Smartphone,
   HardDrive,
@@ -52,6 +55,7 @@ import {
   Search,
   Filter,
   ArrowUpRight,
+  RotateCcw,
 } from 'lucide-react';
 
 interface OrderDetail {
@@ -108,19 +112,10 @@ interface StoreSettings {
   enableCod: boolean;
 }
 
-const projectAssetFiles = [
-  { path: '/products/2412.jpg', name: '2412.jpg', label: 'Berger Robbialac Synthetic Enamel Tin', cat: 'Paints' },
-  { path: '/products/2416.jpg', name: '2416.jpg', label: 'Aqua Paints CNG Royal Green Enamel Can', cat: 'Paints' },
-  { path: '/products/2413.jpg', name: '2413.jpg', label: 'Fevicol 1K PUR Polyurethane Adhesive Bottle', cat: 'Adhesives' },
-  { path: '/products/2414.jpg', name: '2414.jpg', label: 'JM Acrylic Spray Can (Black & Chrome)', cat: 'Sprays' },
-  { path: '/products/2415.jpg', name: '2415.jpg', label: 'HMBR Stainless Steel Security Padlock 50mm', cat: 'Padlocks' },
-  { path: '/products/2417.jpg', name: '2417.jpg', label: 'Professional Industrial Paint Brush 125mm', cat: 'Brushes' },
-  { path: '/logo.jpg', name: 'logo.jpg', label: 'M/S Rong Bahar Official Store Logo', cat: 'Store' },
-];
-
 export default function AdminControlPanel() {
   const { user, isAdmin, token, openAuthModal } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   const [activeTab, setActiveTab] = useState<'orders' | 'add_product' | 'stock' | 'requests' | 'new_arrivals' | 'settings'>('orders');
 
@@ -261,30 +256,34 @@ export default function AdminControlPanel() {
   const [expandedInventoryProdId, setExpandedInventoryProdId] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
-  // PRECISE HARDWARE STORE ADD PRODUCT FORM STATE
+  // CLEAN HARDWARE STORE ADD PRODUCT FORM STATE
   // ---------------------------------------------------------------------------
   const [productType, setProductType] = useState<'paint' | 'brush' | 'lock' | 'adhesive' | 'thinners' | 'sanitary' | 'electrical' | 'general'>('paint');
   const [prodTitle, setProdTitle] = useState('');
   const [prodCategoryId, setProdCategoryId] = useState('synthetic-enamel-paints');
   const [prodVendor, setProdVendor] = useState('Berger Paints BD');
-  const [prodSku, setProdSku] = useState(`RB-BER-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [prodSku, setProdSku] = useState(`RB-PNT-${Math.floor(1000 + Math.random() * 9000)}`);
   const [prodBarcode, setProdBarcode] = useState(`8901234${Math.floor(10000 + Math.random() * 90000)}`);
   const [prodUnit, setProdUnit] = useState('Volume & Color');
-  const [prodCostPrice, setProdCostPrice] = useState<number>(380);
-  const [prodRetailPrice, setProdRetailPrice] = useState<number>(450);
+  const [prodCostPrice, setProdCostPrice] = useState<number>(0);
+  const [prodRetailPrice, setProdRetailPrice] = useState<number>(0);
   const [prodDiscountPrice, setProdDiscountPrice] = useState<number | undefined>(undefined);
   const [prodDescription, setProdDescription] = useState('');
-  const [prodWarranty, setProdWarranty] = useState('5 Years Anti-Rust & Genuine Quality Guarantee');
-  const [prodCoverage, setProdCoverage] = useState('120-140 sq. ft / Litre / Coat');
-  const [prodDryingTime, setProdDryingTime] = useState('Touch dry: 3 hrs, Full cure: 18 hrs');
-  const [prodOrigin, setProdOrigin] = useState('Bangladesh (Direct Factory Stock)');
+  const [prodWarranty, setProdWarranty] = useState('Genuine Store Guarantee');
+  const [prodCoverage, setProdCoverage] = useState('');
+  const [prodDryingTime, setProdDryingTime] = useState('');
+  const [prodOrigin, setProdOrigin] = useState('Bangladesh (Direct Store Stock)');
   const [prodIsNewArrival, setProdIsNewArrival] = useState(true);
   const [prodIsFeatured, setProdIsFeatured] = useState(true);
 
-  // Dual-Mode Image Browser
-  const [imageSourceTab, setImageSourceTab] = useState<'drive' | 'project'>('drive');
-  const [selectedImageUrl, setSelectedImageUrl] = useState('/products/2412.jpg');
-  const [uploadedDriveFileName, setUploadedDriveFileName] = useState('');
+  // Camera & Gallery Uploads
+  const [uploadedImages, setUploadedImages] = useState<Array<{
+    id: string;
+    url: string;
+    name: string;
+    source: 'camera' | 'gallery';
+  }>>([]);
+  const [selectedCoverIndex, setSelectedCoverIndex] = useState<number>(0);
 
   // Universal Multi-Attribute Variants Array
   const [configuredVariants, setConfiguredVariants] = useState<Array<{
@@ -297,22 +296,55 @@ export default function AdminControlPanel() {
     price: number;
     stock: number;
     sku: string;
-  }>>([
-    { id: 'var-init-1', name: '0.455L Can – CNG Royal Green', sizeOrWeight: '0.455 Litre Can', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 195, price: 240, stock: 40, sku: 'BER-045L-GRN' },
-    { id: 'var-init-2', name: '0.91L Tin – CNG Royal Green', sizeOrWeight: '0.91 Litre Tin', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 380, price: 450, stock: 35, sku: 'BER-091L-GRN' },
-    { id: 'var-init-3', name: '3.64L Gallon – CNG Royal Green', sizeOrWeight: '3.64 Litre Gallon', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 1450, price: 1700, stock: 20, sku: 'BER-364L-GRN' },
-  ]);
+  }>>([]);
 
-  const [tempVarSize, setTempVarSize] = useState('0.91 Litre Tin');
-  const [tempVarColor, setTempVarColor] = useState('CNG Royal Green');
+  const [tempVarSize, setTempVarSize] = useState('');
+  const [tempVarColor, setTempVarColor] = useState('');
   const [tempVarColorHex, setTempVarColorHex] = useState('#166534');
-  const [tempVarCost, setTempVarCost] = useState<number>(380);
-  const [tempVarPrice, setTempVarPrice] = useState<number>(450);
-  const [tempVarStock, setTempVarStock] = useState<number>(30);
+  const [tempVarCost, setTempVarCost] = useState<number>(0);
+  const [tempVarPrice, setTempVarPrice] = useState<number>(0);
+  const [tempVarStock, setTempVarStock] = useState<number>(20);
 
   const [addSuccessMessage, setAddSuccessMessage] = useState('');
   const [addedProductSlug, setAddedProductSlug] = useState('');
   const [addedProductTitle, setAddedProductTitle] = useState('');
+
+  // ---------------------------------------------------------------------------
+  // LIVE INVENTORY EDITING & MULTI-VARIANT STUDIO STATE
+  // ---------------------------------------------------------------------------
+  const [stockSearchQuery, setStockSearchQuery] = useState('');
+  const [stockCategoryFilter, setStockCategoryFilter] = useState('ALL');
+
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editVendor, setEditVendor] = useState('');
+  const [editCategoryId, setEditCategoryId] = useState('synthetic-enamel-paints');
+  const [editSku, setEditSku] = useState('');
+  const [editBarcode, setEditBarcode] = useState('');
+  const [editUnit, setEditUnit] = useState('Volume & Color');
+  const [editCostPrice, setEditCostPrice] = useState<number>(0);
+  const [editRetailPrice, setEditRetailPrice] = useState<number>(0);
+  const [editDiscountPrice, setEditDiscountPrice] = useState<number | undefined>(undefined);
+  const [editDescription, setEditDescription] = useState('');
+  const [editWarranty, setEditWarranty] = useState('Genuine Store Guarantee');
+  const [editCoverage, setEditCoverage] = useState('');
+  const [editDryingTime, setEditDryingTime] = useState('');
+  const [editOrigin, setEditOrigin] = useState('Bangladesh');
+  const [editIsNewArrival, setEditIsNewArrival] = useState(false);
+  const [editIsFeatured, setEditIsFeatured] = useState(false);
+  const [editImages, setEditImages] = useState<string[]>([]);
+  const [editVariants, setEditVariants] = useState<ProductVariant[]>([]);
+
+  // Edit Modal New Variant Row Fields
+  const [editNewVarSize, setEditNewVarSize] = useState('');
+  const [editNewVarColor, setEditNewVarColor] = useState('');
+  const [editNewVarColorHex, setEditNewVarColorHex] = useState('#166534');
+  const [editNewVarCost, setEditNewVarCost] = useState<number>(0);
+  const [editNewVarPrice, setEditNewVarPrice] = useState<number>(0);
+  const [editNewVarStock, setEditNewVarStock] = useState<number>(20);
+
+  const editCameraInputRef = useRef<HTMLInputElement | null>(null);
+  const editGalleryInputRef = useRef<HTMLInputElement | null>(null);
 
   // Load from local storage and sync products
   useEffect(() => {
@@ -394,21 +426,308 @@ export default function AdminControlPanel() {
     downloadAnchor.remove();
   };
 
-  // Local Drive / Mobile Gallery Image Upload
-  const handleDriveImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 📸 Direct Camera Snap handler
+  const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedDriveFileName(file.name);
       const reader = new FileReader();
       reader.onload = (event) => {
         const base64Url = event.target?.result as string;
-        setSelectedImageUrl(base64Url);
+        setUploadedImages((prev) => [
+          ...prev,
+          {
+            id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+            url: base64Url,
+            name: `Camera Snap (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+            source: 'camera',
+          },
+        ]);
       };
       reader.readAsDataURL(file);
     }
+    e.target.value = '';
   };
 
-  // Switch product category preset
+  // 🖼️ Device Gallery & File Uploader handler
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64Url = event.target?.result as string;
+          setUploadedImages((prev) => [
+            ...prev,
+            {
+              id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+              url: base64Url,
+              name: file.name,
+              source: 'gallery',
+            },
+          ]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    e.target.value = '';
+  };
+
+  const handleRemoveUploadedImage = (index: number) => {
+    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    if (selectedCoverIndex >= index && selectedCoverIndex > 0) {
+      setSelectedCoverIndex(selectedCoverIndex - 1);
+    }
+  };
+
+  const handleSetCoverImage = (index: number) => {
+    setSelectedCoverIndex(index);
+  };
+
+  // Wipe / Reset catalog to completely blank (0 products)
+  const handleResetAllProducts = () => {
+    if (window.confirm('⚠️ Are you sure you want to wipe all store products and reset the catalog to 0? This will give you a 100% clean blank catalog.')) {
+      setProductsList([]);
+      try {
+        localStorage.removeItem('rong_bahar_products_list');
+      } catch {}
+      setSettingsSavedToast('🧹 Store Catalog wiped! Product list is now 100% blank (0 products).');
+      setTimeout(() => setSettingsSavedToast(''), 4000);
+    }
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    const updated = productsList.filter((p) => p.id !== productId);
+    setProductsList(updated);
+    try {
+      localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
+    } catch {}
+    deleteProductAPI(productId).catch(() => {});
+    setSettingsSavedToast('🗑️ Product deleted from store catalog.');
+    setTimeout(() => setSettingsSavedToast(''), 3000);
+  };
+
+  // ---------------------------------------------------------------------------
+  // FULL PRODUCT EDIT STUDIO HANDLERS
+  // ---------------------------------------------------------------------------
+  const handleOpenEditModal = (product: Product) => {
+    setEditingProduct(product);
+    setEditTitle(product.title || '');
+    setEditVendor(product.vendor || '');
+    setEditCategoryId(product.category?.slug || product.categoryId || 'synthetic-enamel-paints');
+    setEditSku(product.sku || '');
+    setEditBarcode(product.barcode || '');
+    setEditUnit(product.unit || 'Volume & Color');
+    setEditCostPrice(product.costPrice || 0);
+    setEditRetailPrice(product.basePrice || 0);
+    setEditDiscountPrice(product.discountPrice);
+    setEditDescription(product.description || '');
+    setEditWarranty(product.warranty || 'Genuine Store Guarantee');
+    setEditCoverage(product.specifications?.coverage || '');
+    setEditDryingTime(product.specifications?.dryingTime || '');
+    setEditOrigin(product.specifications?.origin || 'Bangladesh');
+    setEditIsNewArrival(Boolean(product.isNewArrival));
+    setEditIsFeatured(Boolean(product.isFeatured));
+    setEditImages(Array.isArray(product.images) ? [...product.images] : []);
+    setEditVariants(
+      Array.isArray(product.variants) && product.variants.length > 0
+        ? product.variants.map((v) => ({ ...v }))
+        : [
+            {
+              id: `var-${Date.now()}`,
+              productId: product.id,
+              name: `${product.unit || '1 Unit'} Standard`,
+              sizeOrWeight: product.unit || '1 Unit',
+              costPrice: product.costPrice || 0,
+              price: product.basePrice || 0,
+              stock: product.stock || 20,
+              sku: product.sku || `RB-${Date.now()}`,
+            },
+          ]
+    );
+    // Reset new variant inputs
+    setEditNewVarSize('');
+    setEditNewVarColor('');
+    setEditNewVarColorHex('#166534');
+    setEditNewVarCost(product.costPrice || 0);
+    setEditNewVarPrice(product.basePrice || 0);
+    setEditNewVarStock(20);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingProduct(null);
+  };
+
+  const handleEditAddVariant = () => {
+    if (!editNewVarSize.trim() || !editNewVarPrice) {
+      alert('Please enter a variant size / dimension and retail selling price.');
+      return;
+    }
+    const name = editNewVarColor.trim() ? `${editNewVarSize} – ${editNewVarColor}` : editNewVarSize;
+    const newSku = `${editSku || 'RB'}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
+
+    const newVar: ProductVariant = {
+      id: `var-${Date.now()}`,
+      productId: editingProduct?.id || `prod-${Date.now()}`,
+      name,
+      sizeOrWeight: editNewVarSize,
+      colorName: editNewVarColor || undefined,
+      colorHex: editNewVarColorHex || undefined,
+      costPrice: Number(editNewVarCost) || undefined,
+      price: Number(editNewVarPrice),
+      stock: Number(editNewVarStock) || 20,
+      sku: newSku,
+    };
+
+    setEditVariants([...editVariants, newVar]);
+    setEditNewVarSize('');
+    setEditNewVarColor('');
+  };
+
+  const handleEditDeleteVariant = (variantId: string) => {
+    setEditVariants(editVariants.filter((v) => v.id !== variantId));
+  };
+
+  const handleEditUpdateVariant = (variantId: string, field: string, value: any) => {
+    setEditVariants(
+      editVariants.map((v) => (v.id === variantId ? { ...v, [field]: value } : v))
+    );
+  };
+
+  const handleEditCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64Url = event.target?.result as string;
+        setEditImages((prev) => [...prev, base64Url]);
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  };
+
+  const handleEditGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64Url = event.target?.result as string;
+          setEditImages((prev) => [...prev, base64Url]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    e.target.value = '';
+  };
+
+  const handleEditRemoveImage = (index: number) => {
+    setEditImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditSetCoverImage = (index: number) => {
+    if (index === 0) return;
+    setEditImages((prev) => {
+      const selected = prev[index];
+      const rest = prev.filter((_, i) => i !== index);
+      return [selected, ...rest];
+    });
+  };
+
+  const handleSaveEditedProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+
+    if (!editTitle.trim()) {
+      alert('Product title cannot be empty.');
+      return;
+    }
+
+    const firstVar = editVariants[0];
+    const basePrice = firstVar ? Number(firstVar.price) : Number(editRetailPrice) || 0;
+    const baseCostPrice = firstVar && firstVar.costPrice ? Number(firstVar.costPrice) : Number(editCostPrice) || 0;
+    const totalStock = editVariants.length > 0
+      ? editVariants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0)
+      : editingProduct.stock || 50;
+
+    const matchedCat = initialFallbackCategories.find((c) => c.slug === editCategoryId || c.id === editCategoryId) || {
+      id: editCategoryId,
+      name: editVendor || 'Hardware Item',
+      slug: editCategoryId,
+    };
+
+    const colors = Array.from(new Set(editVariants.map((v) => v.colorName).filter(Boolean))).map((name) => ({
+      name: name as string,
+      hex: editVariants.find((v) => v.colorName === name)?.colorHex || '#166534',
+    }));
+
+    const sizes = Array.from(new Set(editVariants.map((v) => v.sizeOrWeight).filter(Boolean))) as string[];
+
+    const updatedProduct: Product = {
+      ...editingProduct,
+      title: editTitle,
+      vendor: editVendor || 'M/S Rong Bahar',
+      categoryId: matchedCat.id,
+      category: matchedCat,
+      sku: editSku || editingProduct.sku,
+      barcode: editBarcode || editingProduct.barcode,
+      unit: editUnit || editingProduct.unit,
+      basePrice,
+      costPrice: baseCostPrice,
+      discountPrice: editDiscountPrice || undefined,
+      stock: totalStock,
+      description: editDescription || editingProduct.description,
+      warranty: editWarranty || editingProduct.warranty,
+      specifications: {
+        ...editingProduct.specifications,
+        coverage: editCoverage || undefined,
+        dryingTime: editDryingTime || undefined,
+        origin: editOrigin || 'Bangladesh',
+      },
+      isNewArrival: editIsNewArrival,
+      isFeatured: editIsFeatured,
+      images: editImages.length > 0 ? editImages : editingProduct.images,
+      colors: colors.length > 0 ? colors : undefined,
+      sizes: sizes.length > 0 ? sizes : undefined,
+      variants: editVariants.length > 0 ? editVariants : editingProduct.variants,
+    };
+
+    const updatedList = productsList.map((p) => (p.id === editingProduct.id ? updatedProduct : p));
+    setProductsList(updatedList);
+    try {
+      localStorage.setItem('rong_bahar_products_list', JSON.stringify(updatedList));
+    } catch {}
+
+    updateProductAPI(editingProduct.id, updatedProduct).catch((err) => {
+      console.warn('Backend update sync:', err);
+    });
+
+    setEditingProduct(null);
+    setSettingsSavedToast(`✅ Product "${editTitle}" updated successfully across your entire storefront and inventory!`);
+    setTimeout(() => setSettingsSavedToast(''), 4000);
+  };
+
+  const handleInlineUpdateProduct = (productId: string, field: keyof Product, value: any) => {
+    setProductsList((prev) => {
+      const updated = prev.map((p) => {
+        if (p.id === productId) {
+          const updatedProd = { ...p, [field]: value };
+          updateProductAPI(productId, updatedProd).catch(() => {});
+          return updatedProd;
+        }
+        return p;
+      });
+      try {
+        localStorage.setItem('rong_bahar_products_list', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setSettingsSavedToast('💾 In-place product updates saved.');
+    setTimeout(() => setSettingsSavedToast(''), 2000);
+  };
+
+  // Switch product category preset (configures category metadata without forcing dummy items)
   const handleProductTypeChange = (type: 'paint' | 'brush' | 'lock' | 'adhesive' | 'thinners' | 'sanitary' | 'electrical' | 'general') => {
     setProductType(type);
     const skuCode = `RB-${type.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -416,139 +735,61 @@ export default function AdminControlPanel() {
 
     if (type === 'paint') {
       setProdCategoryId('synthetic-enamel-paints');
-      setProdVendor('Berger Paints BD');
       setProdUnit('Volume & Color');
-      setProdCostPrice(380);
-      setProdRetailPrice(450);
-      setProdWarranty('5 Years Anti-Rust & Gloss Retention');
+      setProdWarranty('5 Years Anti-Rust & Gloss Retention Guarantee');
       setProdCoverage('120-140 sq. ft / Litre / Coat');
       setProdDryingTime('Touch dry: 3 hrs, Full cure: 18 hrs');
       setTempVarSize('0.91 Litre Tin');
       setTempVarColor('CNG Royal Green');
       setTempVarColorHex('#166534');
-      setTempVarCost(380);
-      setTempVarPrice(450);
-      setSelectedImageUrl('/products/2412.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '0.455L Can – CNG Royal Green', sizeOrWeight: '0.455 Litre Can', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 195, price: 240, stock: 40, sku: `${skuCode}-045L` },
-        { id: `v-${Date.now()}-2`, name: '0.91L Tin – CNG Royal Green', sizeOrWeight: '0.91 Litre Tin', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 380, price: 450, stock: 35, sku: `${skuCode}-091L` },
-        { id: `v-${Date.now()}-3`, name: '3.64L Gallon – CNG Royal Green', sizeOrWeight: '3.64 Litre Gallon', colorName: 'CNG Royal Green', colorHex: '#166534', costPrice: 1450, price: 1700, stock: 20, sku: `${skuCode}-364L` },
-      ]);
     } else if (type === 'brush') {
       setProdCategoryId('paint-brushes-and-tools');
-      setProdVendor('Master Brush BD');
       setProdUnit('Width (mm / Inch)');
-      setProdCostPrice(60);
-      setProdRetailPrice(90);
       setProdWarranty('Zero Bristle Shedding Guarantee');
       setProdCoverage('100% Pure White Hog Bristle');
       setProdDryingTime('Wash with solvent after use');
       setTempVarSize('50 mm (2 Inch)');
       setTempVarColor('');
-      setTempVarCost(60);
-      setTempVarPrice(90);
-      setSelectedImageUrl('/products/2417.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '25 mm (1 Inch) Brush', sizeOrWeight: '25 mm (1 Inch)', costPrice: 30, price: 50, stock: 40, sku: `${skuCode}-25MM` },
-        { id: `v-${Date.now()}-2`, name: '50 mm (2 Inch) Brush', sizeOrWeight: '50 mm (2 Inch)', costPrice: 60, price: 90, stock: 35, sku: `${skuCode}-50MM` },
-        { id: `v-${Date.now()}-3`, name: '75 mm (3 Inch) Brush', sizeOrWeight: '75 mm (3 Inch)', costPrice: 90, price: 130, stock: 30, sku: `${skuCode}-75MM` },
-        { id: `v-${Date.now()}-4`, name: '100 mm (4 Inch) Brush', sizeOrWeight: '100 mm (4 Inch)', costPrice: 115, price: 160, stock: 25, sku: `${skuCode}-100MM` },
-        { id: `v-${Date.now()}-5`, name: '125 mm (5 Inch) Brush', sizeOrWeight: '125 mm (5 Inch)', costPrice: 145, price: 200, stock: 20, sku: `${skuCode}-125MM` },
-      ]);
     } else if (type === 'lock') {
       setProdCategoryId('padlocks-and-security');
-      setProdVendor('HMBR Hardware BD');
       setProdUnit('Perimeter / Width (mm)');
-      setProdCostPrice(370);
-      setProdRetailPrice(490);
       setProdWarranty('10 Years Anti-Cut & Anti-Pick Guarantee');
       setProdCoverage('Hardened Boron Steel + Solid Brass');
       setProdDryingTime('Weatherproof & Rustproof');
       setTempVarSize('50 mm Top Security');
       setTempVarColor('');
-      setTempVarCost(370);
-      setTempVarPrice(490);
-      setSelectedImageUrl('/products/2415.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '40 mm Standard Lock', sizeOrWeight: '40 mm Standard', costPrice: 290, price: 390, stock: 20, sku: `${skuCode}-40MM` },
-        { id: `v-${Date.now()}-2`, name: '50 mm Top Security Lock', sizeOrWeight: '50 mm Top Security', costPrice: 370, price: 490, stock: 15, sku: `${skuCode}-50MM` },
-        { id: `v-${Date.now()}-3`, name: '60 mm Heavy Armour Lock', sizeOrWeight: '60 mm Heavy Armour', costPrice: 510, price: 650, stock: 10, sku: `${skuCode}-60MM` },
-        { id: `v-${Date.now()}-4`, name: '70 mm Master Shutter Lock', sizeOrWeight: '70 mm Master Shutter', costPrice: 680, price: 850, stock: 5, sku: `${skuCode}-70MM` },
-      ]);
     } else if (type === 'adhesive') {
       setProdCategoryId('adhesives-and-glues');
-      setProdVendor('Pidilite (Fevicol)');
       setProdUnit('Weight (gm / kg)');
-      setProdCostPrice(620);
-      setProdRetailPrice(744);
       setProdWarranty('Lifetime Waterproof D4 Bond');
       setProdCoverage('1-Component Moisture Curing PU');
       setProdDryingTime('Initial set: 30 mins, Cure: 24 hrs');
       setTempVarSize('500 gm Bottle');
       setTempVarColor('');
-      setTempVarCost(620);
-      setTempVarPrice(744);
-      setSelectedImageUrl('/products/2413.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '250 gm Bottle', sizeOrWeight: '250 gm Bottle', costPrice: 310, price: 390, stock: 30, sku: `${skuCode}-250G` },
-        { id: `v-${Date.now()}-2`, name: '500 gm Bottle', sizeOrWeight: '500 gm Bottle', costPrice: 620, price: 744, stock: 40, sku: `${skuCode}-500G` },
-        { id: `v-${Date.now()}-3`, name: '1 kg Bottle', sizeOrWeight: '1 kg Bottle', costPrice: 1190, price: 1420, stock: 20, sku: `${skuCode}-1KG` },
-      ]);
     } else if (type === 'thinners') {
       setProdCategoryId('thinners-and-solvents');
-      setProdVendor('Berger Solvents');
       setProdUnit('Volume (Litre / Gallon)');
-      setProdCostPrice(140);
-      setProdRetailPrice(180);
       setProdWarranty('100% Pure Grade Mineral Thinner');
       setProdCoverage('Compatible with synthetic enamels & PU');
       setProdDryingTime('Instant paint reducer');
       setTempVarSize('1 Litre Bottle');
       setTempVarColor('');
-      setTempVarCost(140);
-      setTempVarPrice(180);
-      setSelectedImageUrl('/products/2416.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '0.5 Litre Bottle', sizeOrWeight: '0.5 Litre Bottle', costPrice: 80, price: 105, stock: 40, sku: `${skuCode}-05L` },
-        { id: `v-${Date.now()}-2`, name: '1.0 Litre Bottle', sizeOrWeight: '1.0 Litre Bottle', costPrice: 140, price: 180, stock: 35, sku: `${skuCode}-10L` },
-        { id: `v-${Date.now()}-3`, name: '5.0 Litre Gallon', sizeOrWeight: '5.0 Litre Gallon', costPrice: 650, price: 820, stock: 15, sku: `${skuCode}-50L` },
-      ]);
     } else if (type === 'sanitary') {
       setProdCategoryId('sanitary-and-pipes');
-      setProdVendor('RFL Sanitary');
       setProdUnit('Diameter & Length');
-      setProdCostPrice(280);
-      setProdRetailPrice(360);
       setProdWarranty('20 Years Leakproof Guarantee');
       setProdCoverage('High Grade uPVC & Brass Insert');
       setProdDryingTime('Immediate Pressure Tolerant');
       setTempVarSize('0.75 Inch (3/4")');
       setTempVarColor('');
-      setTempVarCost(280);
-      setTempVarPrice(360);
-      setSelectedImageUrl('/products/2415.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '0.5 Inch (1/2") Heavy Fitting', sizeOrWeight: '0.5 Inch (1/2")', costPrice: 180, price: 240, stock: 50, sku: `${skuCode}-05IN` },
-        { id: `v-${Date.now()}-2`, name: '0.75 Inch (3/4") Heavy Fitting', sizeOrWeight: '0.75 Inch (3/4")', costPrice: 280, price: 360, stock: 40, sku: `${skuCode}-075IN` },
-        { id: `v-${Date.now()}-3`, name: '1.0 Inch (1") Heavy Fitting', sizeOrWeight: '1.0 Inch (1")', costPrice: 420, price: 540, stock: 25, sku: `${skuCode}-10IN` },
-      ]);
     } else {
       setProdCategoryId('electrical-and-tools');
-      setProdVendor('General Hardware BD');
       setProdUnit('Piece / Pack');
-      setProdCostPrice(190);
-      setProdRetailPrice(260);
       setProdWarranty('Standard Manufacturer Warranty');
       setProdCoverage('Industrial Grade Component');
       setProdDryingTime('N/A');
       setTempVarSize('1 Piece');
       setTempVarColor('');
-      setTempVarCost(190);
-      setTempVarPrice(260);
-      setSelectedImageUrl('/products/2414.jpg');
-      setConfiguredVariants([
-        { id: `v-${Date.now()}-1`, name: '1 Piece Standard', sizeOrWeight: '1 Piece', costPrice: 190, price: 260, stock: 50, sku: `${skuCode}-01` },
-      ]);
     }
   };
 
@@ -664,17 +905,32 @@ export default function AdminControlPanel() {
   const handleAddProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!prodTitle.trim()) {
+      alert('Please enter a product title.');
+      return;
+    }
+
     const slug = prodTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const firstVar = configuredVariants[0];
-    const basePrice = firstVar ? firstVar.price : prodRetailPrice;
-    const baseCostPrice = firstVar && firstVar.costPrice ? firstVar.costPrice : prodCostPrice;
-    const totalStock = configuredVariants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0) || 50;
+    const basePrice = firstVar ? firstVar.price : (Number(prodRetailPrice) || 0);
+    const baseCostPrice = firstVar && firstVar.costPrice ? firstVar.costPrice : (Number(prodCostPrice) || 0);
+    const totalStock = configuredVariants.length > 0
+      ? configuredVariants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0)
+      : 50;
 
     const matchedCategory = initialFallbackCategories.find((c) => c.slug === prodCategoryId || c.id === prodCategoryId) || {
       id: prodCategoryId,
-      name: prodVendor,
+      name: prodVendor || 'Hardware Superstore',
       slug: prodCategoryId,
     };
+
+    // Images from Camera and Gallery
+    const productImages = uploadedImages.length > 0
+      ? [
+          uploadedImages[selectedCoverIndex]?.url || uploadedImages[0].url,
+          ...uploadedImages.filter((_, i) => i !== selectedCoverIndex).map((img) => img.url),
+        ]
+      : [];
 
     const colors = Array.from(new Set(configuredVariants.map((v) => v.colorName).filter(Boolean))).map((name) => ({
       name: name as string,
@@ -683,11 +939,37 @@ export default function AdminControlPanel() {
 
     const sizes = Array.from(new Set(configuredVariants.map((v) => v.sizeOrWeight).filter(Boolean))) as string[];
 
+    const variantsToSave: ProductVariant[] = configuredVariants.length > 0
+      ? configuredVariants.map((v) => ({
+          id: v.id,
+          productId: `prod-${Date.now()}`,
+          name: v.name,
+          sizeOrWeight: v.sizeOrWeight,
+          colorName: v.colorName,
+          colorHex: v.colorHex,
+          costPrice: v.costPrice,
+          price: Number(v.price),
+          stock: Number(v.stock),
+          sku: v.sku,
+        }))
+      : [
+          {
+            id: `var-${Date.now()}`,
+            productId: `prod-${Date.now()}`,
+            name: `${prodUnit || '1 Unit'} Standard`,
+            sizeOrWeight: prodUnit || '1 Unit',
+            costPrice: baseCostPrice,
+            price: basePrice,
+            stock: 50,
+            sku: prodSku,
+          },
+        ];
+
     const newProduct: Product = {
       id: `prod-${Date.now()}`,
       title: prodTitle,
       slug: slug || `product-${Date.now()}`,
-      description: prodDescription || `${prodTitle} distributed by ${prodVendor}. Authentic genuine stock ready for instant Pakundia local dispatch.`,
+      description: prodDescription || `${prodTitle} available at M/S Rong Bahar. Authentic genuine stock ready for instant Pakundia local dispatch.`,
       categoryId: matchedCategory.id,
       category: matchedCategory,
       basePrice,
@@ -696,33 +978,22 @@ export default function AdminControlPanel() {
       stock: totalStock,
       sku: prodSku,
       barcode: prodBarcode,
-      images: [selectedImageUrl || '/products/2412.jpg'],
+      images: productImages,
       unit: prodUnit,
       isActive: true,
       isNewArrival: prodIsNewArrival,
       isFeatured: prodIsFeatured,
-      vendor: prodVendor,
+      vendor: prodVendor || 'M/S Rong Bahar',
       badge: prodIsNewArrival ? 'New Arrival' : 'In Stock',
       warranty: prodWarranty,
       specifications: {
-        coverage: prodCoverage,
-        dryingTime: prodDryingTime,
+        coverage: prodCoverage || undefined,
+        dryingTime: prodDryingTime || undefined,
         origin: prodOrigin,
       },
       colors: colors.length > 0 ? colors : undefined,
       sizes: sizes.length > 0 ? sizes : undefined,
-      variants: configuredVariants.map((v) => ({
-        id: v.id,
-        productId: `prod-${Date.now()}`,
-        name: v.name,
-        sizeOrWeight: v.sizeOrWeight,
-        colorName: v.colorName,
-        colorHex: v.colorHex,
-        costPrice: v.costPrice,
-        price: Number(v.price),
-        stock: Number(v.stock),
-        sku: v.sku,
-      })),
+      variants: variantsToSave,
       createdAt: new Date().toISOString(),
     };
 
@@ -738,13 +1009,21 @@ export default function AdminControlPanel() {
       console.warn('Backend sync warning:', err);
     });
 
-    setAddSuccessMessage(`🎉 Product "${prodTitle}" is 100% successfully listed across your storefront, catalog, and admin inventory!`);
+    setAddSuccessMessage(`🎉 Product "${prodTitle}" was successfully added from your camera/gallery and is live on your storefront!`);
     setAddedProductSlug(newProduct.slug);
     setAddedProductTitle(newProduct.title);
 
-    // Reset form
+    // Reset form fields cleanly for the next physical store item
     setProdTitle('');
     setProdDescription('');
+    setUploadedImages([]);
+    setSelectedCoverIndex(0);
+    setConfiguredVariants([]);
+    setProdCostPrice(0);
+    setProdRetailPrice(0);
+    setProdDiscountPrice(undefined);
+    setProdSku(`RB-${productType.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`);
+    setProdBarcode(`8901234${Math.floor(10000 + Math.random() * 90000)}`);
 
     // Scroll to success notification
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1189,108 +1468,155 @@ export default function AdminControlPanel() {
               </div>
             </div>
 
-            {/* STEP 4: DUAL-MODE IMAGE PICKER */}
+            {/* STEP 4: CAMERA & GALLERY PHOTO UPLOADER */}
             <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
                 <div>
                   <label className="block text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-                    4. Product Photo Source (Drive Storage or Project Files)
+                    <Camera className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                    4. Product Photos (Live Camera Snap &amp; Gallery Upload Only)
                   </label>
                   <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                    Upload image from PC hard drive / mobile camera or pick from project repository
+                    Snap real photos of physical products in your shop or choose images from your gallery/storage
                   </span>
                 </div>
-
-                <div className="flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setImageSourceTab('drive')}
-                    className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
-                      imageSourceTab === 'drive'
-                        ? 'bg-amber-500 text-slate-950 shadow'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <HardDrive className="w-3.5 h-3.5" />
-                    <span>Browse Device Drive</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setImageSourceTab('project')}
-                    className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
-                      imageSourceTab === 'project'
-                        ? 'bg-amber-500 text-slate-950 shadow'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <FolderOpen className="w-3.5 h-3.5" />
-                    <span>Browse Project Files</span>
-                  </button>
-                </div>
+                {uploadedImages.length > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+                    {uploadedImages.length} {uploadedImages.length === 1 ? 'Photo' : 'Photos'} Attached
+                  </span>
+                )}
               </div>
 
-              {imageSourceTab === 'drive' && (
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="sm:col-span-8 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-amber-500 bg-white dark:bg-slate-900/60 rounded-2xl p-6 text-center cursor-pointer transition space-y-2 group"
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleDriveImageUpload}
-                      className="hidden"
-                    />
-                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 group-hover:bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center mx-auto transition">
-                      <Upload className="w-6 h-6" />
+              {/* Hidden file inputs for Camera and Gallery */}
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleCameraCapture}
+                className="hidden"
+              />
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleGalleryUpload}
+                className="hidden"
+              />
+
+              {/* Primary Action Buttons: Camera Snap & Gallery Choose */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/15 hover:from-amber-500/25 hover:to-amber-500/25 border-2 border-amber-500/50 hover:border-amber-500 text-amber-600 dark:text-amber-300 transition flex items-center justify-center gap-3 font-black text-xs shadow-sm cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center group-hover:scale-110 transition shadow">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-500">
+                      📸 Take Photo with Camera
                     </div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition">
-                      📁 Click to Browse from PC Hard Drive or Mobile Storage
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                      Launches mobile/tablet camera immediately
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Supports JPG, PNG, WEBP from Phone Gallery or Computer
-                    </p>
-                    {uploadedDriveFileName && (
-                      <span className="inline-block px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] font-bold">
-                        ✓ Loaded: {uploadedDriveFileName}
-                      </span>
-                    )}
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="p-5 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800/80 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-amber-500 text-slate-800 dark:text-slate-200 transition flex items-center justify-center gap-3 font-black text-xs shadow-sm cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-amber-500/20 text-slate-600 dark:text-slate-300 group-hover:text-amber-400 flex items-center justify-center group-hover:scale-110 transition">
+                    <ImageIcon className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-amber-500">
+                      🖼️ Choose from Gallery / Photos
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                      Pick photos from phone album or computer disk
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Image Preview & Gallery List */}
+              {uploadedImages.length > 0 ? (
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-slate-700 dark:text-slate-300">
+                      Product Photos ({uploadedImages.length}) — Click &quot;Set Cover&quot; for main display:
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[10px]">
+                      Cover photo appears first in storefront
+                    </span>
                   </div>
 
-                  <div className="sm:col-span-4 flex flex-col items-center justify-center p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Storefront Preview</span>
-                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                      <img src={selectedImageUrl} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Ready for Storefront</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {uploadedImages.map((img, idx) => {
+                      const isCover = idx === selectedCoverIndex;
+                      return (
+                        <div
+                          key={img.id}
+                          className={`relative rounded-xl border p-1.5 transition ${
+                            isCover
+                              ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500 shadow-md'
+                              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                          }`}
+                        >
+                          <div className="aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-950 relative">
+                            <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
+                            {isCover && (
+                              <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-black text-[8px] uppercase tracking-wider shadow">
+                                Cover
+                              </span>
+                            )}
+                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-slate-950/80 text-white font-mono text-[8px] flex items-center gap-0.5">
+                              {img.source === 'camera' ? '📸 Camera' : '🖼️ Gallery'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-1 mt-1.5 pt-1 border-t border-slate-200 dark:border-slate-800/80">
+                            {!isCover ? (
+                              <button
+                                type="button"
+                                onClick={() => handleSetCoverImage(idx)}
+                                className="text-[9px] font-bold text-amber-600 dark:text-amber-400 hover:underline"
+                              >
+                                Set Cover
+                              </button>
+                            ) : (
+                              <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">
+                                ✓ Primary
+                              </span>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveUploadedImage(idx)}
+                              className="p-1 text-rose-500 hover:bg-rose-500/10 rounded transition"
+                              title="Remove photo"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
-
-              {imageSourceTab === 'project' && (
-                <div className="space-y-3">
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold block">
-                    Select a project asset image from <code className="text-amber-500 font-mono">/public/products/</code>:
-                  </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-                    {projectAssetFiles.map((file, idx) => (
-                      <div
-                        key={idx}
-                        onClick={() => setSelectedImageUrl(file.path)}
-                        className={`p-2 rounded-xl border cursor-pointer transition text-center space-y-1.5 ${
-                          selectedImageUrl === file.path
-                            ? 'bg-amber-500/20 border-amber-500 shadow-md ring-1 ring-amber-500'
-                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                        }`}
-                      >
-                        <img src={file.path} alt="" className="w-full h-16 object-cover rounded-lg bg-slate-100 dark:bg-slate-950" />
-                        <div className="text-[10px] font-bold text-slate-900 dark:text-white truncate">{file.name}</div>
-                        <span className="text-[9px] text-slate-500 dark:text-slate-400 block truncate">{file.cat}</span>
-                      </div>
-                    ))}
+              ) : (
+                <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-1.5">
+                  <div className="text-slate-400 dark:text-slate-500 text-xs font-bold">
+                    No product photos attached yet
                   </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Snap a photo using your camera or select an image from your device gallery above.
+                  </p>
                 </div>
               )}
             </div>
@@ -1527,6 +1853,7 @@ export default function AdminControlPanel() {
       {/* ========================================================================= */}
       {activeTab === 'stock' && (
         <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6">
+          {/* Header & Main Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -1534,145 +1861,693 @@ export default function AdminControlPanel() {
                 Live Inventory &amp; Multi-Variant Manager
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Expand any paint, brush, or lock to edit individual variant prices, stock, or delete/add variants
+                Edit product names, pricing, photos, and multi-attribute variant matrix directly in real-time
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black rounded-lg">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-black rounded-xl">
                 {productsList.length} Total Products
               </span>
               <button
                 onClick={() => setActiveTab('add_product')}
-                className="px-3 py-1 bg-amber-500 text-slate-950 font-black text-xs rounded-lg hover:bg-amber-400 transition"
+                className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition flex items-center gap-1.5 shadow"
               >
-                + Add Product
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>+ Add Product</span>
               </button>
+              {productsList.length > 0 && (
+                <button
+                  onClick={handleResetAllProducts}
+                  className="px-3.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5"
+                  title="Wipe catalog to start completely blank"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Wipe All / Reset to 0</span>
+                </button>
+              )}
             </div>
           </div>
 
-          <div className="space-y-4">
-            {productsList.map((product) => {
-              const isExpanded = expandedInventoryProdId === product.id;
-              return (
-                <div
-                  key={product.id}
-                  className="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden transition shadow-xs"
+          {/* Quick Search & Category Filter Bar */}
+          {productsList.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 w-full sm:w-80 shadow-xs">
+                <Search className="w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={stockSearchQuery}
+                  onChange={(e) => setStockSearchQuery(e.target.value)}
+                  placeholder="Search product title, brand, SKU..."
+                  className="bg-transparent text-slate-900 dark:text-white text-xs focus:outline-none w-full"
+                />
+                {stockSearchQuery && (
+                  <button onClick={() => setStockSearchQuery('')} className="text-slate-400 hover:text-slate-600">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+                <select
+                  value={stockCategoryFilter}
+                  onChange={(e) => setStockCategoryFilter(e.target.value)}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white text-xs font-bold focus:outline-none w-full sm:w-auto"
                 >
-                  <div className="p-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={product.images[0] || '/products/2412.jpg'}
-                        alt=""
-                        className="w-12 h-12 rounded-xl object-cover bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-black text-slate-900 dark:text-white truncate">{product.title}</h3>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
-                          <span className="font-bold">{product.vendor || 'Berger'}</span> •{' '}
-                          <span className="text-amber-500 dark:text-amber-400 font-bold">{product.variants?.length || 1} Variants</span> •{' '}
-                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">{product.stock} total stock</span> •{' '}
-                          <span className="font-mono">SKU: {product.sku}</span>
-                        </div>
-                      </div>
-                    </div>
+                  <option value="ALL">All Categories ({productsList.length})</option>
+                  {initialFallbackCategories.map((c) => (
+                    <option key={c.id} value={c.slug}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/products/${product.slug}`}
-                        target="_blank"
-                        className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-amber-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-1"
-                        title="View Live PDP"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">PDP</span>
-                      </Link>
+          {productsList.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-300 dark:border-slate-800 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+                <Package className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Store Catalog is 100% Blank</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
+                  Ready for you to start cataloging real products from your camera or phone gallery.
+                </p>
+              </div>
+              <button
+                onClick={() => setActiveTab('add_product')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md"
+              >
+                <Camera className="w-4 h-4" /> Start Adding Products with Camera
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {productsList
+                .filter((p) => {
+                  const matchesCategory =
+                    stockCategoryFilter === 'ALL' ||
+                    p.category?.slug === stockCategoryFilter ||
+                    p.categoryId === stockCategoryFilter;
+                  const matchesSearch =
+                    !stockSearchQuery ||
+                    p.title.toLowerCase().includes(stockSearchQuery.toLowerCase()) ||
+                    p.vendor?.toLowerCase().includes(stockSearchQuery.toLowerCase()) ||
+                    p.sku.toLowerCase().includes(stockSearchQuery.toLowerCase());
+                  return matchesCategory && matchesSearch;
+                })
+                .map((product) => {
+                  const isExpanded = expandedInventoryProdId === product.id;
+                  const coverImage = product.images?.[0] || '';
+                  const totalVariantsCount = product.variants?.length || 0;
+                  return (
+                    <div
+                      key={product.id}
+                      className="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden transition shadow-xs"
+                    >
+                      {/* Product Header Row */}
+                      <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                          <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0 flex items-center justify-center relative group">
+                            {coverImage ? (
+                              <img src={coverImage} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <Package className="w-7 h-7 text-slate-400" />
+                            )}
+                            <button
+                              onClick={() => handleOpenEditModal(product)}
+                              className="absolute inset-0 bg-slate-950/70 text-amber-400 font-black text-[9px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                              title="Edit product photos"
+                            >
+                              <Camera className="w-4 h-4 mb-0.5" />
+                              <span>Photos</span>
+                            </button>
+                          </div>
 
-                      <button
-                        onClick={() => setExpandedInventoryProdId(isExpanded ? null : product.id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-                          isExpanded
-                            ? 'bg-amber-500 text-slate-950 font-black'
-                            : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
-                        }`}
-                      >
-                        <span>Manage Variants</span>
-                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800 space-y-3">
-                      <div className="flex items-center justify-between text-xs pb-1">
-                        <span className="font-bold text-amber-600 dark:text-amber-400">
-                          Edit Individual Variants &amp; Stock for &quot;{product.title}&quot;:
-                        </span>
-                        <button
-                          onClick={() => handleAddNewVariantToProduct(product.id)}
-                          className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1"
-                        >
-                          <PlusCircle className="w-3 h-3" /> + Add Variant
-                        </button>
-                      </div>
-
-                      <div className="space-y-2">
-                        {product.variants?.map((v) => (
-                          <div
-                            key={v.id}
-                            className="p-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                          >
-                            <div className="flex items-center gap-2.5">
-                              {v.colorHex && (
-                                <span
-                                  className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-white/20 shrink-0"
-                                  style={{ backgroundColor: v.colorHex }}
-                                />
-                              )}
+                          <div className="min-w-0 flex-1 space-y-1">
+                            {/* Inline Editable Product Title */}
+                            <div className="flex items-center gap-2">
                               <input
                                 type="text"
-                                value={v.name}
-                                onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'name', e.target.value)}
-                                className="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1 text-slate-900 dark:text-white text-xs font-bold w-48 sm:w-64"
+                                defaultValue={product.title}
+                                onBlur={(e) => {
+                                  if (e.target.value.trim() && e.target.value !== product.title) {
+                                    handleInlineUpdateProduct(product.id, 'title', e.target.value.trim());
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    (e.target as HTMLInputElement).blur();
+                                  }
+                                }}
+                                className="bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 focus:bg-white dark:focus:bg-slate-900 border border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-amber-500 rounded-lg px-2 py-0.5 text-sm sm:text-base font-black text-slate-900 dark:text-white focus:outline-none transition w-full"
+                                title="Click to edit product name inline"
                               />
                             </div>
 
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700">
-                                <span className="text-amber-500 font-bold">৳</span>
-                                <input
-                                  type="number"
-                                  value={v.price}
-                                  onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'price', Number(e.target.value))}
-                                  className="w-16 bg-transparent text-slate-900 dark:text-white font-bold font-mono focus:outline-none text-right"
-                                />
-                              </div>
-
-                              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700">
-                                <span className="text-slate-500 dark:text-slate-400 text-[10px]">Stock:</span>
-                                <input
-                                  type="number"
-                                  value={v.stock}
-                                  onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'stock', Number(e.target.value))}
-                                  className="w-12 bg-transparent text-emerald-600 dark:text-emerald-400 font-bold font-mono focus:outline-none text-right"
-                                />
-                              </div>
-
-                              <button
-                                onClick={() => handleDeleteProductVariant(product.id, v.id)}
-                                className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition"
-                                title="Delete variant"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2 pl-2">
+                              <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold">
+                                {product.vendor || 'M/S Rong Bahar'}
+                              </span>
+                              <span className="text-slate-400">•</span>
+                              <span className="font-bold text-slate-700 dark:text-slate-300">
+                                {totalVariantsCount} {totalVariantsCount === 1 ? 'Variant' : 'Variants'}
+                              </span>
+                              <span className="text-slate-400">•</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                                ৳{product.basePrice} base price
+                              </span>
+                              <span className="text-slate-400">•</span>
+                              <span className="font-mono text-[10px] text-slate-400">SKU: {product.sku}</span>
+                              {product.isNewArrival && (
+                                <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[9px]">
+                                  ★ New Arrival
+                                </span>
+                              )}
                             </div>
                           </div>
-                        ))}
+                        </div>
+
+                        {/* Action Buttons Toolbar */}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-900">
+                          {/* ✏️ Full Product Edit Studio Button */}
+                          <button
+                            onClick={() => handleOpenEditModal(product)}
+                            className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl transition flex items-center gap-1.5 shadow-sm"
+                            title="Edit full product details, photos, and variants matrix"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                            <span>Edit Product</span>
+                          </button>
+
+                          {/* 📦 Manage Variants In-Place Button */}
+                          <button
+                            onClick={() => setExpandedInventoryProdId(isExpanded ? null : product.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                              isExpanded
+                                ? 'bg-amber-500 text-slate-950 font-black shadow'
+                                : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                            }`}
+                            title="Toggle in-place variant editor"
+                          >
+                            <Sliders className="w-3.5 h-3.5" />
+                            <span>Variants ({totalVariantsCount})</span>
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
+
+                          {/* 👁️ View Live PDP Button */}
+                          <Link
+                            href={`/products/${product.slug}`}
+                            target="_blank"
+                            className="px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-amber-500 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-1"
+                            title="View Live Product Page"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>PDP</span>
+                          </Link>
+
+                          {/* 🗑️ Delete Entire Product Button */}
+                          <button
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="p-2 rounded-xl text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 transition"
+                            title="Delete entire product from store"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Expandable In-Place Variant Manager Drawer */}
+                      {isExpanded && (
+                        <div className="p-4 sm:p-5 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200 dark:border-slate-800">
+                            <div>
+                              <span className="font-bold text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                                <Sliders className="w-3.5 h-3.5" />
+                                In-Place Multi-Variant Matrix for &quot;{product.title}&quot;
+                              </span>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                Edit prices, stock counts, or remove variants on the fly. Changes save instantly.
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handleAddNewVariantToProduct(product.id)}
+                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1 self-start sm:self-auto shadow-xs"
+                            >
+                              <PlusCircle className="w-3.5 h-3.5" /> + Add Variant
+                            </button>
+                          </div>
+
+                          <div className="space-y-2.5">
+                            {product.variants?.map((v) => (
+                              <div
+                                key={v.id}
+                                className="p-3.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shadow-xs"
+                              >
+                                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                  {v.colorHex && (
+                                    <span
+                                      className="w-4 h-4 rounded-full border border-slate-300 dark:border-white/20 shrink-0 shadow-xs"
+                                      style={{ backgroundColor: v.colorHex }}
+                                      title={v.colorName}
+                                    />
+                                  )}
+                                  <div className="flex-1 space-y-1">
+                                    <input
+                                      type="text"
+                                      value={v.name}
+                                      onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'name', e.target.value)}
+                                      placeholder="Variant Name / Dimension"
+                                      className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-slate-900 dark:text-white text-xs font-bold w-full focus:outline-none focus:border-amber-500"
+                                    />
+                                    <div className="text-[10px] text-slate-400 font-mono flex items-center gap-2">
+                                      <span>Size: {v.sizeOrWeight}</span>
+                                      {v.colorName && <span>• Color: {v.colorName}</span>}
+                                      <span>• SKU: {v.sku}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                  {/* Selling Price */}
+                                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <span className="text-amber-500 font-bold">Price: ৳</span>
+                                    <input
+                                      type="number"
+                                      value={v.price}
+                                      onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'price', Number(e.target.value))}
+                                      className="w-16 bg-transparent text-slate-900 dark:text-white font-bold font-mono focus:outline-none text-right"
+                                      title="Retail Selling Price"
+                                    />
+                                  </div>
+
+                                  {/* Stock Count */}
+                                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <span className="text-slate-500 dark:text-slate-400 text-[10px]">Stock:</span>
+                                    <input
+                                      type="number"
+                                      value={v.stock}
+                                      onChange={(e) => handleUpdateProductVariant(product.id, v.id, 'stock', Number(e.target.value))}
+                                      className="w-12 bg-transparent text-emerald-600 dark:text-emerald-400 font-bold font-mono focus:outline-none text-right"
+                                      title="Inventory Stock Count"
+                                    />
+                                  </div>
+
+                                  {/* Delete Variant */}
+                                  <button
+                                    onClick={() => handleDeleteProductVariant(product.id, v.id)}
+                                    className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition"
+                                    title="Delete this variant"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* FULL PRODUCT EDIT STUDIO MODAL (CAMERA, GALLERY, SPECS, VARIANTS MATRIX)  */}
+      {/* ========================================================================= */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 my-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black">
+                  <Edit className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                    Edit Product &amp; Multi-Variant Matrix
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    ID: {editingProduct.id} • SKU: {editingProduct.sku}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseEditModal}
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditedProduct} className="space-y-6">
+              {/* SECTION 1: CORE PRODUCT DETAILS */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+                <span className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Package className="w-4 h-4" /> 1. Core Specifications
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="sm:col-span-2">
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      Product Name / Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="e.g. Berger Robbialac Synthetic Enamel High Gloss"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-slate-900 dark:text-white font-bold text-sm focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      Brand / Manufacturer *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editVendor}
+                      onChange={(e) => setEditVendor(e.target.value)}
+                      placeholder="e.g. Berger Paints BD, Aqua, HMBR, Fevicol"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      Category Taxonomy *
+                    </label>
+                    <select
+                      value={editCategoryId}
+                      onChange={(e) => setEditCategoryId(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500"
+                    >
+                      {initialFallbackCategories.map((c) => (
+                        <option key={c.id} value={c.slug}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      Measurement Unit *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editUnit}
+                      onChange={(e) => setEditUnit(e.target.value)}
+                      placeholder="e.g. Volume & Color, Width (mm), Weight (kg)"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-bold focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      SKU Code
+                    </label>
+                    <input
+                      type="text"
+                      value={editSku}
+                      onChange={(e) => setEditSku(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white font-mono font-bold focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-slate-800 dark:text-slate-200 font-bold mb-1">
+                      Product Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Describe genuine features, surface application, or durability..."
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 resize-none text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: PHOTOS (CAMERA SNAP & GALLERY PICKER) */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                  <span className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Camera className="w-4 h-4" /> 2. Product Photos ({editImages.length})
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    Cover photo appears first on the storefront
+                  </span>
+                </div>
+
+                {/* Hidden File Inputs */}
+                <input
+                  ref={editCameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleEditCameraCapture}
+                  className="hidden"
+                />
+                <input
+                  ref={editGalleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleEditGalleryUpload}
+                  className="hidden"
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => editCameraInputRef.current?.click()}
+                    className="p-3.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-600 dark:text-amber-300 font-black text-xs transition flex items-center justify-center gap-2"
+                  >
+                    <Camera className="w-4 h-4" /> Snap New Photo with Camera
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => editGalleryInputRef.current?.click()}
+                    className="p-3.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-black text-xs transition flex items-center justify-center gap-2"
+                  >
+                    <ImageIcon className="w-4 h-4" /> Add from Phone Gallery / Files
+                  </button>
+                </div>
+
+                {/* Image Thumbnails */}
+                {editImages.length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 pt-2">
+                    {editImages.map((imgUrl, idx) => (
+                      <div
+                        key={idx}
+                        className={`relative rounded-xl border p-1 transition ${
+                          idx === 0
+                            ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500'
+                            : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                        }`}
+                      >
+                        <div className="aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-950 relative">
+                          <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                          {idx === 0 && (
+                            <span className="absolute top-1 left-1 px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 font-black text-[8px] uppercase tracking-wider">
+                              Cover
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between gap-1 mt-1 pt-1 border-t border-slate-100 dark:border-slate-800 text-[9px]">
+                          {idx !== 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => handleEditSetCoverImage(idx)}
+                              className="font-bold text-amber-600 hover:underline"
+                            >
+                              Set Cover
+                            </button>
+                          ) : (
+                            <span className="text-emerald-600 font-bold">✓ Primary</span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleEditRemoveImage(idx)}
+                            className="p-1 text-rose-500 hover:bg-rose-500/10 rounded"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION 3: MULTI-ATTRIBUTE VARIANTS MATRIX */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                  <span className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Sliders className="w-4 h-4" /> 3. Multi-Attribute Variant Matrix ({editVariants.length})
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Each variant holds its own retail selling price, wholesale cost, and stock
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {editVariants.map((v) => (
+                    <div
+                      key={v.id}
+                      className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs"
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {v.colorHex && (
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-white/20 shrink-0"
+                            style={{ backgroundColor: v.colorHex }}
+                          />
+                        )}
+                        <input
+                          type="text"
+                          value={v.name}
+                          onChange={(e) => handleEditUpdateVariant(v.id, 'name', e.target.value)}
+                          placeholder="Variant Name"
+                          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-slate-900 dark:text-white font-bold w-full focus:outline-none focus:border-amber-500"
+                        />
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800">
+                          <span className="text-amber-500 font-bold">Price: ৳</span>
+                          <input
+                            type="number"
+                            value={v.price}
+                            onChange={(e) => handleEditUpdateVariant(v.id, 'price', Number(e.target.value))}
+                            className="w-16 bg-transparent text-slate-900 dark:text-white font-bold font-mono focus:outline-none text-right"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800">
+                          <span className="text-slate-400 text-[10px]">Stock:</span>
+                          <input
+                            type="number"
+                            value={v.stock}
+                            onChange={(e) => handleEditUpdateVariant(v.id, 'stock', Number(e.target.value))}
+                            className="w-12 bg-transparent text-emerald-600 dark:text-emerald-400 font-bold font-mono focus:outline-none text-right"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleEditDeleteVariant(v.id)}
+                          className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg transition"
+                          title="Delete variant"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
+
+                {/* Add Variant to Matrix in Edit Modal */}
+                <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                  <span className="text-[11px] text-slate-600 dark:text-slate-400 font-bold block">
+                    + Add New Variant to Matrix:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                    <input
+                      type="text"
+                      value={editNewVarSize}
+                      onChange={(e) => setEditNewVarSize(e.target.value)}
+                      placeholder="Size / Volume (e.g. 0.91L Tin)"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500 sm:col-span-2"
+                    />
+                    <input
+                      type="text"
+                      value={editNewVarColor}
+                      onChange={(e) => setEditNewVarColor(e.target.value)}
+                      placeholder="Color (e.g. CNG Green)"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500"
+                    />
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2 py-1.5">
+                      <span className="text-amber-500 text-xs font-bold">৳</span>
+                      <input
+                        type="number"
+                        value={editNewVarPrice || ''}
+                        onChange={(e) => setEditNewVarPrice(Number(e.target.value))}
+                        placeholder="Price"
+                        className="w-full bg-transparent text-slate-900 dark:text-white text-xs font-mono font-bold focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleEditAddVariant}
+                      className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg transition"
+                    >
+                      + Add Row
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: BADGES & STORE DISPLAY TOGGLES */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                  <div>
+                    <strong className="text-slate-900 dark:text-white text-xs block">✨ Feature in &quot;New Arrivals&quot;</strong>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Show badge on homepage</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={editIsNewArrival}
+                    onChange={(e) => setEditIsNewArrival(e.target.checked)}
+                    className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                  />
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                  <div>
+                    <strong className="text-slate-900 dark:text-white text-xs block">🔥 Feature in &quot;Hot Deals&quot;</strong>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Highlighted in catalog</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={editIsFeatured}
+                    onChange={(e) => setEditIsFeatured(e.target.checked)}
+                    className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* MODAL ACTION BUTTONS */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold text-xs transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 text-slate-950 font-black text-xs rounded-xl transition shadow-lg flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" /> Save Changes &amp; Update Store
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -1862,25 +2737,40 @@ export default function AdminControlPanel() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {productsList.filter((p) => p.isNewArrival).map((item) => (
-              <div key={item.id} className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-4">
-                <img
-                  src={item.images[0] || '/products/2412.jpg'}
-                  alt={item.title}
-                  className="w-16 h-16 rounded-xl object-cover bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0"
-                />
-                <div className="min-w-0 flex-1">
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[9px] uppercase">
-                    New Arrival
-                  </span>
-                  <h3 className="text-xs font-black text-slate-900 dark:text-white truncate mt-1">{item.title}</h3>
-                  <div className="text-xs font-black text-amber-600 dark:text-amber-400 font-mono">{formatCurrency(item.basePrice)}</div>
-                  <div className="text-[10px] text-slate-500 dark:text-slate-400">{item.stock} in stock</div>
+          {productsList.filter((p) => p.isNewArrival).length === 0 ? (
+            <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-950 border border-dashed border-slate-300 dark:border-slate-800 space-y-2">
+              <Flame className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="text-xs text-slate-500 font-medium">No products tagged as &quot;New Arrival&quot; yet.</p>
+              <button
+                onClick={() => setActiveTab('add_product')}
+                className="px-4 py-2 bg-amber-500 text-slate-950 font-black text-xs rounded-xl hover:bg-amber-400 transition"
+              >
+                + Add New Arrival with Camera
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {productsList.filter((p) => p.isNewArrival).map((item) => (
+                <div key={item.id} className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shrink-0 flex items-center justify-center">
+                    {item.images?.[0] ? (
+                      <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <Package className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[9px] uppercase">
+                      New Arrival
+                    </span>
+                    <h3 className="text-xs font-black text-slate-900 dark:text-white truncate mt-1">{item.title}</h3>
+                    <div className="text-xs font-black text-amber-600 dark:text-amber-400 font-mono">{formatCurrency(item.basePrice)}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400">{item.stock} in stock</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
