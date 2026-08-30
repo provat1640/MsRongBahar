@@ -56,6 +56,7 @@ import {
   Filter,
   ArrowUpRight,
   RotateCcw,
+  AlertCircle,
 } from 'lucide-react';
 
 interface OrderDetail {
@@ -71,6 +72,7 @@ interface OrderDetail {
   paymentMethod: string;
   paymentStatus: string;
   orderStatus: string;
+  cancelReason?: string;
   bkashTrxId?: string;
   notes?: string;
   createdAt: string;
@@ -885,17 +887,65 @@ export default function AdminControlPanel() {
     });
   };
 
-  const handleUpdateOrderStatus = (orderId: string, newStatus: string) => {
+  const handleUpdateOrderStatus = (orderId: string, newStatus: string, cancelReason?: string) => {
     setOrders((prev) => {
-      const updated = prev.map((o) => (o.id === orderId ? { ...o, orderStatus: newStatus } : o));
+      const updated = prev.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            orderStatus: newStatus,
+            cancelReason: newStatus === 'CANCELLED' ? (cancelReason || o.cancelReason || 'Product not in stock / not delivered') : undefined,
+          };
+        }
+        return o;
+      });
       try {
         localStorage.setItem('rong_bahar_all_orders', JSON.stringify(updated));
       } catch {}
       return updated;
     });
     if (selectedOrder && selectedOrder.id === orderId) {
-      setSelectedOrder({ ...selectedOrder, orderStatus: newStatus });
+      setSelectedOrder({
+        ...selectedOrder,
+        orderStatus: newStatus,
+        cancelReason: newStatus === 'CANCELLED' ? (cancelReason || selectedOrder.cancelReason || 'Product not in stock / not delivered') : undefined,
+      });
     }
+  };
+
+  const handleCancelOrderWithReason = (orderId: string, reason: string) => {
+    handleUpdateOrderStatus(orderId, 'CANCELLED', reason);
+    setSettingsSavedToast(`❌ Order marked as CANCELLED: ${reason}`);
+    setTimeout(() => setSettingsSavedToast(''), 3500);
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    if (!window.confirm('⚠️ Are you sure you want to permanently delete this order request? (Use this when the product is not in stock or cannot be delivered)')) return;
+    setOrders((prev) => {
+      const updated = prev.filter((o) => o.id !== orderId);
+      try {
+        localStorage.setItem('rong_bahar_all_orders', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder(null);
+    }
+    setSettingsSavedToast('🗑️ Order deleted from pipeline.');
+    setTimeout(() => setSettingsSavedToast(''), 3000);
+  };
+
+  const handleDeleteProductRequest = (requestId: string) => {
+    if (!window.confirm('Are you sure you want to delete / dismiss this customer request?')) return;
+    setProductRequests((prev) => {
+      const updated = prev.filter((r) => r.id !== requestId);
+      try {
+        localStorage.setItem('rong_bahar_customer_requests', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setSettingsSavedToast('🗑️ Customer product request dismissed.');
+    setTimeout(() => setSettingsSavedToast(''), 3000);
   };
 
   const handleConvertRequestToProduct = (req: ProductRequest) => {
@@ -2610,7 +2660,7 @@ export default function AdminControlPanel() {
                   <th className="pb-3 font-bold">Items Ordered</th>
                   <th className="pb-3 font-bold">Total Bill</th>
                   <th className="pb-3 font-bold">Status</th>
-                  <th className="pb-3 font-bold text-right">Action</th>
+                  <th className="pb-3 font-bold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
@@ -2624,25 +2674,48 @@ export default function AdminControlPanel() {
                     </td>
                     <td className="py-3.5 font-mono font-black text-slate-900 dark:text-white">{formatCurrency(o.totalAmount)}</td>
                     <td className="py-3.5">
-                      <select
-                        value={o.orderStatus}
-                        onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
-                        className="bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-2.5 py-1 text-xs text-amber-600 dark:text-amber-300 font-bold focus:outline-none focus:border-amber-500"
-                      >
-                        <option value="PENDING">PENDING</option>
-                        <option value="CONFIRMED">CONFIRMED</option>
-                        <option value="SHIPPED">SHIPPED</option>
-                        <option value="DELIVERED">DELIVERED</option>
-                        <option value="CANCELLED">CANCELLED</option>
-                      </select>
+                      <div className="space-y-1">
+                        <select
+                          value={o.orderStatus}
+                          onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
+                          className={`border rounded-xl px-2.5 py-1 text-xs font-bold focus:outline-none focus:border-amber-500 ${
+                            o.orderStatus === 'CANCELLED'
+                              ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+                              : o.orderStatus === 'DELIVERED'
+                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                              : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-800 text-amber-600 dark:text-amber-300'
+                          }`}
+                        >
+                          <option value="PENDING">PENDING</option>
+                          <option value="CONFIRMED">CONFIRMED</option>
+                          <option value="SHIPPED">SHIPPED</option>
+                          <option value="DELIVERED">DELIVERED</option>
+                          <option value="CANCELLED">CANCELLED</option>
+                        </select>
+                        {o.orderStatus === 'CANCELLED' && (
+                          <div className="text-[10px] text-rose-500 font-bold block max-w-[150px] truncate" title={o.cancelReason || 'Product not in stock / not delivered'}>
+                            ⚠ {o.cancelReason || 'Out of Stock / Cancelled'}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 text-right">
-                      <button
-                        onClick={() => setSelectedOrder(o)}
-                        className="px-3 py-1.5 bg-amber-500/15 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-xl font-bold text-xs inline-flex items-center gap-1.5 transition"
-                      >
-                        <Eye className="w-3.5 h-3.5" /> 100% Details
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setSelectedOrder(o)}
+                          className="px-2.5 py-1.5 bg-amber-500/15 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-xl font-bold text-xs inline-flex items-center gap-1 transition"
+                          title="View order details and invoices"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Details
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOrder(o.id)}
+                          className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-500/15 border border-rose-500/20 transition"
+                          title="Delete order request (when product not delivered or out of stock)"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -2662,7 +2735,7 @@ export default function AdminControlPanel() {
                 Customer Product Requests
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Requests submitted by customers from the storefront
+                Manage requests submitted by customers; add to catalog or dismiss out-of-stock items
               </p>
             </div>
             <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-bold rounded-lg">
@@ -2696,8 +2769,16 @@ export default function AdminControlPanel() {
                     <button
                       onClick={() => handleConvertRequestToProduct(req)}
                       className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow"
+                      title="Add this product to store catalog"
                     >
                       <PlusCircle className="w-3.5 h-3.5" /> + Add to Shop
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProductRequest(req.id)}
+                      className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/30 rounded-xl text-xs font-bold transition flex items-center gap-1"
+                      title="Delete / Dismiss request (e.g. not in stock or cannot procure)"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Dismiss
                     </button>
                   </div>
                 </div>
@@ -2965,6 +3046,21 @@ export default function AdminControlPanel() {
               </div>
             </div>
 
+            {/* Cancellation / Out of Stock Reason Notice */}
+            {selectedOrder.orderStatus === 'CANCELLED' && (
+              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs space-y-1">
+                <div className="font-black flex items-center gap-1.5 text-sm">
+                  <AlertCircle className="w-4 h-4" /> Order Request Cancelled / Not Delivered
+                </div>
+                <p className="text-[11px] text-rose-500/90">
+                  Reason: <strong className="text-rose-600 dark:text-rose-300">{selectedOrder.cancelReason || 'Product is not in physical stock or cannot be delivered.'}</strong>
+                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                  Customer will see this explanation when tracking order #{selectedOrder.orderNumber}.
+                </p>
+              </div>
+            )}
+
             {/* Total */}
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
               <div>
@@ -3000,7 +3096,8 @@ export default function AdminControlPanel() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+            {/* Modal Actions Footer */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-slate-500 font-bold">Status:</span>
                 <select
@@ -3016,13 +3113,47 @@ export default function AdminControlPanel() {
                 </select>
               </div>
 
-              <Link
-                href={`/track-order?query=${selectedOrder.orderNumber}`}
-                target="_blank"
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5"
-              >
-                <Printer className="w-3.5 h-3.5 text-amber-500" /> Print Invoice
-              </Link>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Out of stock & delivery cancellation shortcuts */}
+                {selectedOrder.orderStatus !== 'CANCELLED' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleCancelOrderWithReason(selectedOrder.id, 'Product not in stock in store')}
+                      className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition"
+                      title="Cancel order because product is out of stock"
+                    >
+                      🚫 Out of Stock
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleCancelOrderWithReason(selectedOrder.id, 'Product not delivered / unfulfillable')}
+                      className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition"
+                      title="Cancel order because product cannot be delivered"
+                    >
+                      🚚 Undeliverable
+                    </button>
+                  </>
+                )}
+
+                {/* Permanent Delete Order Request Button */}
+                <button
+                  type="button"
+                  onClick={() => handleDeleteOrder(selectedOrder.id)}
+                  className="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm"
+                  title="Permanently delete order request"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete Order
+                </button>
+
+                <Link
+                  href={`/track-order?query=${selectedOrder.orderNumber}`}
+                  target="_blank"
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5"
+                >
+                  <Printer className="w-3.5 h-3.5 text-amber-500" /> Print Invoice
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -158,7 +158,13 @@ function TrackOrderContent() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-black text-slate-300">Order Number:</span>
                     <span className="font-mono text-lg font-black text-amber-400">{order.orderNumber}</span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
+                        order.orderStatus === 'CANCELLED'
+                          ? 'bg-rose-500/15 border-rose-500/30 text-rose-400'
+                          : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                      }`}
+                    >
                       {order.orderStatus}
                     </span>
                   </div>
@@ -175,6 +181,24 @@ function TrackOrderContent() {
                   <Printer className="w-4 h-4 text-amber-400" /> Print Official Invoice
                 </button>
               </div>
+
+              {/* Cancellation Reason Notice / Placeholder */}
+              {order.orderStatus === 'CANCELLED' && (
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-1.5 print:hidden">
+                  <div className="font-black text-rose-400 flex items-center gap-2 text-sm">
+                    <AlertCircle className="w-4 h-4" /> Order Request Cancelled / Not Delivered
+                  </div>
+                  <p className="text-xs">
+                    {order.cancelReason || 'This order was cancelled because the product is currently out of physical stock or delivery cannot be fulfilled to your location.'}
+                  </p>
+                  <div className="text-[11px] text-slate-400 pt-1">
+                    For immediate assistance, refunds, or replacement products, please call store manager at{' '}
+                    <a href="tel:01722452836" className="text-amber-400 hover:underline font-bold font-mono">
+                      01722-452836
+                    </a>.
+                  </div>
+                </div>
+              )}
 
               {/* Real-Time Status Timeline */}
               <div className="print:hidden">
