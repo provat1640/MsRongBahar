@@ -2,6 +2,7 @@ import React from 'react';
 import { fetchProducts, fetchCategories } from '../../lib/api';
 import { ProductCard } from '../../components/ProductCard';
 import { CatalogGrid } from '../../components/CatalogGrid';
+import { sortCategoriesDFS } from '../../lib/graphEngine';
 import Link from 'next/link';
 import { Filter, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 
@@ -16,11 +17,13 @@ interface Props {
 
 export default async function ProductsCatalogPage({ searchParams }: Props) {
   const products = await fetchProducts(searchParams);
-  const categories = await fetchCategories();
+  const rawCategories = await fetchCategories();
+  const categories = sortCategoriesDFS(rawCategories);
 
   const selectedCategory = searchParams.category || '';
   const selectedUnit = searchParams.unit || '';
   const searchQuery = searchParams.search || '';
+  const initialSort = searchParams.sort || 'intelligent';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

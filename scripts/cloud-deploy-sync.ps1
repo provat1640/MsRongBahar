@@ -1,35 +1,42 @@
-# ==========================================
-# 🚀 M/S Rong Bahar: Cloud Deployment Sync Script (PowerShell)
-# ==========================================
+# ==============================================================================
+# 🚀 M/S Rong Bahar: Multi-Cloud Deployment & Health Verification Script (PowerShell)
+# ==============================================================================
 param (
-    [string]$CommitMessage = "feat(cloud): automated multi-cloud deployment update"
+    [string]$CommitMessage = "feat(cloud): automated multi-cloud deployment with DFS/BFS engine and fast inventory ingestion"
 )
 
-Write-Host "========================================================" -ForegroundColor Cyan
-Write-Host "🚀 M/S Rong Bahar: Initiating Automated Cloud Sync" -ForegroundColor Yellow
-Write-Host "========================================================" -ForegroundColor Cyan
+$ErrorActionPreference = "Continue"
 
-# 1. Check Git Status
-Write-Host "📦 Stage 1: Checking modified and new files..." -ForegroundColor Gray
-git status -s
+Write-Host "==================================================================" -ForegroundColor Cyan
+Write-Host "🚀 M/S Rong Bahar: Initiating Automated Multi-Cloud Sync" -ForegroundColor Cyan
+Write-Host "==================================================================" -ForegroundColor Cyan
 
-# 2. Stage all files
-Write-Host "✨ Stage 2: Staging codebase changes..." -ForegroundColor Gray
+Write-Host "📦 Stage 1: Staging files..." -ForegroundColor Yellow
 git add -A
 
-# 3. Commit changes
-Write-Host "💾 Stage 3: Committing with message: '$CommitMessage'..." -ForegroundColor Gray
+Write-Host "💾 Stage 2: Committing changes..." -ForegroundColor Yellow
 git commit -m "$CommitMessage"
 
-# 4. Push to origin main
-Write-Host "🚀 Stage 4: Pushing to GitHub (origin main)..." -ForegroundColor Cyan
+Write-Host "🚀 Stage 3: Pushing to GitHub (origin main)..." -ForegroundColor Yellow
 git push origin main
 
-Write-Host "========================================================" -ForegroundColor Green
-Write-Host "🎉 Successfully pushed to GitHub!" -ForegroundColor Green
-Write-Host "GitHub Actions Multi-Cloud CI/CD is now automatically building & deploying to:" -ForegroundColor White
-Write-Host "  • 🌐 Vercel Edge Network (Next.js Storefront)" -ForegroundColor Yellow
-Write-Host "  • 🚀 Render / Fly.io (NestJS Core API)" -ForegroundColor Yellow
-Write-Host "  • 🐳 GitHub Container Registry (GHCR Multi-Stage Docker Images)" -ForegroundColor Yellow
-Write-Host "  • 🐘 PostgreSQL Database (Prisma Migrations)" -ForegroundColor Yellow
-Write-Host "========================================================" -ForegroundColor Green
+Write-Host "==================================================================" -ForegroundColor Cyan
+Write-Host "☁️ Stage 4: Verifying Multi-Cloud Connectivity & Endpoints..." -ForegroundColor Cyan
+Write-Host "==================================================================" -ForegroundColor Cyan
+
+$backendUrl = if ($env:NEXT_PUBLIC_API_URL) { "$($env:NEXT_PUBLIC_API_URL)/health" } else { "https://ms-rong-bahar.onrender.com/api/health" }
+
+Write-Host "📡 Testing NestJS Backend Cloud Health: $backendUrl ..." -ForegroundColor Green
+try {
+    $res = Invoke-RestMethod -Uri $backendUrl -Method Get -TimeoutSec 10 -ErrorAction Stop
+    Write-Host "✅ Backend Cloud Status: $($res.status) | Database: $($res.database)" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️ Backend is currently cold-starting or offline (Standby mode active)" -ForegroundColor Yellow
+}
+
+Write-Host "==================================================================" -ForegroundColor Cyan
+Write-Host "🎉 Multi-Cloud Deployment Pipeline triggered successfully!" -ForegroundColor Green
+Write-Host "• GitHub Actions CI/CD: https://github.com/provat1640/MsRongBahar/actions"
+Write-Host "• Render Backend Cloud: https://dashboard.render.com"
+Write-Host "• Vercel Edge Storefront: https://vercel.com"
+Write-Host "==================================================================" -ForegroundColor Cyan

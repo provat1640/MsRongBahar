@@ -8,6 +8,7 @@ import { formatCurrency } from '../../../lib/utils';
 import { ProductCard } from '../../../components/ProductCard';
 import { AutoHealImage } from '../../../components/AutoHealImage';
 import { RawMaterialPhysicsModal } from '../../../components/RawMaterialPhysicsModal';
+import { discoverCompanionProductsBFS } from '../../../lib/graphEngine';
 import {
   ShoppingCart,
   Truck,
@@ -22,6 +23,7 @@ import {
   Layers,
   Atom,
   Calculator,
+  Network,
 } from 'lucide-react';
 
 interface Props {
@@ -34,6 +36,7 @@ export function ProductDetailClient({ initialProduct, product: propProduct, slug
   const { addItem } = useCart();
 
   const [currentProduct, setCurrentProduct] = useState<Product | null>(propProduct || initialProduct || null);
+  const [allStoreProducts, setAllStoreProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(!propProduct && !initialProduct);
   const [isPhysicsOpen, setIsPhysicsOpen] = useState(false);
 
@@ -602,17 +605,35 @@ export function ProductDetailClient({ initialProduct, product: propProduct, slug
           </div>
         </div>
 
-        {/* Related Products */}
-        {product.related && product.related.length > 0 && (
-          <div className="space-y-6 pb-20 sm:pb-0">
-            <h2 className="text-xl font-black text-white">Recommended Hardware &amp; Paints</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {product.related.map((rel) => (
-                <ProductCard key={rel.id} product={rel} />
-              ))}
+        {/* BFS Graph Companion Hardware & Related Products */}
+        {(() => {
+          const companionItems = product
+            ? product.related && product.related.length > 0
+              ? product.related
+              : discoverCompanionProductsBFS(product, allStoreProducts, 4)
+            : [];
+
+          if (companionItems.length === 0) return null;
+
+          return (
+            <div className="space-y-6 pb-20 sm:pb-0">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <Network className="w-5 h-5 text-amber-500" />
+                  <span>Compatible Hardware &amp; Companions</span>
+                </h2>
+                <span className="text-xs text-amber-400 font-bold hidden sm:inline">
+                  BFS 2-Hop Graph Exploration
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {companionItems.map((rel) => (
+                  <ProductCard key={rel.id} product={rel} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Raw Material Physics Spec Modal */}
