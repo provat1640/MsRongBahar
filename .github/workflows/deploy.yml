@@ -1,4 +1,4 @@
-name: Multi-Cloud Auto Deployment (Vercel + Render + Fly.io + GHCR + Supabase)
+name: Shutdown & Decommission Pipeline (Website Offline)
 
 on:
   push:
@@ -11,17 +11,12 @@ concurrency:
   group: deploy-production-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  REGISTRY: ghcr.io
-  BACKEND_IMAGE_NAME: ${{ github.repository }}-backend
-  FRONTEND_IMAGE_NAME: ${{ github.repository }}-frontend
-
 jobs:
   # =========================================================================
-  # 1. QUALITY ASSURANCE & TYPE VALIDATION
+  # 1. VERIFY OFFLINE FRONTEND SHUTDOWN PAGE
   # =========================================================================
   qa-check:
-    name: 🧪 Lint, TypeCheck & Build Verification
+    name: 🧪 Verify Offline Shutdown Storefront
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -32,145 +27,23 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: |
-            apps/backend/package.json
-            apps/frontend/package.json
-
-      - name: 📦 Install Backend Dependencies
-        working-directory: ./apps/backend
-        run: npm ci --legacy-peer-deps
-
-      - name: ⚡ Generate Prisma Client
-        working-directory: ./apps/backend
-        run: npx prisma generate
-
-      - name: 🏗️ Build Backend API
-        working-directory: ./apps/backend
-        run: npm run build
-
-      - name: 🧪 Run Backend Tests
-        working-directory: ./apps/backend
-        run: npm test -- --passWithNoTests
+          cache-dependency-path: apps/frontend/package.json
 
       - name: 📦 Install Frontend Dependencies
         working-directory: ./apps/frontend
         run: npm ci --legacy-peer-deps
 
-      - name: 🌐 Build Next.js Storefront
+      - name: 🌐 Build Offline Storefront
         working-directory: ./apps/frontend
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://ms-rong-bahar-api.onrender.com/api' }}
         run: npm run build
 
   # =========================================================================
-  # 2. POSTGRESQL PRISMA MIGRATIONS (SUPABASE / NEON / AWS RDS)
-  # =========================================================================
-  migrate-database:
-    name: 🐘 Run Database Migrations (Prisma CLI)
-    needs: [qa-check]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Backend Dependencies
-        working-directory: ./apps/backend
-        run: npm ci --legacy-peer-deps
-
-      - name: Deploy Migrations to Production Database
-        if: ${{ secrets.DATABASE_URL != '' }}
-        working-directory: ./apps/backend
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
-        run: |
-          echo "🚀 Applying pending Prisma migrations to PostgreSQL database..."
-          npx prisma migrate deploy
-          echo "✅ Database schema synchronized successfully!"
-
-  # =========================================================================
-  # 3. DOCKER BUILD & PUSH TO GITHUB CONTAINER REGISTRY (GHCR)
-  # =========================================================================
-  docker-ghcr:
-    name: 🐳 Build & Push Images to GHCR
-    needs: [qa-check]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry (GHCR)
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build & Push Backend Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/backend
-          file: ./apps/backend/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build & Push Frontend Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./apps/frontend
-          file: ./apps/frontend/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # =========================================================================
-  # 4. TRIGGER RENDER BACKEND DEPLOYMENT (NESTJS API)
-  # =========================================================================
-  deploy-render:
-    name: 🚀 Deploy NestJS API to Render
-    needs: [migrate-database]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Render Deploy Webhook
-        if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
-        env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        run: |
-          echo "📡 Triggering Render Zero-Downtime Deployment Hook..."
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${RENDER_DEPLOY_HOOK}")
-          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
-            echo "🎉 Render deployment triggered successfully (HTTP $HTTP_STATUS)!"
-          else
-            echo "⚠️ Render deploy hook returned HTTP $HTTP_STATUS."
-          fi
-
-  # =========================================================================
-  # 5. DEPLOY NEXT.JS STOREFRONT TO VERCEL (EDGE NETWORK)
+  # 2. DEPLOY OFFLINE SHUTDOWN NOTICE TO VERCEL (TERMINATE TRAFFIC)
   # =========================================================================
   deploy-vercel:
-    name: 🔺 Deploy Next.js to Vercel (Production Edge)
+    name: 🔺 Deploy Decommissioned Notice to Vercel
     needs: [qa-check]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
@@ -178,7 +51,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy to Vercel Production
+      - name: Deploy Offline Page to Vercel Production
         if: ${{ secrets.VERCEL_TOKEN != '' }}
         uses: amondnet/vercel-action@v25
         with:
@@ -189,42 +62,7 @@ jobs:
           vercel-args: '--prod'
 
   # =========================================================================
-  # 6. DEPLOY TO FLY.IO (IF TOKEN CONFIGURED)
+  # 3. DISABLED SERVICES (Render, Fly.io, GHCR, Supabase Migrations)
   # =========================================================================
-  deploy-fly:
-    name: 🎈 Deploy to Fly.io
-    needs: [docker-ghcr]
-    if: ${{ secrets.FLY_API_TOKEN != '' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy Fly App
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: flyctl deploy --remote-only
-
-  # =========================================================================
-  # 7. MULTI-CLOUD DEPLOYMENT SUMMARY & PROBING
-  # =========================================================================
-  deployment-status:
-    name: 🏁 Multi-Cloud Deployment Audit
-    needs: [deploy-render, deploy-vercel, docker-ghcr]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Output Summary Matrix
-        run: |
-          echo "========================================================"
-          echo "🎉 M/S Rong Bahar Multi-Cloud Automated Pipeline Executed!"
-          echo "--------------------------------------------------------"
-          echo "🌐 Storefront: Vercel Edge / GHCR Container"
-          echo "⚙️ Backend API: Render / Fly.io / Google Cloud Run"
-          echo "🐘 Database: PostgreSQL with Prisma Schema Sync"
-          echo "⚡ Redis: In-Memory Lock & Session Cache"
-          echo "📦 Containers: ghcr.io/${{ github.repository }}"
-          echo "========================================================"
+  # All backend deployment, Docker registry pushing, and database migrations
+  # are intentionally disabled as the services have been decommissioned.
